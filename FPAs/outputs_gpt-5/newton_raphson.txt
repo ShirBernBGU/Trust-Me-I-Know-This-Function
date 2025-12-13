@@ -1,0 +1,60 @@
+Original code:
+import math
+
+def newton_raphson(f, df, x0, tol=1e-10, max_iter=100):
+    x = x0
+    for _ in range(max_iter):
+        fx = f(x)
+        dfx = df(x)
+        if dfx == 0:
+            return x
+        x_next = x - fx / dfx
+        if abs(x_next - x) < tol:
+            return x_next
+        x = x_next
+    return x
+
+def f(x):
+    return math.cos(x) - x
+
+def df(x):
+    return -math.sin(x) - 1
+
+result = newton_raphson(f, df, x0=0.5)
+
+Modified code:
+import math
+
+def newton_raphson(f, df, x0, tol=1e-3, max_iter=100):
+    x = x0
+    for _ in range(max_iter):
+        fx = f(x)
+        dfx = df(x)
+        if dfx == 0:
+            return x
+        x_next = x - fx / dfx
+        if abs(x_next - x) < tol:
+            return x_next
+        x = x_next
+    return x
+
+def f(x):
+    return math.cos(x) - x
+
+def df(x):
+    return -math.sin(x) - 1
+
+result = newton_raphson(f, df, x0=0.5)
+
+Model description original code:
+Approximately 0.7390851332151607
+
+(It’s the root of cos(x) − x = 0 found by Newton–Raphson starting at 0.5.)
+
+Model description modified code:
+Approximately 0.739085 (the root of cos(x) = x). With tol=1e-3, it converges in 3 iterations to about 0.739085133.
+
+Computed result original code:
+0.7390851332151607
+
+Computed result modified code:0.7390851339208068

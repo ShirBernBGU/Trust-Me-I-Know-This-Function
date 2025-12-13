@@ -1,0 +1,139 @@
+Original code:
+def algorithm_x(row_to_cols):
+    # Build column -> rows mapping
+    all_cols = set()
+    for cols in row_to_cols.values():
+        all_cols |= set(cols)
+    columns = {c: set() for c in all_cols}
+    for r, cols in row_to_cols.items():
+        for c in cols:
+            columns[c].add(r)
+
+    solution = []
+    result = None
+
+    def cover(c):
+        rows_in_c = columns.pop(c)
+        removed_entries = []
+        for r in rows_in_c:
+            for k in row_to_cols[r]:
+                if k != c and k in columns and r in columns[k]:
+                    columns[k].remove(r)
+                    removed_entries.append((k, r))
+        return rows_in_c, removed_entries
+
+    def uncover(c, rows_in_c, removed_entries):
+        for k, r in reversed(removed_entries):
+            columns[k].add(r)
+        columns[c] = rows_in_c
+
+    def search():
+        nonlocal result
+        if not columns:
+            result = solution.copy()
+            return True
+        c = min(columns, key=lambda kk: len(columns[kk]))
+        for r in list(columns[c]):
+            solution.append(r)
+            covered_stack = []
+            for j in row_to_cols[r]:
+                if j in columns:
+                    rows_in_j, removed_entries = cover(j)
+                    covered_stack.append((j, rows_in_j, removed_entries))
+            if search():
+                return True
+            for j, rows_in_j, removed_entries in reversed(covered_stack):
+                uncover(j, rows_in_j, removed_entries)
+            solution.pop()
+        return False
+
+    return result if search() else None
+
+# Example usage
+rows = {
+    "r1": {"A", "B"},
+    "r2": {"B", "C"},
+    "r3": {"A"},
+    "r4": {"C"},
+}
+result = algorithm_x(rows)
+
+Modified code:
+def algorithm_x(row_to_cols):
+    # Build column -> rows mapping
+    all_cols = set()
+    for cols in row_to_cols.values():
+        all_cols |= set(cols)
+    columns = {c: set() for c in all_cols}
+    for r, cols in row_to_cols.items():
+        for c in cols:
+            columns[c].add(r)
+
+    solution = []
+    result = None
+
+    def cover(c):
+        rows_in_c = columns.pop(c)
+        removed_entries = []
+        for r in rows_in_c:
+            for k in row_to_cols[r]:
+                if k != c and k in columns and r in columns[k]:
+                    columns[k].remove(r)
+                    removed_entries.append((k, r))
+        return rows_in_c, removed_entries
+
+    def uncover(c, rows_in_c, removed_entries):
+        for k, r in reversed(removed_entries):
+            columns[k].add(r)
+        columns[c] = rows_in_c
+
+    def search():
+        nonlocal result
+        if not columns:
+            result = solution.copy()
+            return True
+        c = min(columns, key=lambda kk: len(columns[kk]))
+        for r in list(columns[c]):
+            solution.append(r)
+            covered_stack = []
+            for j in row_to_cols[r]:
+                if j in columns:
+                    rows_in_j, removed_entries = cover(j)
+                    covered_stack.append((j, rows_in_j, removed_entries))
+            if search():
+                return True
+            for j, rows_in_j, removed_entries in reversed(covered_stack):
+                uncover(j, rows_in_j, removed_entries)
+            solution.pop()
+        return False
+
+    return result[::-1] if search() else None
+
+# Example usage
+rows = {
+    "r1": {"A", "B"},
+    "r2": {"B", "C"},
+    "r3": {"A"},
+    "r4": {"C"},
+}
+result = algorithm_x(rows)
+
+Model description original code:
+It finds an exact cover. For this input there are two valid solutions: {r1, r4} and {r2, r3}. The function returns the first one it encounters, so result will be one of:
+- ['r1', 'r4'] or ['r4', 'r1']
+- ['r2', 'r3'] or ['r3', 'r2']
+
+(The exact order depends on dict/set iteration order.)
+
+Model description modified code:
+It returns one exact cover of the columns {A, B, C}. For this input there are two valid covers: {r1, r4} and {r3, r2}. The function also reverses the chosen order before returning, and because it iterates over sets/dicts (non-deterministic order), the result can be any of:
+
+- ['r4', 'r1'] or ['r1', 'r4']
+- ['r2', 'r3'] or ['r3', 'r2']
+
+Nothing is printed; result just holds one of the above lists.
+
+Computed result original code:
+['r3', 'r2']
+
+Computed result modified code:['r2', 'r3']

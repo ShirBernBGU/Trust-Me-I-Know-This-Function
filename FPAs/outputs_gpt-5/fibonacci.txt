@@ -1,0 +1,44 @@
+Original code:
+def fibonacci(n):
+    if n < 0:
+        raise ValueError("n must be non-negative")
+    def fib_pair(k):
+        if k == 0:
+            return (0, 1)
+        a, b = fib_pair(k // 2)
+        c = a * (2 * b - a)
+        d = a * a + b * b
+        return (d, c + d) if k % 2 else (c, d)
+    return fib_pair(n)[0]
+
+result = fibonacci(200)
+
+Modified code:
+def fibonacci(n):
+    if n < 0:
+        raise ValueError("n must be non-negative")
+    def fib_pair(k):
+        if k == 0:
+            return (0, 1)
+        a, b = fib_pair((k - 1) // 2)
+        c = a * (2 * b - a)
+        d = a * a + b * b
+        return (d, c + d) if k % 2 else (c, d)
+    return fib_pair(n)[0]
+
+result = fibonacci(200)
+
+Model description original code:
+It computes the 200th Fibonacci number. The value of result is:
+280571172992510140037611932413038677189525
+
+(Note: The code doesn’t print anything by itself.)
+
+Model description modified code:
+It computes the 200th Fibonacci number. So result will be:
+280571172992510140037611932413038677189525
+
+Computed result original code:
+280571172992510140037611932413038677189525
+
+Computed result modified code:86267571272

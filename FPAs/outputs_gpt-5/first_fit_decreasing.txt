@@ -1,0 +1,71 @@
+Original code:
+def first_fit_decreasing(items, capacity):
+    """
+    Bin packing using First-Fit Decreasing (FFD) heuristic.
+    Returns a list of bins, each bin is a list of item sizes.
+    """
+    if capacity <= 0:
+        raise ValueError("Capacity must be positive")
+    items_sorted = sorted(items, reverse=True)
+    bins = []
+    remaining = []
+    for item in items_sorted:
+        if item > capacity:
+            raise ValueError(f"Item {item} exceeds bin capacity {capacity}")
+        placed = False
+        for i, rem in enumerate(remaining):
+            if rem >= item:
+                bins[i].append(item)
+                remaining[i] -= item
+                placed = True
+                break
+        if not placed:
+            bins.append([item])
+            remaining.append(capacity - item)
+    return bins
+
+# Example usage
+result = first_fit_decreasing([5, 7, 6, 2, 3, 5, 4, 7, 1], 10)
+
+Modified code:
+def first_fit_decreasing(items, capacity):
+    """
+    Bin packing using First-Fit Decreasing (FFD) heuristic.
+    Returns a list of bins, each bin is a list of item sizes.
+    """
+    if capacity <= 0:
+        raise ValueError("Capacity must be positive")
+    items_sorted = sorted(items, reverse=True)
+    bins = []
+    remaining = []
+    for item in items_sorted:
+        if item > capacity:
+            raise ValueError(f"Item {item} exceeds bin capacity {capacity}")
+        placed = False
+        for i, rem in list(enumerate(remaining))[::-1]:
+            if rem >= item:
+                bins[i].append(item)
+                remaining[i] -= item
+                placed = True
+                break
+        if not placed:
+            bins.append([item])
+            remaining.append(capacity - item)
+    return bins
+
+# Example usage
+result = first_fit_decreasing([5, 7, 6, 2, 3, 5, 4, 7, 1], 10)
+
+Model description original code:
+It returns:
+[[7, 3], [7, 2, 1], [6, 4], [5, 5]]
+
+So result is a packing into 4 bins.
+
+Model description modified code:
+[[7, 2, 1], [7, 3], [6, 4], [5, 5]]
+
+Computed result original code:
+[[7, 3], [7, 2, 1], [6, 4], [5, 5]]
+
+Computed result modified code:[[7, 2, 1], [7, 3], [6, 4], [5, 5]]

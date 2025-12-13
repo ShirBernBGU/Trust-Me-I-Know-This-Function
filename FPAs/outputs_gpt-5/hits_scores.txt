@@ -1,0 +1,147 @@
+Original code:
+def hits_scores(graph, max_iter=100, tol=1e-9):
+    nodes = set()
+    for u, vs in graph.items():
+        nodes.add(u)
+        for v in vs:
+            nodes.add(v)
+    nodes = list(nodes)
+
+    out_links = {u: list(graph.get(u, [])) for u in nodes}
+    in_links = {u: [] for u in nodes}
+    for u, vs in out_links.items():
+        for v in vs:
+            in_links[v].append(u)
+
+    auth = {u: 1.0 for u in nodes}
+    hub = {u: 1.0 for u in nodes}
+
+    for _ in range(max_iter):
+        new_auth = {u: 0.0 for u in nodes}
+        for u in nodes:
+            s = 0.0
+            for v in in_links[u]:
+                s += hub[v]
+            new_auth[u] = s
+
+        normA = sum(v * v for v in new_auth.values()) ** 0.5
+        if normA != 0.0:
+            invA = 1.0 / normA
+            for u in new_auth:
+                new_auth[u] *= invA
+
+        new_hub = {u: 0.0 for u in nodes}
+        for u in nodes:
+            s = 0.0
+            for v in out_links[u]:
+                s += new_auth[v]
+            new_hub[u] = s
+
+        normH = sum(v * v for v in new_hub.values()) ** 0.5
+        if normH != 0.0:
+            invH = 1.0 / normH
+            for u in new_hub:
+                new_hub[u] *= invH
+
+        delta_a = max((abs(new_auth[u] - auth[u]) for u in nodes), default=0.0)
+        delta_h = max((abs(new_hub[u] - hub[u]) for u in nodes), default=0.0)
+
+        auth, hub = new_auth, new_hub
+        if max(delta_a, delta_h) < tol:
+            break
+
+    return auth, hub
+
+graph = {
+    'A': ['B', 'C'],
+    'B': ['C'],
+    'C': ['A'],
+    'D': []
+}
+result = hits_scores(graph, max_iter=100, tol=1e-8)
+
+Modified code:
+def hits_scores(graph, max_iter=100, tol=1e-9):
+    nodes = set()
+    for u, vs in graph.items():
+        nodes.add(u)
+        for v in vs:
+            nodes.add(v)
+    nodes = list(nodes)
+
+    out_links = {u: (list(graph.get(u, [])) or [u]) for u in nodes}
+    in_links = {u: [] for u in nodes}
+    for u, vs in out_links.items():
+        for v in vs:
+            in_links[v].append(u)
+
+    auth = {u: 1.0 for u in nodes}
+    hub = {u: 1.0 for u in nodes}
+
+    for _ in range(max_iter):
+        new_auth = {u: 0.0 for u in nodes}
+        for u in nodes:
+            s = 0.0
+            for v in in_links[u]:
+                s += hub[v]
+            new_auth[u] = s
+
+        normA = sum(v * v for v in new_auth.values()) ** 0.5
+        if normA != 0.0:
+            invA = 1.0 / normA
+            for u in new_auth:
+                new_auth[u] *= invA
+
+        new_hub = {u: 0.0 for u in nodes}
+        for u in nodes:
+            s = 0.0
+            for v in out_links[u]:
+                s += new_auth[v]
+            new_hub[u] = s
+
+        normH = sum(v * v for v in new_hub.values()) ** 0.5
+        if normH != 0.0:
+            invH = 1.0 / normH
+            for u in new_hub:
+                new_hub[u] *= invH
+
+        delta_a = max((abs(new_auth[u] - auth[u]) for u in nodes), default=0.0)
+        delta_h = max((abs(new_hub[u] - hub[u]) for u in nodes), default=0.0)
+
+        auth, hub = new_auth, new_hub
+        if max(delta_a, delta_h) < tol:
+            break
+
+    return auth, hub
+
+graph = {
+    'A': ['B', 'C'],
+    'B': ['C'],
+    'C': ['A'],
+    'D': []
+}
+result = hits_scores(graph, max_iter=100, tol=1e-8)
+
+Model description original code:
+It returns a pair (auth, hub) of dictionaries with the HITS authority and hub scores. For this graph they converge (to within tol) to approximately:
+
+auth ≈ {'A': 0.0, 'B': 0.5257311121, 'C': 0.8506508084, 'D': 0.0}
+hub  ≈ {'A': 0.8506508084, 'B': 0.5257311121, 'C': 0.0, 'D': 0.0}
+
+(‘A’ has essentially zero authority, ‘C’ has essentially zero hub; ‘D’ is zero for both.)
+
+Model description modified code:
+Approximately:
+(
+  {'A': 0.0, 'B': 0.5257311121, 'C': 0.8506508084, 'D': 0.0},
+  {'A': 0.8506508084, 'B': 0.5257311121, 'C': 0.0, 'D': 0.0}
+)
+
+Notes:
+- Values are L2-normalized. 
+- Due to iteration tolerance, the zeros will be very close to 0 (not exactly 0).
+
+Computed result original code:
+({'D': 0.0, 'A': 5.1373963279330726e-09, 'B': 0.5257311121191336, 'C': 0.8506508083520399}, {'D': 0.0, 'A': 0.8506508083520399, 'B': 0.5257311121191336, 'C': 3.1750855443415398e-09})
+
+Computed result modified code:({'D': 5.137396327933071e-09, 'A': 5.137396327933071e-09, 'B': 0.5257311121191336, 'C': 0.8506508083520399}, {'D': 3.175085544341539e-09, 'A': 0.8506508083520399, 'B': 0.5257311121191336, 'C': 3.175085544341539e-09})

@@ -1,0 +1,46 @@
+Original code:
+from collections import Counter
+import math
+
+def shannon_entropy(data):
+    if data is None:
+        return 0.0
+    iterable = data if isinstance(data, (str, bytes, bytearray)) else list(data)
+    n = len(iterable)
+    if n == 0:
+        return 0.0
+    counts = Counter(iterable)
+    return -sum((c / n) * math.log2(c / n) for c in counts.values())
+
+result = shannon_entropy("hello world")
+
+Modified code:
+from collections import Counter
+import math
+
+def shannon_entropy(data):
+    if data is None:
+        return 0.0
+    iterable = data if isinstance(data, (str, bytes, bytearray)) else list(data)
+    n = len(iterable)
+    if n == 0:
+        return 0.0
+    counts = Counter(iterable)
+    return -sum((c / n) * math.log(c / n) for c in counts.values())
+
+result = shannon_entropy("hello world")
+
+Model description original code:
+result will be approximately 2.845350936622436
+
+Explanation (brief): It computes the Shannon entropy (in bits) of the characters in "hello world" where counts are l:3, o:2, and h,e, ,w,r,d:1 each.
+
+Model description modified code:
+About 1.9722469794234418
+
+Explanation: It computes the Shannon entropy (using natural log, i.e., nats) of the string "hello world". The value assigned to result is approximately 1.9722469794234418.
+
+Computed result original code:
+2.8453509366224368
+
+Computed result modified code:1.9722469794234416

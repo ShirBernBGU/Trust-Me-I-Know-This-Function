@@ -1,0 +1,40 @@
+Original code:
+def find_missing_number(nums):
+    """
+    Given an array nums containing n distinct numbers taken from the range [0, n],
+    return the one number from the range that is missing from the array.
+    Uses XOR method with O(n) time and O(1) extra space.
+    """
+    missing = len(nums)
+    for i, num in enumerate(nums):
+        missing ^= i ^ num
+    return missing
+
+# Example usage:
+result = find_missing_number([9, 6, 4, 2, 3, 5, 7, 0, 1])  # Expected: 8
+
+Modified code:
+def find_missing_number(nums):
+    """
+    Given an array nums containing n distinct numbers taken from the range [0, n],
+    return the one number from the range that is missing from the array.
+    Uses XOR method with O(n) time and O(1) extra space.
+    """
+    missing = len(nums)
+    for i, num in enumerate(nums, 1):
+        missing ^= i ^ num
+    return missing
+
+# Example usage:
+result = find_missing_number([9, 6, 4, 2, 3, 5, 7, 0, 1])  # Expected: 8
+
+Model description original code:
+It returns 8 for that input. As written, nothing is printed; the variable result will be 8.
+
+Model description modified code:
+It returns 8. The list contains all numbers from 0 to 9 except 8, so result will be 8. (No output is printed unless you add a print statement.)
+
+Computed result original code:
+8
+
+Computed result modified code:1

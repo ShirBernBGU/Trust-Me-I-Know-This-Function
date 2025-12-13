@@ -1,0 +1,96 @@
+Original code:
+def number_to_words(n: int) -> str:
+    units = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+    teens = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"]
+    tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
+    scales = ["", "thousand", "million", "billion", "trillion", "quadrillion", "quintillion", "sextillion", "septillion", "octillion", "nonillion", "decillion"]
+
+    def three_to_words(num: int) -> str:
+        parts = []
+        if num >= 100:
+            parts.append(units[num // 100] + " hundred")
+            num %= 100
+        if num >= 20:
+            t = num // 10
+            u = num % 10
+            parts.append(tens[t] + ("-" + units[u] if u else ""))
+        elif num >= 10:
+            parts.append(teens[num - 10])
+        elif num > 0:
+            parts.append(units[num])
+        return " ".join(filter(None, parts))
+
+    if n == 0:
+        return "zero"
+    if n < 0:
+        return "minus " + number_to_words(-n)
+
+    words = []
+    idx = 0
+    while n > 0:
+        chunk = n % 1000
+        if chunk:
+            chunk_words = three_to_words(chunk)
+            scale = scales[idx] if idx < len(scales) else ""
+            words.append((chunk_words + (" " + scale if scale else "")).strip())
+        n //= 1000
+        idx += 1
+
+    return " ".join(reversed(words)).strip()
+
+
+result = number_to_words(987654321012345678)
+
+Modified code:
+def number_to_words(n: int) -> str:
+    units = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+    teens = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"]
+    tens = ["", "", "twenty", "thirty", "fourty", "fifty", "sixty", "seventy", "eighty", "ninety"]
+    scales = ["", "thousand", "million", "billion", "trillion", "quadrillion", "quintillion", "sextillion", "septillion", "octillion", "nonillion", "decillion"]
+
+    def three_to_words(num: int) -> str:
+        parts = []
+        if num >= 100:
+            parts.append(units[num // 100] + " hundred")
+            num %= 100
+        if num >= 20:
+            t = num // 10
+            u = num % 10
+            parts.append(tens[t] + ("-" + units[u] if u else ""))
+        elif num >= 10:
+            parts.append(teens[num - 10])
+        elif num > 0:
+            parts.append(units[num])
+        return " ".join(filter(None, parts))
+
+    if n == 0:
+        return "zero"
+    if n < 0:
+        return "minus " + number_to_words(-n)
+
+    words = []
+    idx = 0
+    while n > 0:
+        chunk = n % 1000
+        if chunk:
+            chunk_words = three_to_words(chunk)
+            scale = scales[idx] if idx < len(scales) else ""
+            words.append((chunk_words + (" " + scale if scale else "")).strip())
+        n //= 1000
+        idx += 1
+
+    return " ".join(reversed(words)).strip()
+
+
+result = number_to_words(987654321012345678)
+
+Model description original code:
+nine hundred eighty-seven quadrillion six hundred fifty-four trillion three hundred twenty-one billion twelve million three hundred forty-five thousand six hundred seventy-eight
+
+Model description modified code:
+nine hundred eighty-seven quadrillion six hundred fifty-four trillion three hundred twenty-one billion twelve million three hundred fourty-five thousand six hundred seventy-eight
+
+Computed result original code:
+nine hundred eighty-seven quadrillion six hundred fifty-four trillion three hundred twenty-one billion twelve million three hundred forty-five thousand six hundred seventy-eight
+
+Computed result modified code:nine hundred eighty-seven quadrillion six hundred fifty-four trillion three hundred twenty-one billion twelve million three hundred fourty-five thousand six hundred seventy-eight
