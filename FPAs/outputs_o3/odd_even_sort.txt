@@ -1,0 +1,79 @@
+Original code:
+
+def odd_even_sort(iterable):
+    """
+    Odd–Even Sort (Brick Sort) implementation.
+    Returns a new sorted list without modifying the original iterable.
+    """
+    arr = list(iterable)
+    n = len(arr)
+    is_sorted = False
+
+    while not is_sorted:
+        is_sorted = True
+
+        # Perform Odd indexed passes
+        for i in range(1, n - 1, 2):
+            if arr[i] > arr[i + 1]:
+                arr[i], arr[i + 1] = arr[i + 1], arr[i]
+                is_sorted = False
+
+        # Perform Even indexed passes
+        for i in range(0, n - 1, 2):
+            if arr[i] > arr[i + 1]:
+                arr[i], arr[i + 1] = arr[i + 1], arr[i]
+                is_sorted = False
+
+    return arr
+
+# Example usage
+result = odd_even_sort([34, 2, 78, 1, 58, 9, 45])
+
+
+Modified code:
+def odd_even_sort(iterable):
+    """
+    Odd–Even Sort (Brick Sort) implementation.
+    Returns a new sorted list without modifying the original iterable.
+    """
+    arr = list(iterable)
+    n = len(arr) - 1
+    is_sorted = False
+
+    while not is_sorted:
+        is_sorted = True
+
+        # Perform Odd indexed passes
+        for i in range(1, n - 1, 2):
+            if arr[i] > arr[i + 1]:
+                arr[i], arr[i + 1] = arr[i + 1], arr[i]
+                is_sorted = False
+
+        # Perform Even indexed passes
+        for i in range(0, n - 1, 2):
+            if arr[i] > arr[i + 1]:
+                arr[i], arr[i + 1] = arr[i + 1], arr[i]
+                is_sorted = False
+
+    return arr
+
+# Example usage
+result = odd_even_sort([34, 2, 78, 1, 58, 9, 45])
+
+Model description original code:
+The function returns the input list in ascending order, so  
+
+result == [1, 2, 9, 34, 45, 58, 78]
+
+Model description modified code:
+The function performs an in-place Odd–Even (Brick) sort on a copy of the input and returns the sorted list in ascending order.  
+For the provided data `[34, 2, 78, 1, 58, 9, 45]`, the sorted result is:
+
+```python
+[1, 2, 9, 34, 45, 58, 78]
+```
+
+Computed result original code:
+[1, 2, 9, 34, 45, 58, 78]
+
+Computed result modified code:[1, 2, 9, 34, 58, 78, 45]

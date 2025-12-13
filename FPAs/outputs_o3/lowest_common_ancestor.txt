@@ -1,0 +1,121 @@
+Original code:
+from dataclasses import dataclass
+
+@dataclass
+class TreeNode:
+    val: int
+    left: 'TreeNode' = None
+    right: 'TreeNode' = None
+
+def lowest_common_ancestor(root: TreeNode, p: int, q: int) -> TreeNode:
+    """
+    Finds the lowest common ancestor (LCA) of two nodes with values p and q in a binary tree.
+    """
+    if root is None:
+        return None
+    if root.val == p or root.val == q:
+        return root
+
+    left_lca = lowest_common_ancestor(root.left, p, q)
+    right_lca = lowest_common_ancestor(root.right, p, q)
+
+    if left_lca and right_lca:
+        return root
+    return left_lca if left_lca else right_lca
+
+# Example usage:
+# Constructing a sample binary tree:
+#         3
+#        / \
+#       5   1
+#      / \ / \
+#     6  2 0  8
+#       / \
+#      7   4
+
+root = TreeNode(3)
+root.left = TreeNode(5)
+root.right = TreeNode(1)
+root.left.left = TreeNode(6)
+root.left.right = TreeNode(2)
+root.right.left = TreeNode(0)
+root.right.right = TreeNode(8)
+root.left.right.left = TreeNode(7)
+root.left.right.right = TreeNode(4)
+
+# Finding LCA of nodes with values 5 and 1
+result_node = lowest_common_ancestor(root, 5, 1)
+result = result_node.val if result_node else None
+
+Modified code:
+from dataclasses import dataclass
+
+@dataclass
+class TreeNode:
+    val: int
+    left: 'TreeNode' = None
+    right: 'TreeNode' = None
+
+def lowest_common_ancestor(root: TreeNode, p: int, q: int) -> TreeNode:
+    """
+    Finds the lowest common ancestor (LCA) of two nodes with values p and q in a binary tree.
+    """
+    if root is None:
+        return None
+    if root.val == p and root.val == q:
+        return root
+
+    left_lca = lowest_common_ancestor(root.left, p, q)
+    right_lca = lowest_common_ancestor(root.right, p, q)
+
+    if left_lca and right_lca:
+        return root
+    return left_lca if left_lca else right_lca
+
+# Example usage:
+# Constructing a sample binary tree:
+#         3
+#        / \
+#       5   1
+#      / \ / \
+#     6  2 0  8
+#       / \
+#      7   4
+
+root = TreeNode(3)
+root.left = TreeNode(5)
+root.right = TreeNode(1)
+root.left.left = TreeNode(6)
+root.left.right = TreeNode(2)
+root.right.left = TreeNode(0)
+root.right.right = TreeNode(8)
+root.left.right.left = TreeNode(7)
+root.left.right.right = TreeNode(4)
+
+# Finding LCA of nodes with values 5 and 1
+result_node = lowest_common_ancestor(root, 5, 1)
+result = result_node.val if result_node else None
+
+Model description original code:
+The lowest common ancestor of the nodes whose values are 5 and 1 in the given tree is the root node with value 3, so the variable `result` ends up holding the integer  
+
+```
+3
+```
+
+Model description modified code:
+The call  
+
+```python
+result_node = lowest_common_ancestor(root, 5, 1)
+result = result_node.val if result_node else None
+```  
+
+returns the node whose `val` is 3, therefore `result` is set to `3`.
+
+(The script itself doesn’t print anything; but if you inspect or print `result`, you would get `3`.)
+
+Computed result original code:
+3
+
+Computed result modified code:None

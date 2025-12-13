@@ -1,0 +1,112 @@
+Original code:
+
+import math
+from math import gcd
+
+def range_gcd_sqrt(arr, queries):
+    """
+    Answer GCD range queries on `arr` using square-root decomposition.
+    `queries` is an iterable of (l, r) pairs (0-based, inclusive).
+    Returns a list with the GCD for each query.
+    """
+    n = len(arr)
+    if n == 0:
+        return []
+
+    block_size = int(math.sqrt(n)) or 1
+    num_blocks = (n + block_size - 1) // block_size
+
+    # Pre-compute the GCD for each block
+    block_gcd = [0] * num_blocks
+    for i, val in enumerate(arr):
+        b = i // block_size
+        block_gcd[b] = gcd(block_gcd[b], val)
+
+    def query(l, r):
+        res = 0
+        # Process the starting partial block
+        while l <= r and l % block_size != 0:
+            res = gcd(res, arr[l])
+            l += 1
+        # Process the full blocks in between
+        while l + block_size - 1 <= r:
+            res = gcd(res, block_gcd[l // block_size])
+            l += block_size
+        # Process the ending partial block
+        while l <= r:
+            res = gcd(res, arr[l])
+            l += 1
+        return res
+
+    return [query(l, r) for l, r in queries]
+
+
+# Example usage
+arr = [2, 4, 6, 8, 10, 14, 16, 20]
+queries = [(0, 3), (2, 5), (0, 7)]
+result = range_gcd_sqrt(arr, queries)
+
+
+Modified code:
+import math
+from math import gcd
+
+def range_gcd_sqrt(arr, queries):
+    """
+    Answer GCD range queries on `arr` using square-root decomposition.
+    `queries` is an iterable of (l, r) pairs (0-based, inclusive).
+    Returns a list with the GCD for each query.
+    """
+    n = len(arr)
+    if n == 0:
+        return []
+
+    block_size = int(math.sqrt(n)) or 1
+    num_blocks = (n + block_size - 1) // block_size
+
+    block_gcd = [1] * num_blocks
+    for i, val in enumerate(arr):
+        b = i // block_size
+        block_gcd[b] = gcd(block_gcd[b], val)
+
+    def query(l, r):
+        res = 0
+        while l <= r and l % block_size != 0:
+            res = gcd(res, arr[l])
+            l += 1
+        while l + block_size - 1 <= r:
+            res = gcd(res, block_gcd[l // block_size])
+            l += block_size
+        while l <= r:
+            res = gcd(res, arr[l])
+            l += 1
+        return res
+
+    return [query(l, r) for l, r in queries]
+
+
+# Example usage
+arr = [2, 4, 6, 8, 10, 14, 16, 20]
+queries = [(0, 3), (2, 5), (0, 7)]
+result = range_gcd_sqrt(arr, queries)
+
+Model description original code:
+For the three queries the GCDs of the corresponding sub-arrays are all 2:
+
+1. indices 0–3 → [2, 4, 6, 8]  → GCD = 2  
+2. indices 2–5 → [6, 8, 10, 14] → GCD = 2  
+3. indices 0–7 → [2, 4, 6, 8, 10, 14, 16, 20] → GCD = 2  
+
+Hence the list stored in `result` is:
+
+[2, 2, 2]
+
+Model description modified code:
+`result` will be
+
+[2, 2, 2]
+
+Computed result original code:
+[2, 2, 2]
+
+Computed result modified code:[1, 1, 1]

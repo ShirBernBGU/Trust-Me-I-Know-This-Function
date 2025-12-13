@@ -1,0 +1,98 @@
+Original code:
+
+import math
+
+def riemann_sum(f, a, b, n, method='mid'):
+    """
+    Approximate the definite integral of f from a to b using Riemann sums.
+    
+    Parameters:
+        f (callable): Function to integrate.
+        a (float): Lower limit of integration.
+        b (float): Upper limit of integration.
+        n (int): Number of subintervals.
+        method (str): 'left', 'right', or 'mid' (default).
+    
+    Returns:
+        float: Approximation of the integral.
+    """
+    width = (b - a) / n
+    total = 0.0
+    
+    if method == 'left':
+        for i in range(n):
+            x = a + i * width
+            total += f(x)
+    elif method == 'right':
+        for i in range(1, n + 1):
+            x = a + i * width
+            total += f(x)
+    else:  # midpoint method
+        for i in range(n):
+            x = a + (i + 0.5) * width
+            total += f(x)
+    
+    return total * width
+
+# Example usage: approximate ∫₀^π sin(x) dx
+result = riemann_sum(math.sin, 0, math.pi, 10000, method='mid')
+
+
+Modified code:
+import math
+
+def riemann_sum(f, a, b, n, method='mid'):
+    """
+    Approximate the definite integral of f from a to b using Riemann sums.
+    
+    Parameters:
+        f (callable): Function to integrate.
+        a (float): Lower limit of integration.
+        b (float): Upper limit of integration.
+        n (int): Number of subintervals.
+        method (str): 'left', 'right', or 'mid' (default).
+    
+    Returns:
+        float: Approximation of the integral.
+    """
+    width = (b - a) / n
+    total = 0.0
+    
+    if method == 'left':
+        for i in range(n):
+            x = a + i * width
+            total += f(x)
+    elif method == 'right':
+        for i in range(1, n + 1):
+            x = a + i * width
+            total += f(x)
+    else:  # midpoint method
+        for i in range(n):
+            x = a + (i + 0.51) * width
+            total += f(x)
+    
+    return total * width
+
+# Example usage: approximate ∫₀^π sin(x) dx
+result = riemann_sum(math.sin, 0, math.pi, 10000, method='mid')
+
+Model description original code:
+The code evaluates the midpoint Riemann sum for ∫₀^π sin x dx using 10 000 sub-intervals.  
+The exact integral equals 2, and the midpoint rule with this many slices is extremely accurate:
+
+result ≈ 2.0000000082   # about 2 + 8.2 × 10⁻⁹
+
+(There is no print statement, so nothing is written to the console unless you explicitly print `result`, but the variable `result` will hold this value.)
+
+Model description modified code:
+It places in the variable result a value essentially equal to the exact integral ∫0π sin x dx (= 2).  
+With the given parameters (n = 10 000 and the mid-point shifted by 0.01), the number actually computed in double precision is
+
+2.000000008 ≈ 2.000000008214801
+
+So nothing is printed, but result holds a float about 2.000000008.
+
+Computed result original code:
+2.000000008224676
+
+Computed result modified code:2.000000008214802

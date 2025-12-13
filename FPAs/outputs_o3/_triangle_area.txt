@@ -1,0 +1,132 @@
+Original code:
+import math
+import heapq
+
+def _triangle_area(a, b, c):
+    return abs(a[0]*(b[1]-c[1]) + b[0]*(c[1]-a[1]) + c[0]*(a[1]-b[1])) / 2.0
+
+def visvalingam_whyatt(points, threshold):
+    """
+    Simplify a polyline using the Visvalingam–Whyatt algorithm.
+    
+    points: List of (x, y) tuples.
+    threshold: Minimum effective area; points forming smaller areas are removed.
+    Returns a simplified list of points.
+    """
+    n = len(points)
+    if n <= 2:
+        return points[:]
+
+    prev_idx = list(range(-1, n - 1)) + [-1]
+    next_idx = list(range(1, n)) + [-1]
+    removed = [False] * n
+    areas = [float('inf')] * n
+    heap = []
+
+    for i in range(1, n - 1):
+        areas[i] = _triangle_area(points[i - 1], points[i], points[i + 1])
+        heapq.heappush(heap, (areas[i], i))
+
+    while heap and heap[0][0] < threshold:
+        area, i = heapq.heappop(heap)
+        if removed[i] or area > areas[i]:  # stale entry
+            continue
+        removed[i] = True
+
+        p, q = prev_idx[i], next_idx[i]
+        if p != -1:
+            next_idx[p] = q
+        if q != -1:
+            prev_idx[q] = p
+
+        for idx in (p, q):
+            if idx in (-1, 0, n - 1) or removed[idx]:
+                continue
+            new_area = _triangle_area(points[prev_idx[idx]], points[idx], points[next_idx[idx]])
+            areas[idx] = new_area
+            heapq.heappush(heap, (new_area, idx))
+
+    simplified = []
+    i = 0
+    while i != -1:
+        if not removed[i]:
+            simplified.append(points[i])
+        i = next_idx[i]
+
+    return simplified
+
+# Example usage
+polyline = [(0, 0), (1, 0.02), (2, 0.1), (3, 0.01), (4, 0)]
+result = visvalingam_whyatt(polyline, threshold=0.05)
+
+Modified code:
+import math
+import heapq
+
+def _triangle_area(a, b, c):
+    return abs(a[0]*(b[1]-c[1]) + b[0]*(c[1]-a[1]) + c[0]*(a[1]-b[1])) / 2.0
+
+def visvalingam_whyatt(points, threshold):
+    n = len(points)
+    if n <= 2:
+        return points[:]
+
+    prev_idx = list(range(-1, n - 1)) + [-1]
+    next_idx = list(range(1, n)) + [-1]
+    removed = [False] * n
+    areas = [float('inf')] * n
+    heap = []
+
+    for i in range(1, n - 1):
+        areas[i] = _triangle_area(points[i - 1], points[i], points[i + 1])
+        heapq.heappush(heap, (areas[i], i))
+
+    while heap and heap[0][0] < threshold * 0.8:
+        area, i = heapq.heappop(heap)
+        if removed[i] or area > areas[i]:
+            continue
+        removed[i] = True
+
+        p, q = prev_idx[i], next_idx[i]
+        if p != -1:
+            next_idx[p] = q
+        if q != -1:
+            prev_idx[q] = p
+
+        for idx in (p, q):
+            if idx in (-1, 0, n - 1) or removed[idx]:
+                continue
+            new_area = _triangle_area(points[prev_idx[idx]], points[idx], points[next_idx[idx]])
+            areas[idx] = new_area
+            heapq.heappush(heap, (new_area, idx))
+
+    simplified = []
+    i = 0
+    while i != -1:
+        if not removed[i]:
+            simplified.append(points[i])
+        i = next_idx[i]
+
+    return simplified
+
+# Example usage
+polyline = [(0, 0), (1, 0.02), (2, 0.1), (3, 0.01), (4, 0)]
+result = visvalingam_whyatt(polyline, threshold=0.05)
+
+Model description original code:
+The two interior points whose effective triangle areas are below the 0.05 threshold (indices 1 and 3) are discarded, so the polyline is reduced to the endpoints plus the “highest” remaining point in the middle.
+
+The list stored in `result` (and what you would see if you printed it) is: 
+
+[(0, 0), (2, 0.1), (4, 0)]
+
+Model description modified code:
+It leaves only the middle-most “important” vertex and both end points, so  
+the list stored in result is:
+
+[(0, 0), (2, 0.1), (4, 0)]
+
+Computed result original code:
+[(0, 0), (2, 0.1), (4, 0)]
+
+Computed result modified code:[(0, 0), (2, 0.1), (3, 0.01), (4, 0)]

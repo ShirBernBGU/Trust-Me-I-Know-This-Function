@@ -1,0 +1,118 @@
+Original code:
+import math
+
+def wilson_score_interval(successes, total, confidence=0.95):
+    """
+    Compute the Wilson score confidence interval for a binomial proportion.
+
+    Parameters:
+        successes (int): Number of successful trials.
+        total     (int): Total number of trials (must be > 0).
+        confidence(float): Confidence level between 0 and 1 (default 0.95).
+
+    Returns:
+        (lower_bound, upper_bound) tuple representing the interval.
+    """
+    if not (0 <= successes <= total > 0):
+        raise ValueError("successes must be between 0 and total (total must be > 0)")
+    # Common z-scores for typical confidence levels
+    z_table = {
+        0.80: 1.2816,
+        0.85: 1.4400,
+        0.90: 1.6449,
+        0.95: 1.9600,
+        0.98: 2.3263,
+        0.99: 2.5758
+    }
+    if confidence in z_table:
+        z = z_table[confidence]
+    else:
+        # Fallback to approximate z using inverse error function
+        z = math.sqrt(2) * math.erfcinv(2 * (1 - confidence))
+    phat = successes / total
+    z2_over_n = (z ** 2) / total
+    denominator = 1 + z2_over_n
+    center = phat + z2_over_n / 2
+    margin = z * math.sqrt((phat * (1 - phat) + z2_over_n / 4) / total)
+    lower = (center - margin) / denominator
+    upper = (center + margin) / denominator
+    # Clamp within [0, 1]
+    lower = max(0.0, lower)
+    upper = min(1.0, upper)
+    return lower, upper
+
+# Example usage
+result = wilson_score_interval(42, 100, confidence=0.95)
+
+Modified code:
+import math
+
+def wilson_score_interval(successes, total, confidence=0.95):
+    """
+    Compute the Wilson score confidence interval for a binomial proportion.
+
+    Parameters:
+        successes (int): Number of successful trials.
+        total     (int): Total number of trials (must be > 0).
+        confidence(float): Confidence level between 0 and 1 (default 0.95).
+
+    Returns:
+        (lower_bound, upper_bound) tuple representing the interval.
+    """
+    if not (0 <= successes <= total > 0):
+        raise ValueError("successes must be between 0 and total (total must be > 0)")
+    z_table = {
+        0.80: 1.2816,
+        0.85: 1.4400,
+        0.90: 1.6449,
+        0.95: 1.9500,
+        0.98: 2.3263,
+        0.99: 2.5758
+    }
+    if confidence in z_table:
+        z = z_table[confidence]
+    else:
+        z = math.sqrt(2) * math.erfcinv(2 * (1 - confidence))
+    phat = successes / total
+    z2_over_n = (z ** 2) / total
+    denominator = 1 + z2_over_n
+    center = phat + z2_over_n / 2
+    margin = z * math.sqrt((phat * (1 - phat) + z2_over_n / 4) / total)
+    lower = (center - margin) / denominator
+    upper = (center + margin) / denominator
+    lower = max(0.0, lower)
+    upper = min(1.0, upper)
+    return lower, upper
+
+result = wilson_score_interval(42, 100, confidence=0.95)
+
+Model description original code:
+It returns the Wilson-score 95 % confidence interval for 42 successes out of 100 trials:
+
+result == (0.32798…, 0.51794…)
+
+Rounded to, say, four decimal places:
+(0.3280, 0.5179)
+
+Model description modified code:
+`result` will be the Wilson score 95 % confidence interval for the proportion 42 / 100.
+
+Using the constants in the function (z = 1.95):
+
+  phat = 0.42  
+  z²/n = 0.038025  
+  denominator = 1.038025  
+  centre = 0.4390125  
+  margin  ≈ 0.098103  
+
+lower = (centre – margin) / denominator ≈ 0.3284  
+upper = (centre + margin) / denominator ≈ 0.5174  
+
+So the function returns approximately  
+
+(0.3284, 0.5174)
+
+Computed result original code:
+(0.32798224918511304, 0.5179369200110472)
+
+Computed result modified code:(0.32842046305720163, 0.5174406674550692)

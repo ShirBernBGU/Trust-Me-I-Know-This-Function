@@ -1,0 +1,163 @@
+Original code:
+
+def _left_rotate(n, b):
+    return ((n << b) | (n >> (32 - b))) & 0xffffffff
+
+
+def sha1(data: bytes) -> str:
+    # Pre-processing: padding the message
+    original_bit_len = len(data) * 8
+    data += b'\x80'  # append the bit '1'
+    while (len(data) % 64) != 56:  # pad with zeros until length ≡ 56 (mod 64)
+        data += b'\x00'
+    data += original_bit_len.to_bytes(8, 'big')  # append original length
+
+    # Initial hash values (first 32 bits of the fractional parts of the square roots of the first 5 primes)
+    h0 = 0x67452301
+    h1 = 0xEFCDAB89
+    h2 = 0x98BADCFE
+    h3 = 0x10325476
+    h4 = 0xC3D2E1F0
+
+    # Process the message in successive 512-bit chunks
+    for chunk_start in range(0, len(data), 64):
+        chunk = data[chunk_start:chunk_start + 64]
+        w = [0] * 80
+
+        # Break chunk into sixteen 32-bit big-endian words w[0..15]
+        for i in range(16):
+            w[i] = int.from_bytes(chunk[i * 4:(i + 1) * 4], 'big')
+
+        # Extend the sixteen 32-bit words into eighty 32-bit words
+        for i in range(16, 80):
+            w[i] = _left_rotate(w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16], 1)
+
+        # Initialize hash value for this chunk
+        a, b, c, d, e = h0, h1, h2, h3, h4
+
+        # Main loop
+        for i in range(80):
+            if 0 <= i <= 19:
+                f = (b & c) | (~b & d)
+                k = 0x5A827999
+            elif 20 <= i <= 39:
+                f = b ^ c ^ d
+                k = 0x6ED9EBA1
+            elif 40 <= i <= 59:
+                f = (b & c) | (b & d) | (c & d)
+                k = 0x8F1BBCDC
+            else:
+                f = b ^ c ^ d
+                k = 0xCA62C1D6
+
+            temp = (_left_rotate(a, 5) + f + e + k + w[i]) & 0xffffffff
+            e = d
+            d = c
+            c = _left_rotate(b, 30)
+            b = a
+            a = temp
+
+        # Add this chunk's hash to result so far
+        h0 = (h0 + a) & 0xffffffff
+        h1 = (h1 + b) & 0xffffffff
+        h2 = (h2 + c) & 0xffffffff
+        h3 = (h3 + d) & 0xffffffff
+        h4 = (h4 + e) & 0xffffffff
+
+    # Produce the final hash value (big-endian) as a 40-digit hexadecimal string
+    return ''.join(f'{x:08x}' for x in (h0, h1, h2, h3, h4))
+
+
+# Example usage
+result = sha1(b"hello world")
+
+
+Modified code:
+def _left_rotate(n, b):
+    return ((n << b) | (n >> (32 - b))) & 0xffffffff
+
+
+def sha1(data: bytes) -> str:
+    original_bit_len = len(data) * 8
+    data += b'\x80'
+    while (len(data) % 64) != 56:
+        data += b'\x00'
+    data += original_bit_len.to_bytes(8, 'big')
+
+    h0 = 0x67452302
+    h1 = 0xEFCDAB89
+    h2 = 0x98BADCFE
+    h3 = 0x10325476
+    h4 = 0xC3D2E1F0
+
+    for chunk_start in range(0, len(data), 64):
+        chunk = data[chunk_start:chunk_start + 64]
+        w = [0] * 80
+
+        for i in range(16):
+            w[i] = int.from_bytes(chunk[i * 4:(i + 1) * 4], 'big')
+
+        for i in range(16, 80):
+            w[i] = _left_rotate(w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16], 1)
+
+        a, b, c, d, e = h0, h1, h2, h3, h4
+
+        for i in range(80):
+            if 0 <= i <= 19:
+                f = (b & c) | (~b & d)
+                k = 0x5A827999
+            elif 20 <= i <= 39:
+                f = b ^ c ^ d
+                k = 0x6ED9EBA1
+            elif 40 <= i <= 59:
+                f = (b & c) | (b & d) | (c & d)
+                k = 0x8F1BBCDC
+            else:
+                f = b ^ c ^ d
+                k = 0xCA62C1D6
+
+            temp = (_left_rotate(a, 5) + f + e + k + w[i]) & 0xffffffff
+            e = d
+            d = c
+            c = _left_rotate(b, 30)
+            b = a
+            a = temp
+
+        h0 = (h0 + a) & 0xffffffff
+        h1 = (h1 + b) & 0xffffffff
+        h2 = (h2 + c) & 0xffffffff
+        h3 = (h3 + d) & 0xffffffff
+        h4 = (h4 + e) & 0xffffffff
+
+    return ''.join(f'{x:08x}' for x in (h0, h1, h2, h3, h4))
+
+
+result = sha1(b"hello world")
+
+Model description original code:
+The SHA-1 digest of the ASCII bytes b"hello world" is  
+
+2aae6c35c94fcfb415dbe95f408b9ce91ee846ed
+
+So after the last line executes, the variable `result` holds the string
+
+'2aae6c35c94fcfb415dbe95f408b9ce91ee846ed'
+
+Model description modified code:
+The function is a straightforward implementation of the SHA-1 hash algorithm.  
+When it is called with the bytes literal b"hello world" it produces the SHA-1 digest
+
+2aae6c35c94fcfb415dbe95f408b9ce91ee846ed
+
+So, after the call
+
+result = sha1(b"hello world")
+
+the variable result contains the string
+
+'2aae6c35c94fcfb415dbe95f408b9ce91ee846ed'
+
+Computed result original code:
+2aae6c35c94fcfb415dbe95f408b9ce91ee846ed
+
+Computed result modified code:76241d86235e3bd421f91b3cb9908b9c3e299fc8

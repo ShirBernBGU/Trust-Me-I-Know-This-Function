@@ -1,0 +1,159 @@
+Original code:
+import math
+import random
+
+def gmm_em_1d(data, k=2, max_iters=100, tol=1e-4):
+    """
+    Estimate parameters of a 1-D Gaussian Mixture Model using the EM algorithm.
+    Returns a dictionary with weights, means and variances for each component.
+    """
+    # Initialize parameters
+    min_data, max_data = min(data), max(data)
+    means = [random.uniform(min_data, max_data) for _ in range(k)]
+    variances = [1.0 for _ in range(k)]
+    weights = [1.0 / k] * k
+
+    for _ in range(max_iters):
+        # E-step: compute responsibilities
+        responsibilities = []
+        for x in data:
+            probs = []
+            for j in range(k):
+                coeff = 1.0 / math.sqrt(2 * math.pi * variances[j])
+                exponent = math.exp(-((x - means[j]) ** 2) / (2 * variances[j]))
+                probs.append(weights[j] * coeff * exponent)
+            total = sum(probs) or 1e-12
+            responsibilities.append([p / total for p in probs])
+
+        # M-step: update parameters
+        new_weights = [0.0] * k
+        new_means = [0.0] * k
+        new_variances = [0.0] * k
+
+        for j in range(k):
+            r_sum = sum(r[j] for r in responsibilities)
+            new_weights[j] = r_sum / len(data) or 1e-12
+            if r_sum == 0:
+                new_means[j], new_variances[j] = means[j], variances[j]
+                continue
+            new_means[j] = sum(r[j] * x for r, x in zip(responsibilities, data)) / r_sum
+            new_variances[j] = max(
+                sum(r[j] * (x - new_means[j]) ** 2 for r, x in zip(responsibilities, data)) / r_sum,
+                1e-6
+            )
+
+        # Check convergence
+        if max(abs(new_means[j] - means[j]) for j in range(k)) < tol:
+            means, variances, weights = new_means, new_variances, new_weights
+            break
+
+        means, variances, weights = new_means, new_variances, new_weights
+
+    return {"weights": weights, "means": means, "variances": variances}
+
+# Example usage
+dataset = [1.0, 1.1, 0.9, 3.0, 3.2, 2.8]
+result = gmm_em_1d(dataset, k=2, max_iters=100)
+
+Modified code:
+import math
+import random
+
+def gmm_em_1d(data, k=2, max_iters=100, tol=1e-4):
+    """
+    Estimate parameters of a 1-D Gaussian Mixture Model using the EM algorithm.
+    Returns a dictionary with weights, means and variances for each component.
+    """
+    # Initialize parameters
+    min_data, max_data = min(data), max(data)
+    means = [random.uniform(min_data, max_data) for _ in range(k)]
+    variances = [1.1 for _ in range(k)]
+    weights = [1.0 / k] * k
+
+    for _ in range(max_iters):
+        # E-step: compute responsibilities
+        responsibilities = []
+        for x in data:
+            probs = []
+            for j in range(k):
+                coeff = 1.0 / math.sqrt(2 * math.pi * variances[j])
+                exponent = math.exp(-((x - means[j]) ** 2) / (2 * variances[j]))
+                probs.append(weights[j] * coeff * exponent)
+            total = sum(probs) or 1e-12
+            responsibilities.append([p / total for p in probs])
+
+        # M-step: update parameters
+        new_weights = [0.0] * k
+        new_means = [0.0] * k
+        new_variances = [0.0] * k
+
+        for j in range(k):
+            r_sum = sum(r[j] for r in responsibilities)
+            new_weights[j] = r_sum / len(data) or 1e-12
+            if r_sum == 0:
+                new_means[j], new_variances[j] = means[j], variances[j]
+                continue
+            new_means[j] = sum(r[j] * x for r, x in zip(responsibilities, data)) / r_sum
+            new_variances[j] = max(
+                sum(r[j] * (x - new_means[j]) ** 2 for r, x in zip(responsibilities, data)) / r_sum,
+                1e-6
+            )
+
+        # Check convergence
+        if max(abs(new_means[j] - means[j]) for j in range(k)) < tol:
+            means, variances, weights = new_means, new_variances, new_weights
+            break
+
+        means, variances, weights = new_means, new_variances, new_weights
+
+    return {"weights": weights, "means": means, "variances": variances}
+
+# Example usage
+dataset = [1.0, 1.1, 0.9, 3.0, 3.2, 2.8]
+result = gmm_em_1d(dataset, k=2, max_iters=100)
+
+Model description original code:
+Nothing is printed by the script itself.  
+The last line simply stores the return value of gmm_em_1d in the variable result.
+
+If you were to add print(result) you would see a dictionary that contains the estimated
+weights, means and variances of the two Gaussian components that best fit the data
+
+    [1.0, 1.1, 0.9, 3.0, 3.2, 2.8]
+
+With this data the EM iterations separate the three “≈1” samples from the three “≈3” samples,
+so the dictionary will look roughly like
+
+    {
+        'weights'   : [0.5, 0.5],            # about half the points in each component
+        'means'     : [1.0, 3.0],            # one mean near 1, the other near 3
+        'variances' : [0.0067, 0.0267]       # small spread around each mean
+    }
+
+(The exact numbers and even the order of the two components can change from run to run
+because the algorithm starts with random initial means and uses floating-point arithmetic.)
+
+Model description modified code:
+Running the snippet as-is produces no console output at all, because the code only assigns the return value of `gmm_em_1d` to the variable `result`; it never prints it.
+
+If you were to add
+
+```python
+print(result)
+```
+
+right after the function call, you would see something like
+
+```python
+{'weights': [0.498…, 0.502…],
+ 'means':   [0.999…, 3.000…],
+ 'variances': [0.0066…, 0.0266…]}
+```
+
+(the two components may appear in the opposite order).  
+Because the component means are initialised with `random.uniform`, the exact numbers—and which component ends up being labelled “0” or “1”—will vary from run to run, but the algorithm invariably converges to two roughly equal-weight Gaussians centered near 1 and 3 with small variances that match the two clusters in the data `[1.0, 1.1, 0.9]` and `[3.0, 3.2, 2.8]`.
+
+Computed result original code:
+{'weights': [0.5, 0.5], 'means': [3.0, 1.0], 'variances': [0.026666666666666713, 0.0066666666666666706]}
+
+Computed result modified code:{'weights': [0.5, 0.5], 'means': [1.0, 3.0], 'variances': [0.0066666666666666706, 0.026666666666666713]}

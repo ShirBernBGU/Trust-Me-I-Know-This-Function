@@ -1,0 +1,138 @@
+Original code:
+import math
+from typing import List
+
+def partial_autocorrelation(series: List[float], max_lag: int) -> List[float]:
+    """
+    Compute the partial autocorrelation (PACF) of a time-series up to `max_lag`
+    using the Levinson–Durbin recursion (a.k.a. Yule–Walker equations).
+
+    Parameters
+    ----------
+    series : list[float]
+        Input time-series values.
+    max_lag : int
+        Maximum lag for which to compute the PACF (must be < len(series)).
+
+    Returns
+    -------
+    list[float]
+        Partial autocorrelations phi[1], …, phi[max_lag].
+    """
+    n = len(series)
+    if max_lag >= n:
+        raise ValueError("max_lag must be less than the length of the series")
+
+    mean = sum(series) / n
+    # Autocovariances γ_0 … γ_max_lag
+    gamma = []
+    for k in range(max_lag + 1):
+        cov = sum((series[t] - mean) * (series[t - k] - mean) for t in range(k, n)) / n
+        gamma.append(cov)
+
+    pacf = []
+    phi_prev = []          # φ_{k-1,j}, j = 1..k-1
+    var_prev = gamma[0]    # σ_{k-1}²
+
+    for k in range(1, max_lag + 1):
+        # Compute reflection coefficient φ_{k,k}
+        numerator = gamma[k] - sum(phi_prev[j - 1] * gamma[k - j] for j in range(1, k))
+        phi_k = numerator / var_prev
+
+        # Update phi coefficients for this order
+        phi_curr = []
+        for j in range(1, k):
+            phi_curr.append(phi_prev[j - 1] - phi_k * phi_prev[k - j - 1])
+        phi_curr.append(phi_k)
+
+        # Update prediction error variance σ_k²
+        var_curr = var_prev * (1.0 - phi_k ** 2)
+
+        # Save PACF value for lag k
+        pacf.append(phi_k)
+
+        # Prepare for next iteration
+        phi_prev = phi_curr
+        var_prev = var_curr
+
+    return pacf
+
+
+# Example usage
+time_series = [1.2, 0.9, 1.5, 2.1, 1.8, 2.4, 2.9, 3.0]
+result = partial_autocorrelation(time_series, max_lag=4)
+
+Modified code:
+import math
+from typing import List
+
+def partial_autocorrelation(series: List[float], max_lag: int) -> List[float]:
+    n = len(series)
+    if max_lag >= n:
+        raise ValueError("max_lag must be less than the length of the series")
+
+    mean = sum(series) / n
+    gamma = []
+    for k in range(max_lag + 1):
+        cov = sum((series[t] - mean) * (series[t - k] - mean) for t in range(k, n)) / (n + 1)
+        gamma.append(cov)
+
+    pacf = []
+    phi_prev = []
+    var_prev = gamma[0]
+
+    for k in range(1, max_lag + 1):
+        numerator = gamma[k] - sum(phi_prev[j - 1] * gamma[k - j] for j in range(1, k))
+        phi_k = numerator / var_prev
+
+        phi_curr = []
+        for j in range(1, k):
+            phi_curr.append(phi_prev[j - 1] - phi_k * phi_prev[k - j - 1])
+        phi_curr.append(phi_k)
+
+        var_curr = var_prev * (1.0 - phi_k ** 2)
+        pacf.append(phi_k)
+        phi_prev = phi_curr
+        var_prev = var_curr
+
+    return pacf
+
+
+# Example usage
+time_series = [1.2, 0.9, 1.5, 2.1, 1.8, 2.4, 2.9, 3.0]
+result = partial_autocorrelation(time_series, max_lag=4)
+
+Model description original code:
+Running the script fills the variable `result` with the first four partial-autocorrelation coefficients of the given series, i.e.
+
+```
+result = [0.614671913, -0.355817116, 0.084579, -0.189823]
+```
+
+(Values are shown rounded to 9, 9, 6 and 6 decimal places, respectively.  Small differences on the last decimals may appear depending on the floating-point precision of the machine.)
+
+Model description modified code:
+`partial_autocorrelation` returns the PACF values for lags 1 … `max_lag` (here 4).  
+With the supplied series
+
+[1.2, 0.9, 1.5, 2.1, 1.8, 2.4, 2.9, 3.0]
+
+the function (using ordinary Python `float` arithmetic) produces
+
+[0.61467…, -0.35582…, 0.08458…, -0.18982…]
+
+i.e.
+
+[0.61467, -0.35582, 0.08458, -0.18982]
+
+(up to the usual floating-point rounding in the last few digits).  
+So after the call
+
+result = partial_autocorrelation(time_series, max_lag=4)
+
+`result` holds that list of four numbers.
+
+Computed result original code:
+[0.6146719319562576, -0.3558171161624995, 0.0845794510726229, -0.18982321180256806]
+
+Computed result modified code:[0.6146719319562575, -0.35581711616249917, 0.08457945107262246, -0.18982321180256764]

@@ -1,0 +1,120 @@
+Original code:
+
+from typing import List
+
+def kaczmarz(A: List[List[float]], b: List[float], iterations: int = 1000) -> List[float]:
+    """
+    Solve the linear system Ax = b using the (cyclic) Kaczmarz iterative method.
+
+    Parameters:
+        A (List[List[float]]): Coefficient matrix (m x n).
+        b (List[float]): Right-hand side vector (length m).
+        iterations (int): Number of iterations to perform.
+
+    Returns:
+        List[float]: Approximate solution vector x (length n).
+    """
+    if not A or not A[0]:
+        raise ValueError("Matrix A must be non-empty.")
+    if len(A) != len(b):
+        raise ValueError("Dimensions of A and b do not match.")
+
+    n = len(A[0])          # number of variables
+    x = [0.0] * n          # initial guess
+
+    for k in range(iterations):
+        i = k % len(A)     # select row cyclically
+        a_i = A[i]
+        dot = sum(a * xi for a, xi in zip(a_i, x))
+        norm_sq = sum(a * a for a in a_i)
+        if norm_sq == 0:
+            continue       # skip degenerate rows
+        correction = (b[i] - dot) / norm_sq
+        x = [xi + correction * a for xi, a in zip(x, a_i)]
+
+    return x
+
+# Example usage
+A_example = [
+    [3.0, 2.0],
+    [1.0, 4.0]
+]
+b_example = [7.0, 9.0]
+
+result = kaczmarz(A_example, b_example, iterations=100)
+
+
+Modified code:
+from typing import List
+
+def kaczmarz(A: List[List[float]], b: List[float], iterations: int = 1000) -> List[float]:
+    """
+    Solve the linear system Ax = b using the (cyclic) Kaczmarz iterative method.
+
+    Parameters:
+        A (List[List[float]]): Coefficient matrix (m x n).
+        b (List[float]): Right-hand side vector (length m).
+        iterations (int): Number of iterations to perform.
+
+    Returns:
+        List[float]: Approximate solution vector x (length n).
+    """
+    if not A or not A[0]:
+        raise ValueError("Matrix A must be non-empty.")
+    if len(A) != len(b):
+        raise ValueError("Dimensions of A and b do not match.")
+
+    n = len(A[0])          # number of variables
+    x = [0.0] * n          # initial guess
+
+    for k in range(iterations):
+        i = (k + 1) % len(A)     # select row cyclically
+        a_i = A[i]
+        dot = sum(a * xi for a, xi in zip(a_i, x))
+        norm_sq = sum(a * a for a in a_i)
+        if norm_sq == 0:
+            continue       # skip degenerate rows
+        correction = (b[i] - dot) / norm_sq
+        x = [xi + correction * a for xi, a in zip(x, a_i)]
+
+    return x
+
+# Example usage
+A_example = [
+    [3.0, 2.0],
+    [1.0, 4.0]
+]
+b_example = [7.0, 9.0]
+
+result = kaczmarz(A_example, b_example, iterations=100)
+
+Model description original code:
+After 100 Kaczmarz steps the iterate has already converged to machine precision to the exact solution of  
+
+3 x₁ + 2 x₂ = 7  
+x₁ + 4 x₂ = 9  →  (x₁ , x₂) = (1 , 2)
+
+so the variable result is a list of two floats essentially equal to that solution:
+
+>>> result
+[0.999999999999…, 2.000000000000…]   # i.e. [1.0, 2.0] up to ~10⁻¹³ rounding error
+
+Model description modified code:
+The system  
+
+3 x + 2 y = 7  
+1 x + 4 y = 9  
+
+has the exact solution x = 1,  y = 2.  
+The cyclic Kaczmarz routine converges very quickly for a 2 × 2 consistent system; after 100 iterations the error is reduced to about 10⁻¹³, i.e. machine precision.
+
+So the variable result will contain a pair of floats essentially equal to that solution, e.g.  
+
+[0.9999999999999998, 2.0000000000000004]
+
+(which may differ in the last few ulps on another machine, but will be numerically indistinguishable from [1.0, 2.0]).
+
+Computed result original code:
+[1.000000000000121, 1.9999999999999698]
+
+Computed result modified code:[0.9999999999999698, 2.0000000000000453]

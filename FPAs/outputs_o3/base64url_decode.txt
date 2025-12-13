@@ -1,0 +1,93 @@
+Original code:
+_B64URL_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+_CHAR_TO_VAL = {c: i for i, c in enumerate(_B64URL_CHARS)}
+
+def base64url_decode(data: str) -> bytes:
+    """
+    Decode a Base64 URL-safe encoded string without using external libraries.
+    Padding characters '=' are optional.
+    """
+    data = data.rstrip('=')  # strip padding if present
+    bit_buffer = 0
+    bit_count = 0
+    output = bytearray()
+
+    for ch in data:
+        if ch not in _CHAR_TO_VAL:
+            raise ValueError(f"Invalid Base64URL character: {ch}")
+        bit_buffer = (bit_buffer << 6) | _CHAR_TO_VAL[ch]
+        bit_count += 6
+
+        if bit_count >= 8:
+            bit_count -= 8
+            output.append((bit_buffer >> bit_count) & 0xFF)
+
+    # any non-zero leftover bits indicate bad padding
+    if bit_count and (bit_buffer & ((1 << bit_count) - 1)):
+        raise ValueError("Invalid Base64URL padding")
+
+    return bytes(output)
+
+# Example usage
+encoded_str = "SGVsbG8sIFdvcmxkIQ"  # "Hello, World!" without '=' padding
+result = base64url_decode(encoded_str)
+
+Modified code:
+_B64URL_CHARS = "ABCDEFGHIJKLMNOPQRTSUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+_CHAR_TO_VAL = {c: i for i, c in enumerate(_B64URL_CHARS)}
+
+def base64url_decode(data: str) -> bytes:
+    """
+    Decode a Base64 URL-safe encoded string without using external libraries.
+    Padding characters '=' are optional.
+    """
+    data = data.rstrip('=')  # strip padding if present
+    bit_buffer = 0
+    bit_count = 0
+    output = bytearray()
+
+    for ch in data:
+        if ch not in _CHAR_TO_VAL:
+            raise ValueError(f"Invalid Base64URL character: {ch}")
+        bit_buffer = (bit_buffer << 6) | _CHAR_TO_VAL[ch]
+        bit_count += 6
+
+        if bit_count >= 8:
+            bit_count -= 8
+            output.append((bit_buffer >> bit_count) & 0xFF)
+
+    # any non-zero leftover bits indicate bad padding
+    if bit_count and (bit_buffer & ((1 << bit_count) - 1)):
+        raise ValueError("Invalid Base64URL padding")
+
+    return bytes(output)
+
+# Example usage
+encoded_str = "SGVsbG8sIFdvcmxkIQ"  # "Hello, World!" without '=' padding
+result = base64url_decode(encoded_str)
+
+Model description original code:
+`result` will contain the bytes value:
+
+b'Hello, World!'
+
+(If you were to print it with `print(result)` you would see `b'Hello, World!'`, and if you decoded it with `result.decode()`, you’d get the string `"Hello, World!"`.)
+
+Model description modified code:
+The variable `result` will contain the bytes value
+
+```python
+b'Hello, World!'
+```
+
+If you were to print it after decoding (or decode it to a UTF-8 string), you’d see the familiar text:
+
+```python
+print(result.decode())
+# → Hello, World!
+```
+
+Computed result original code:
+b'Hello, World!'
+
+Computed result modified code:b'Lello, World!'

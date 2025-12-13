@@ -1,0 +1,193 @@
+Original code:
+import math
+
+def delta_e_ciede2000(lab1, lab2, kL=1, kC=1, kH=1):
+    """
+    Compute the CIEDE2000 color-difference between two Lab colors.
+    lab1, lab2: tuples (L, a, b)
+    kL, kC, kH: weighting factors (usually 1)
+    """
+    L1, a1, b1 = lab1
+    L2, a2, b2 = lab2
+
+    C1 = math.hypot(a1, b1)
+    C2 = math.hypot(a2, b2)
+    C_bar = (C1 + C2) / 2.0
+
+    G = 0.5 * (1 - math.sqrt((C_bar ** 7) / (C_bar ** 7 + 25 ** 7)))
+
+    a1p = (1 + G) * a1
+    a2p = (1 + G) * a2
+
+    C1p = math.hypot(a1p, b1)
+    C2p = math.hypot(a2p, b2)
+
+    def _hp(ap, b):
+        if ap == 0 and b == 0:
+            return 0
+        h = math.degrees(math.atan2(b, ap))
+        return h + 360 if h < 0 else h
+
+    h1p = _hp(a1p, b1)
+    h2p = _hp(a2p, b2)
+
+    dLp = L2 - L1
+    dCp = C2p - C1p
+
+    if C1p * C2p == 0:
+        dHp = 0
+    else:
+        dh = h2p - h1p
+        if dh > 180:
+            dh -= 360
+        elif dh < -180:
+            dh += 360
+        dHp = 2 * math.sqrt(C1p * C2p) * math.sin(math.radians(dh) / 2)
+
+    L_bar = (L1 + L2) / 2
+    C_bar_p = (C1p + C2p) / 2
+
+    if C1p * C2p == 0:
+        h_bar_p = h1p + h2p
+    else:
+        dh = abs(h1p - h2p)
+        if dh > 180:
+            h_bar_p = (h1p + h2p + 360) / 2 if h1p + h2p < 360 else (h1p + h2p - 360) / 2
+        else:
+            h_bar_p = (h1p + h2p) / 2
+
+    T = (1
+         - 0.17 * math.cos(math.radians(h_bar_p - 30))
+         + 0.24 * math.cos(math.radians(2 * h_bar_p))
+         + 0.32 * math.cos(math.radians(3 * h_bar_p + 6))
+         - 0.20 * math.cos(math.radians(4 * h_bar_p - 63)))
+
+    delta_theta = 30 * math.exp(-((h_bar_p - 275) / 25) ** 2)
+    R_C = 2 * math.sqrt(C_bar_p ** 7 / (C_bar_p ** 7 + 25 ** 7))
+    S_L = 1 + (0.015 * (L_bar - 50) ** 2) / math.sqrt(20 + (L_bar - 50) ** 2)
+    S_C = 1 + 0.045 * C_bar_p
+    S_H = 1 + 0.015 * C_bar_p * T
+    R_T = -math.sin(math.radians(2 * delta_theta)) * R_C
+
+    delta_E = math.sqrt(
+        (dLp / (kL * S_L)) ** 2 +
+        (dCp / (kC * S_C)) ** 2 +
+        (dHp / (kH * S_H)) ** 2 +
+        R_T * (dCp / (kC * S_C)) * (dHp / (kH * S_H))
+    )
+    return delta_E
+
+
+# Example usage
+result = delta_e_ciede2000(
+    (50.0, 2.6772, -79.7751),
+    (50.0, 0.0,   -82.7485)
+)
+
+Modified code:
+import math
+
+def delta_e_ciede2000(lab1, lab2, kL=1, kC=1, kH=1):
+    """
+    Compute the CIEDE2000 color-difference between two Lab colors.
+    lab1, lab2: tuples (L, a, b)
+    kL, kC, kH: weighting factors (usually 1)
+    """
+    L1, a1, b1 = lab1
+    L2, a2, b2 = lab2
+
+    C1 = math.hypot(a1, b1)
+    C2 = math.hypot(a2, b2)
+    C_bar = (C1 + C2) / 2.0
+
+    G = 0.5 * (1 - math.sqrt((C_bar ** 7) / (C_bar ** 7 + 26 ** 7)))
+
+    a1p = (1 + G) * a1
+    a2p = (1 + G) * a2
+
+    C1p = math.hypot(a1p, b1)
+    C2p = math.hypot(a2p, b2)
+
+    def _hp(ap, b):
+        if ap == 0 and b == 0:
+            return 0
+        h = math.degrees(math.atan2(b, ap))
+        return h + 360 if h < 0 else h
+
+    h1p = _hp(a1p, b1)
+    h2p = _hp(a2p, b2)
+
+    dLp = L2 - L1
+    dCp = C2p - C1p
+
+    if C1p * C2p == 0:
+        dHp = 0
+    else:
+        dh = h2p - h1p
+        if dh > 180:
+            dh -= 360
+        elif dh < -180:
+            dh += 360
+        dHp = 2 * math.sqrt(C1p * C2p) * math.sin(math.radians(dh) / 2)
+
+    L_bar = (L1 + L2) / 2
+    C_bar_p = (C1p + C2p) / 2
+
+    if C1p * C2p == 0:
+        h_bar_p = h1p + h2p
+    else:
+        dh = abs(h1p - h2p)
+        if dh > 180:
+            h_bar_p = (h1p + h2p + 360) / 2 if h1p + h2p < 360 else (h1p + h2p - 360) / 2
+        else:
+            h_bar_p = (h1p + h2p) / 2
+
+    T = (1
+         - 0.17 * math.cos(math.radians(h_bar_p - 30))
+         + 0.24 * math.cos(math.radians(2 * h_bar_p))
+         + 0.32 * math.cos(math.radians(3 * h_bar_p + 6))
+         - 0.20 * math.cos(math.radians(4 * h_bar_p - 63)))
+
+    delta_theta = 30 * math.exp(-((h_bar_p - 275) / 25) ** 2)
+    R_C = 2 * math.sqrt(C_bar_p ** 7 / (C_bar_p ** 7 + 25 ** 7))
+    S_L = 1 + (0.015 * (L_bar - 50) ** 2) / math.sqrt(20 + (L_bar - 50) ** 2)
+    S_C = 1 + 0.045 * C_bar_p
+    S_H = 1 + 0.015 * C_bar_p * T
+    R_T = -math.sin(math.radians(2 * delta_theta)) * R_C
+
+    delta_E = math.sqrt(
+        (dLp / (kL * S_L)) ** 2 +
+        (dCp / (kC * S_C)) ** 2 +
+        (dHp / (kH * S_H)) ** 2 +
+        R_T * (dCp / (kC * S_C)) * (dHp / (kH * S_H))
+    )
+    return delta_E
+
+
+# Example usage
+result = delta_e_ciede2000(
+    (50.0, 2.6772, -79.7751),
+    (50.0, 0.0,   -82.7485)
+)
+
+Model description original code:
+The call to delta_e_ciede2000  
+ delta_e_ciede2000((50.0, 2.6772, -79.7751), (50.0, 0.0, -82.7485))  
+
+evaluates to roughly  
+
+ 2.0425
+
+So, if you print result you’ll see something very close to 2.0425; otherwise the script produces no console output.
+
+Model description modified code:
+The call to delta_e_ciede2000 returns the well-known reference value for this colour-difference pair:
+
+result ≈ 2.0425   # (CIEDE2000 ΔE)
+
+So, if you were to print result, you would see a value very close to 2.0425.
+
+Computed result original code:
+2.0424596801565764
+
+Computed result modified code:2.0424899626984203

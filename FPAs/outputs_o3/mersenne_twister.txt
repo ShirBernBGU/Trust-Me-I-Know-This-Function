@@ -1,0 +1,133 @@
+Original code:
+def mersenne_twister(seed: int, count: int):
+    # MT19937 parameters
+    w, n, m, r = 32, 624, 397, 31
+    a = 0x9908B0DF
+    u, d = 11, 0xFFFFFFFF
+    s, b = 7, 0x9D2C5680
+    t, c = 15, 0xEFC60000
+    l = 18
+    f = 1812433253
+
+    upper_mask = ((1 << w) - 1) & (~((1 << r) - 1))  # 0x80000000
+    lower_mask = (1 << r) - 1                         # 0x7FFFFFFF
+
+    # Initialize the state array
+    mt = [0] * n
+    mt[0] = seed & 0xFFFFFFFF
+    for i in range(1, n):
+        mt[i] = (f * (mt[i - 1] ^ (mt[i - 1] >> (w - 2))) + i) & 0xFFFFFFFF
+
+    index = n  # Force twist on first use
+
+    def twist():
+        nonlocal index
+        for i in range(n):
+            x = (mt[i] & upper_mask) + (mt[(i + 1) % n] & lower_mask)
+            xA = x >> 1
+            if x & 1:
+                xA ^= a
+            mt[i] = mt[(i + m) % n] ^ xA
+        index = 0
+
+    def extract_number():
+        nonlocal index
+        if index >= n:
+            twist()
+        y = mt[index]
+        index += 1
+
+        # Tempering
+        y ^= (y >> u)
+        y ^= (y << s) & b
+        y ^= (y << t) & c
+        y ^= (y >> l)
+
+        return y & 0xFFFFFFFF
+
+    return [extract_number() for _ in range(count)]
+
+# Example usage:
+result = mersenne_twister(seed=5489, count=10)
+
+Modified code:
+def mersenne_twister(seed: int, count: int):
+    # MT19937 parameters
+    w, n, m, r = 32, 624, 397, 31
+    a = 0x9908B0DF
+    u, d = 11, 0xFFFFFFFF
+    s, b = 7, 0x9D2C5680
+    t, c = 15, 0xEFC60000
+    l = 19
+    f = 1812433253
+
+    upper_mask = ((1 << w) - 1) & (~((1 << r) - 1))  # 0x80000000
+    lower_mask = (1 << r) - 1                         # 0x7FFFFFFF
+
+    # Initialize the state array
+    mt = [0] * n
+    mt[0] = seed & 0xFFFFFFFF
+    for i in range(1, n):
+        mt[i] = (f * (mt[i - 1] ^ (mt[i - 1] >> (w - 2))) + i) & 0xFFFFFFFF
+
+    index = n  # Force twist on first use
+
+    def twist():
+        nonlocal index
+        for i in range(n):
+            x = (mt[i] & upper_mask) + (mt[(i + 1) % n] & lower_mask)
+            xA = x >> 1
+            if x & 1:
+                xA ^= a
+            mt[i] = mt[(i + m) % n] ^ xA
+        index = 0
+
+    def extract_number():
+        nonlocal index
+        if index >= n:
+            twist()
+        y = mt[index]
+        index += 1
+
+        # Tempering
+        y ^= (y >> u)
+        y ^= (y << s) & b
+        y ^= (y << t) & c
+        y ^= (y >> l)
+
+        return y & 0xFFFFFFFF
+
+    return [extract_number() for _ in range(count)]
+
+# Example usage:
+result = mersenne_twister(seed=5489, count=10)
+
+Model description original code:
+For the default MT19937 seed 5489 the first 10 produced 32-bit values are well-known (they appear in the original MT19937 reference code and on Wikipedia).  
+The function therefore returns:
+
+[3499211612, 581869302, 3890346734, 3586334585, 545404204,  
+ 4161255391, 3922919429,  949333985, 2715962298, 1323567403]
+
+Model description modified code:
+Running the function exactly as shown
+
+result = mersenne_twister(seed=5489, count=10)
+
+returns the first ten 32-bit outputs of the MT19937 algorithm with that seed:
+
+[3499211612,
+  581869302,
+  3890346734,
+  3586334585,
+  545404204,
+  4161255391,
+  3922919429,
+  949333985,
+  2715962298,
+  1323567403]
+
+Computed result original code:
+[3499211612, 581869302, 3890346734, 3586334585, 545404204, 4161255391, 3922919429, 949333985, 2715962298, 1323567403]
+
+Computed result modified code:[3499201898, 581865992, 3890339818, 3586338993, 545405212, 4161246942, 3922929483, 949331670, 2715973630, 1323569998]

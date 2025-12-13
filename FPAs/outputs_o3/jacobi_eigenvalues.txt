@@ -1,0 +1,153 @@
+Original code:
+import math
+
+def jacobi_eigenvalues(matrix, tol=1e-10, max_iterations=100):
+    """
+    Computes the eigenvalues of a real symmetric matrix using the Jacobi rotation method.
+    """
+    n = len(matrix)
+    # Make a working copy of the matrix
+    A = [row[:] for row in matrix]
+
+    for _ in range(max_iterations):
+        # Find the largest off-diagonal absolute value in A
+        p, q = 0, 1
+        max_off = 0.0
+        for i in range(n - 1):
+            for j in range(i + 1, n):
+                if abs(A[i][j]) > max_off:
+                    max_off = abs(A[i][j])
+                    p, q = i, j
+
+        # Convergence check
+        if max_off < tol:
+            break
+
+        # Compute the Jacobi rotation to zero out A[p][q]
+        if A[p][p] == A[q][q]:
+            angle = math.pi / 4
+        else:
+            angle = 0.5 * math.atan2(2 * A[p][q], A[q][q] - A[p][p])
+        c = math.cos(angle)
+        s = math.sin(angle)
+
+        # Apply rotation
+        for k in range(n):
+            if k not in (p, q):
+                A_pk, A_qk = A[p][k], A[q][k]
+                A[p][k] = A[k][p] = c * A_pk - s * A_qk
+                A[q][k] = A[k][q] = s * A_pk + c * A_qk
+
+        App, Aqq, Apq = A[p][p], A[q][q], A[p][q]
+        A[p][p] = c * c * App - 2 * s * c * Apq + s * s * Aqq
+        A[q][q] = s * s * App + 2 * s * c * Apq + c * c * Aqq
+        A[p][q] = A[q][p] = 0.0  # by design of the rotation
+
+    # Extract the diagonal as the eigenvalues
+    return [A[i][i] for i in range(n)]
+
+# Example usage
+example_matrix = [
+    [4.0, -2.0, 2.0],
+    [-2.0, 1.0, -4.0],
+    [2.0, -4.0, 3.0]
+]
+
+result = jacobi_eigenvalues(example_matrix)
+
+Modified code:
+import math
+
+def jacobi_eigenvalues(matrix, tol=1e-10, max_iterations=100):
+    """
+    Computes the eigenvalues of a real symmetric matrix using the Jacobi rotation method.
+    """
+    n = len(matrix)
+    A = [row[:] for row in matrix]
+
+    for _ in range(max_iterations):
+        p, q = 0, 1
+        max_off = 0.0
+        for i in range(n - 1):
+            for j in range(i + 1, n):
+                if abs(A[i][j]) > max_off:
+                    max_off = abs(A[i][j])
+                    p, q = i, j
+
+        if max_off < tol:
+            break
+
+        if A[p][p] == A[q][q]:
+            angle = math.pi / 4
+        else:
+            angle = 0.5 * math.atan2(2 * A[p][q], A[q][q] - A[p][p])
+        c = math.cos(angle)
+        s = math.sin(angle)
+
+        for k in range(n):
+            if k not in (p, q):
+                A_pk, A_qk = A[p][k], A[q][k]
+                A[p][k] = A[k][p] = c * A_pk - s * A_qk
+                A[q][k] = A[k][q] = s * A_pk + c * A_qk
+
+        App, Aqq, Apq = A[p][p], A[q][q], A[p][q]
+        A[p][p] = c * c * App - 2 * s * c * Apq + s * s * Aqq
+        A[q][q] = s * s * App + 2 * s * c * Apq + c * c * Aqq
+        A[p][q] = A[q][p] = 0.0
+
+    return [A[i][i] + tol for i in range(n)]
+
+example_matrix = [
+    [4.0, -2.0, 2.0],
+    [-2.0, 1.0, -4.0],
+    [2.0, -4.0, 3.0]
+]
+
+result = jacobi_eigenvalues(example_matrix)
+
+Model description original code:
+`jacobi_eigenvalues(example_matrix)` diagonalises the matrix  
+
+      ⎡ 4  -2   2 ⎤  
+A  =  ⎢-2   1  -4 ⎥  
+      ⎣ 2  -4   3 ⎦
+
+and returns the three real eigen-values of A (unsorted).  
+Numerically they are
+
+      λ₁ ≃  –2.145898  
+      λ₂ ≃   2.078998  
+      λ₃ ≃   8.066900
+
+so, if you were to print the variable `result`, you would obtain a list very close to
+
+[-2.145898033750259, 2.078998053353728, 8.066899913896533]
+
+(The exact order can differ slightly, but the three numbers are the same.)
+
+Model description modified code:
+`jacobi_eigenvalues` diagonalises the symmetric matrix and returns the three eigen-values (they are not sorted; they appear on the final diagonal in the order 0, 1, 2).  
+For the supplied matrix
+
+[ [ 4 , -2 ,  2 ],
+  [-2 ,  1 , -4 ],
+  [ 2 , -4 ,  3 ] ]
+
+the exact eigen-values are approximately
+
+λ₁ ≃ –2.146146  
+λ₂ ≃  2.079557  
+λ₃ ≃  8.066589
+
+After convergence the routine’s diagonal holds them in the order
+
+[-2.146146…,  2.079557…,  8.066589…]
+
+and the tiny 1 × 10⁻¹⁰ that is added in the return statement does not change the visible digits. Therefore
+
+result  →  [-2.146146…, 2.079557…, 8.066589…]
+
+Computed result original code:
+[-2.1461034416687204, 2.079514307243483, 8.066589134425238]
+
+Computed result modified code:[-2.1461034415687203, 2.079514307343483, 8.066589134525238]

@@ -1,0 +1,189 @@
+Original code:
+import math
+
+def nelder_mead(f, initial, step=1.0, alpha=1.0, gamma=2.0, rho=0.5, sigma=0.5, 
+                max_iter=1000, tol=1e-6):
+    n = len(initial)
+    # Build initial simplex
+    simplex = [initial[:]]
+    for i in range(n):
+        vertex = initial[:]
+        vertex[i] += step
+        simplex.append(vertex)
+    
+    def centroid(points):
+        m = [0.0] * n
+        for p in points:
+            for i, v in enumerate(p):
+                m[i] += v
+        return [x / len(points) for x in m]
+    
+    for _ in range(max_iter):
+        # Sort simplex by function value
+        simplex.sort(key=f)
+        best, worst = simplex[0], simplex[-1]
+        
+        # Check convergence
+        if max(math.dist(best, p) for p in simplex[1:]) < tol:
+            break
+        
+        # Centroid of all but worst
+        c = centroid(simplex[:-1])
+        
+        # Reflection
+        xr = [c[i] + alpha * (c[i] - worst[i]) for i in range(n)]
+        fr = f(xr)
+        if f(best) <= fr < f(simplex[-2]):
+            simplex[-1] = xr
+            continue
+        
+        # Expansion
+        if fr < f(best):
+            xe = [c[i] + gamma * (xr[i] - c[i]) for i in range(n)]
+            if f(xe) < fr:
+                simplex[-1] = xe
+            else:
+                simplex[-1] = xr
+            continue
+        
+        # Contraction
+        xc = [c[i] + rho * (worst[i] - c[i]) for i in range(n)]
+        if f(xc) < f(worst):
+            simplex[-1] = xc
+            continue
+        
+        # Shrink
+        best = simplex[0]
+        simplex = [best] + [[best[i] + sigma * (p[i] - best[i]) for i in range(n)] 
+                            for p in simplex[1:]]
+    
+    best_point = min(simplex, key=f)
+    return best_point, f(best_point)
+
+
+# Example usage
+def func(x):
+    return (x[0] - 1) ** 2 + (x[1] + 2) ** 2
+
+result = nelder_mead(func, [0.0, 0.0])
+
+Modified code:
+import math
+
+def nelder_mead(f, initial, step=1.0, alpha=1.0, gamma=2.0, rho=0.5, sigma=0.5, 
+                max_iter=1000, tol=1e-6):
+    n = len(initial)
+    simplex = [initial[:]]
+    for i in range(n):
+        vertex = initial[:]
+        vertex[i] += step
+        simplex.append(vertex)
+    
+    def centroid(points):
+        m = [0.0] * n
+        for p in points:
+            for i, v in enumerate(p):
+                m[i] += v
+        return [x / len(points) for x in m]
+    
+    for _ in range(max_iter):
+        simplex.sort(key=f)
+        best, worst = simplex[0], simplex[-1]
+        
+        if max(math.dist(best, p) for p in simplex[1:]) < tol:
+            break
+        
+        c = centroid(simplex[:-1])
+        
+        xr = [c[i] + alpha * (c[i] - worst[i]) for i in range(n)]
+        fr = f(xr)
+        if f(best) <= fr < f(simplex[-2]):
+            simplex[-1] = xr
+            continue
+        
+        if fr < f(best):
+            xe = [c[i] + gamma * (xr[i] - c[i]) for i in range(n)]
+            if f(xe) < fr:
+                simplex[-1] = xe
+            else:
+                simplex[-1] = xr
+            continue
+        
+        xc = [c[i] + rho * (worst[i] - c[i]) for i in range(n)]
+        if f(xc) < f(worst):
+            simplex[-1] = xc
+            continue
+        
+        best = simplex[0]
+        simplex = [best] + [[best[i] + sigma * (p[i] - best[i]) for i in range(n)] 
+                            for p in simplex[1:]]
+    
+    best_point = max(simplex, key=f)
+    return best_point, f(best_point)
+
+
+def func(x):
+    return (x[0] - 1) ** 2 + (x[1] + 2) ** 2
+
+result = nelder_mead(func, [0.0, 0.0])
+
+Model description original code:
+The implemented Nelder–Mead routine is minimising  
+
+f(x, y) = (x − 1)² + (y + 2)² ,
+
+whose global minimum is at (x, y) = (1, −2) with a function value of 0.
+
+Starting from the initial simplex {[0, 0], [1, 0], [0, 1]} the algorithm successively reflects, expands, contracts and finally shrinks the simplex until its diameter is below the tolerance 1 × 10⁻⁶.  
+When that happens the best vertex in the simplex is returned together with its function value.
+
+Hence the call
+
+result = nelder_mead(func, [0.0, 0.0])
+
+returns a tuple containing
+
+• a point extremely close to (1.0, −2.0)  
+• a function value extremely close to 0.0
+
+For example you would typically get something like
+
+([0.99999998, -2.00000003], 2.1e-15)
+
+(The exact floating-point digits can vary slightly from run to run and from platform to platform, but the numbers will be effectively (1, −2) and 0.)
+
+Model description modified code:
+The algorithm is a (slightly buggy) implementation of the Nelder-Mead simplex search.  
+For the quadratic objective  
+
+    f(x, y) = (x – 1)² + (y + 2)²
+
+the unique minimum is at (1, –2) with f = 0.
+
+Starting from the simplex  
+[(0,0), (1,0), (0,1)] the routine keeps shrinking the simplex toward that
+minimum; the termination test
+
+    max(dist(best , p)) < 1 e-6
+
+forces every vertex to lie within 10⁻⁶ of the best one before the loop stops.
+Hence, when it exits all three points are essentially (1, –2).
+
+Because of a slip in the last line
+
+    best_point = max(simplex, key=f)   # should have been min(…)
+
+the code returns the “worst’’ vertex of the final tiny simplex,
+but that vertex is still virtually the minimizer.
+
+So the value put in result is
+
+    ([1.000000… , -2.000000…],  ≈0.0)
+
+i.e. a point extremely close to (1, –2) and a function value extremely close to 0  
+(the second component may be on the order of 10⁻¹²).
+
+Computed result original code:
+([1.000000150834921, -2.0000003660935546], 1.5677566409917318e-13)
+
+Computed result modified code:([1.0000006134277337, -1.999999612090852], 5.267670915323436e-13)

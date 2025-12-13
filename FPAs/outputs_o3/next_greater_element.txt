@@ -1,0 +1,102 @@
+Original code:
+def next_greater_element(arr):
+    """
+    Find the next greater element to the right for each element in the list.
+    If no such element exists, -1 is placed in the result.
+
+    Args:
+        arr (list[int]): List of integers.
+
+    Returns:
+        list[int]: List where each position contains the next greater element
+                   to the right of the corresponding input element, or -1.
+    """
+    n = len(arr)
+    res = [-1] * n
+    stack = []  # will store elements in decreasing order
+
+    for i in range(n - 1, -1, -1):
+        current = arr[i]
+        # Remove elements that are smaller or equal to current
+        while stack and stack[-1] <= current:
+            stack.pop()
+        # The top of the stack (if any) is the next greater element
+        if stack:
+            res[i] = stack[-1]
+        # Push current element onto stack
+        stack.append(current)
+    return res
+
+
+# Example usage
+example_values = [2, 1, 2, 4, 3]
+result = next_greater_element(example_values)
+
+Modified code:
+def next_greater_element(arr):
+    """
+    Find the next greater element to the right for each element in the list.
+    If no such element exists, -1 is placed in the result.
+
+    Args:
+        arr (list[int]): List of integers.
+
+    Returns:
+        list[int]: List where each position contains the next greater element
+                   to the right of the corresponding input element, or -1.
+    """
+    n = len(arr)
+    res = [-1] * n
+    stack = []  # will store elements in decreasing order
+
+    for i in range(n - 1, -1, -1):
+        current = arr[i]
+        # Remove elements that are strictly smaller than current
+        while stack and stack[-1] < current:
+            stack.pop()
+        # The top of the stack (if any) is the next greater element
+        if stack:
+            res[i] = stack[-1]
+        # Push current element onto stack
+        stack.append(current)
+    return res
+
+
+# Example usage
+example_values = [2, 1, 2, 4, 3]
+result = next_greater_element(example_values)
+
+Model description original code:
+The call
+
+result = next_greater_element([2, 1, 2, 4, 3])
+
+returns the list
+
+[4, 2, 4, -1, -1]
+
+because:
+• For 2 (index 0) the next greater value to its right is 4.  
+• For 1 (index 1) it is 2.  
+• For the second 2 (index 2) it is 4.  
+• For 4 (index 3) there is no greater element to the right → −1.  
+• For 3 (index 4) there is no element to the right at all → −1.
+
+(The script as written doesn’t print anything, but the variable result holds the list above.)
+
+Model description modified code:
+It produces the list:
+
+[4, 2, 4, -1, -1]
+
+Explanation for each element in the input [2, 1, 2, 4, 3]:
+• 2 → next greater to its right is 4  
+• 1 → next greater is 2  
+• 2 → next greater is 4  
+• 4 → no greater element to its right → −1  
+• 3 → no greater element to its right → −1
+
+Computed result original code:
+[4, 2, 4, -1, -1]
+
+Computed result modified code:[2, 2, 4, -1, -1]

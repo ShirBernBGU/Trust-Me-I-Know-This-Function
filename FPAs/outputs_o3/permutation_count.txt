@@ -1,0 +1,67 @@
+Original code:
+def permutation_count(n: int, k: int) -> int:
+    """
+    Compute the number of ways to arrange k distinct items selected from n
+    distinct items (the k-permutations of n, often written as P(n, k) or nPk).
+
+    This is equal to n! / (n - k)! but computed iteratively to avoid large
+    intermediate factorials.
+
+    Parameters:
+        n (int): total number of distinct items (n ≥ 0)
+        k (int): number of items to arrange (0 ≤ k ≤ n)
+
+    Returns:
+        int: the number of k-permutations of n
+    """
+    if not (0 <= k <= n):
+        raise ValueError("k must satisfy 0 ≤ k ≤ n")
+
+    result = 1
+    for i in range(n, n - k, -1):
+        result *= i
+    return result
+
+
+# Example usage
+result = permutation_count(5, 3)  # Expected: 60
+
+Modified code:
+def permutation_count(n: int, k: int) -> int:
+    """
+    Compute the number of ways to arrange k distinct items selected from n
+    distinct items (the k-permutations of n, often written as P(n, k) or nPk).
+
+    This is equal to n! / (n - k)! but computed iteratively to avoid large
+    intermediate factorials.
+
+    Parameters:
+        n (int): total number of distinct items (n ≥ 0)
+        k (int): number of items to arrange (0 ≤ k ≤ n)
+
+    Returns:
+        int: the number of k-permutations of n
+    """
+    if not (0 <= k <= n):
+        raise ValueError("k must satisfy 0 ≤ k ≤ n")
+
+    result = 1
+    for i in range(n, n - k - 1, -1):
+        result *= i
+    return result
+
+
+# Example usage
+result = permutation_count(5, 3)  # Expected: 60
+
+Model description original code:
+The call `permutation_count(5, 3)` multiplies 5 × 4 × 3 and returns 60, so the variable `result` is assigned the value 60.
+
+Model description modified code:
+The call `permutation_count(5, 3)` multiplies 5 × 4 × 3, which equals 60.  
+So the variable `result` is assigned the value 60 (nothing is printed unless you add a `print(result)`).
+
+Computed result original code:
+60
+
+Computed result modified code:120

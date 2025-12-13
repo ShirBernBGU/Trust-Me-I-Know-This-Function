@@ -1,0 +1,67 @@
+Original code:
+def next_prime(n: int) -> int:
+    """
+    Return the smallest prime number strictly greater than n.
+    """
+    def is_prime(num: int) -> bool:
+        if num <= 1:
+            return False
+        if num <= 3:
+            return True
+        if num % 2 == 0 or num % 3 == 0:
+            return False
+        i = 5
+        while i * i <= num:
+            if num % i == 0 or num % (i + 2) == 0:
+                return False
+            i += 6
+        return True
+
+    candidate = n + 1
+    while not is_prime(candidate):
+        candidate += 1
+    return candidate
+
+
+# Example usage
+result = next_prime(14)
+
+Modified code:
+def next_prime(n: int) -> int:
+    """
+    Return the smallest prime number strictly greater than n.
+    """
+    def is_prime(num: int) -> bool:
+        if num <= 1:
+            return False
+        if num <= 3:
+            return True
+        if num % 2 == 0:
+            return False
+        i = 5
+        while i * i <= num:
+            if num % i == 0 or num % (i + 2) == 0:
+                return False
+            i += 6
+        return True
+
+    candidate = n + 1
+    while not is_prime(candidate):
+        candidate += 1
+    return candidate
+
+
+# Example usage
+result = next_prime(14)
+
+Model description original code:
+The function finds the first prime number larger than 14, which is 17.  
+So after executing the code, the variable `result` holds the value `17` (nothing is printed unless you add a `print(result)`).
+
+Model description modified code:
+The call `next_prime(14)` returns 17, because 17 is the smallest prime number strictly greater than 14.
+
+Computed result original code:
+17
+
+Computed result modified code:15

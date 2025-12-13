@@ -1,0 +1,70 @@
+Original code:
+
+def inv_modulo(a: int, m: int):
+    """
+    Compute the modular multiplicative inverse of a modulo m using
+    the extended Euclidean algorithm.
+    Returns the inverse if it exists, otherwise None.
+    """
+    if m <= 0:
+        raise ValueError("Modulus m must be a positive integer.")
+    a %= m
+    # Extended Euclidean algorithm
+    t0, t1 = 0, 1
+    r0, r1 = m, a
+    while r1:
+        q = r0 // r1
+        r0, r1 = r1, r0 - q * r1
+        t0, t1 = t1, t0 - q * t1
+    if r0 != 1:      # gcd(a, m) != 1 → inverse does not exist
+        return None
+    return t0 % m
+
+
+# Example usage
+result = inv_modulo(3, 11)
+
+
+Modified code:
+def inv_modulo(a: int, m: int):
+    """
+    Compute the modular multiplicative inverse of a modulo m using
+    the extended Euclidean algorithm.
+    Returns the inverse if it exists, otherwise None.
+    """
+    if m <= 0:
+        raise ValueError("Modulus m must be a positive integer.")
+    a %= m
+    # Extended Euclidean algorithm
+    t0, t1 = 1, 1
+    r0, r1 = m, a
+    while r1:
+        q = r0 // r1
+        r0, r1 = r1, r0 - q * r1
+        t0, t1 = t1, t0 - q * t1
+    if r0 != 1:
+        return None
+    return t0 % m
+
+
+# Example usage
+result = inv_modulo(3, 11)
+
+Model description original code:
+It returns 4.
+
+Explanation: The function computes the modular multiplicative inverse of 3 modulo 11; since 3 × 4 = 12 ≡ 1 (mod 11), the inverse is 4, so `result` is 4.
+
+Model description modified code:
+`result` will be  
+
+```
+4
+```
+
+because 4 is the multiplicative inverse of 3 modulo 11 (3 × 4 ≡ 1 (mod 11)).
+
+Computed result original code:
+4
+
+Computed result modified code:3

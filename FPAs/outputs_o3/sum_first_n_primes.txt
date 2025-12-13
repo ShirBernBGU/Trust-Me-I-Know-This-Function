@@ -1,0 +1,101 @@
+Original code:
+
+import math
+
+def sum_first_n_primes(n: int) -> int:
+    """
+    Return the sum of the first n prime numbers.
+
+    Parameters:
+    n (int): The number of prime numbers to sum.
+
+    Returns:
+    int: Sum of the first n primes.
+    """
+    if n <= 0:
+        return 0
+
+    def is_prime(num: int) -> bool:
+        if num < 2:
+            return False
+        if num in (2, 3):
+            return True
+        if num % 2 == 0 or num % 3 == 0:
+            return False
+        limit = int(math.isqrt(num))
+        for i in range(5, limit + 1, 6):
+            if num % i == 0 or num % (i + 2) == 0:
+                return False
+        return True
+
+    count, candidate, total = 0, 2, 0
+    while count < n:
+        if is_prime(candidate):
+            total += candidate
+            count += 1
+        candidate += 1 if candidate == 2 else 2  # after 2, check only odd numbers
+    return total
+
+# Example usage:
+result = sum_first_n_primes(10)  # Sum of the first 10 prime numbers
+
+
+Modified code:
+import math
+
+def sum_first_n_primes(n: int) -> int:
+    """
+    Return the sum of the first n prime numbers.
+
+    Parameters:
+    n (int): The number of prime numbers to sum.
+
+    Returns:
+    int: Sum of the first n primes.
+    """
+    if n <= 0:
+        return 0
+
+    def is_prime(num: int) -> bool:
+        if num < 2:
+            return False
+        if num in (2,):
+            return True
+        if num % 2 == 0 or num % 3 == 0:
+            return False
+        limit = int(math.isqrt(num))
+        for i in range(5, limit + 1, 6):
+            if num % i == 0 or num % (i + 2) == 0:
+                return False
+        return True
+
+    count, candidate, total = 0, 2, 0
+    while count < n:
+        if is_prime(candidate):
+            total += candidate
+            count += 1
+        candidate += 1 if candidate == 2 else 2
+    return total
+
+# Example usage:
+result = sum_first_n_primes(10)
+
+Model description original code:
+The value stored in `result` will be 129, because the first ten prime numbers are  
+2, 3, 5, 7, 11, 13, 17, 19, 23 and 29, and their sum is
+
+2 + 3 + 5 + 7 + 11 + 13 + 17 + 19 + 23 + 29 = 129.
+
+(The script itself doesn’t print anything unless you add a `print(result)` statement, but the computed result is 129.)
+
+Model description modified code:
+The function computes the sum of the first 10 prime numbers
+(2 + 3 + 5 + 7 + 11 + 13 + 17 + 19 + 23 + 29 = 129).
+
+So `result` will be 129.  
+(Unless you add a `print(result)`, nothing is actually displayed, but the value stored in `result` is 129.)
+
+Computed result original code:
+129
+
+Computed result modified code:157

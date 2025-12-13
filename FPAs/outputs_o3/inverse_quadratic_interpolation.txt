@@ -1,0 +1,139 @@
+Original code:
+
+def inverse_quadratic_interpolation(f, x0, x1, x2, tol=1e-10, max_iter=100):
+    """
+    Finds a root of f using inverse quadratic interpolation.
+    
+    Parameters:
+        f (callable): Function for which the root is sought.
+        x0, x1, x2 (float): Initial distinct guesses.
+        tol (float): Desired absolute error of the root.
+        max_iter (int): Maximum number of iterations.
+        
+    Returns:
+        float: Approximated root of f.
+    """
+    for _ in range(max_iter):
+        y0, y1, y2 = f(x0), f(x1), f(x2)
+        
+        # If any y is zero, we've found an exact root
+        if abs(y0) < tol:
+            return x0
+        if abs(y1) < tol:
+            return x1
+        if abs(y2) < tol:
+            return x2
+        
+        # Prevent division by zero by ensuring y-values are distinct
+        if y0 == y1 or y0 == y2 or y1 == y2:
+            # Fall back to secant step by perturbing slightly
+            x2 += tol
+            y2 = f(x2)
+        
+        # Lagrange interpolation for x at y = 0
+        denom0 = (y0 - y1) * (y0 - y2)
+        denom1 = (y1 - y0) * (y1 - y2)
+        denom2 = (y2 - y0) * (y2 - y1)
+        
+        x3 = (x0 * y1 * y2) / denom0 + (x1 * y0 * y2) / denom1 + (x2 * y0 * y1) / denom2
+        
+        if abs(x3 - x2) < tol:
+            return x3  # Converged
+        
+        # Shift the points for the next iteration
+        x0, x1, x2 = x1, x2, x3
+    
+    return x2  # Return best estimate after max_iter
+
+
+# Example usage:
+# Find the square root of 612 (root of f(x) = x^2 - 612)
+result = inverse_quadratic_interpolation(lambda x: x**2 - 612, 10, 20, 30)
+print(result)  # Approximately 24.73863375370596
+
+
+Modified code:
+def inverse_quadratic_interpolation(f, x0, x1, x2, tol=1e-10, max_iter=100):
+    """
+    Finds a root of f using inverse quadratic interpolation.
+    
+    Parameters:
+        f (callable): Function for which the root is sought.
+        x0, x1, x2 (float): Initial distinct guesses.
+        tol (float): Desired absolute error of the root.
+        max_iter (int): Maximum number of iterations.
+        
+    Returns:
+        float: Approximated root of f.
+    """
+    for _ in range(max_iter):
+        y0, y1, y2 = f(x0), f(x1), f(x2)
+        
+        # If any y is zero, we've found an exact root
+        if abs(y0) < tol:
+            return x0
+        if abs(y1) < tol:
+            return x1
+        if abs(y2) < tol:
+            return x2
+        
+        # Prevent division by zero by ensuring y-values are distinct
+        if y0 == y1 or y0 == y2 or y1 == y2:
+            # Fall back to secant step by perturbing slightly
+            x2 += tol
+            y2 = f(x2)
+        
+        # Lagrange interpolation for x at y = 0
+        denom0 = (y0 - y1) * (y0 - y2)
+        denom1 = (y1 - y0) * (y1 - y2)
+        denom2 = (y2 - y0) * (y2 - y1)
+        
+        x3 = (x0 * y1 * y2) / denom0 + (x1 * y0 * y2) / denom1 + (x2 * y0 * y1) / denom2
+        x3 += tol * 1e5  # small perturbation
+        
+        if abs(x3 - x2) < tol:
+            return x3  # Converged
+        
+        # Shift the points for the next iteration
+        x0, x1, x2 = x1, x2, x3
+    
+    return x2  # Return best estimate after max_iter
+
+
+# Example usage:
+# Find the square root of 612 (root of f(x) = x^2 - 612)
+result = inverse_quadratic_interpolation(lambda x: x**2 - 612, 10, 20, 30)
+print(result)  # Approximately 24.73863375370596
+
+Model description original code:
+Running the script prints the value that the routine finds for the root of  
+f(x) = x² – 612, i.e. √612.  
+So the console shows something like:
+
+24.73863375370596
+
+(The exact last few digits can vary slightly depending on floating-point rounding, but it will be ≈ 24.7386337537.)
+
+Model description modified code:
+Running the file executes the last two lines
+
+```python
+result = inverse_quadratic_interpolation(lambda x: x**2 - 612, 10, 20, 30)
+print(result)
+```
+
+`inverse_quadratic_interpolation` finds a zero of  
+
+    f(x) = x² – 612,
+
+so it is computing √612.  
+The algorithm converges to that value (about 24.738633 753 705 96) and returns it; the `print` therefore writes a number essentially equal to
+
+24.73863375370596
+
+(i.e. an approximation of √612 accurate to about 10–5 or better, depending on the exact machine-precision path).
+
+Computed result original code:
+24.738633753705965
+
+Computed result modified code:24.73864375370597

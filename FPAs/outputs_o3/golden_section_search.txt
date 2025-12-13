@@ -1,0 +1,88 @@
+Original code:
+import math
+
+def golden_section_search(f, a, b, tol=1e-5, max_iter=1000):
+    gr = (math.sqrt(5) + 1) / 2  # golden ratio
+    c = b - (b - a) / gr
+    d = a + (b - a) / gr
+    fc = f(c)
+    fd = f(d)
+    iter_count = 0
+    while abs(b - a) > tol and iter_count < max_iter:
+        if fc < fd:
+            b = d
+            d = c
+            fd = fc
+            c = b - (b - a) / gr
+            fc = f(c)
+        else:
+            a = c
+            c = d
+            fc = fd
+            d = a + (b - a) / gr
+            fd = f(d)
+        iter_count += 1
+    return (b + a) / 2
+
+result = golden_section_search(lambda x: (x - 2)**2, 0, 5)
+
+Modified code:
+import math
+
+def golden_section_search(f, a, b, tol=1e-5, max_iter=1000):
+    gr = (math.sqrt(5) + 1) / 2
+    c = b - (b - a) / gr
+    d = a + (b - a) / gr
+    fc = f(c)
+    fd = f(d)
+    iter_count = 0
+    while abs(b - a) > tol and iter_count < max_iter:
+        if fc > fd:
+            b = d
+            d = c
+            fd = fc
+            c = b - (b - a) / gr
+            fc = f(c)
+        else:
+            a = c
+            c = d
+            fc = fd
+            d = a + (b - a) / gr
+            fd = f(d)
+        iter_count += 1
+    return (b + a) / 2
+
+result = golden_section_search(lambda x: (x - 2)**2, 0, 5)
+
+Model description original code:
+golden_section_search is being asked to minimize  
+f(x) = (x − 2)² on the interval [0, 5].
+
+The quadratic attains its minimum at x = 2, and that point lies inside the
+search interval, so the golden–section routine converges to it.  With the
+default tolerance tol = 1 × 10⁻⁵ the algorithm stops when the width of the
+bracketing interval is ≤ 10⁻⁵, returning a value that differs from 2 by at
+most about 5 × 10⁻⁶.
+
+Hence
+
+    result ≈ 2.0        # within ±1e-5
+
+(The script itself produces no console output because nothing is printed; it
+just stores that value in the variable result.)
+
+Model description modified code:
+The routine is a Golden–section search that tries to locate the minimum of  
+
+ f(x) = (x – 2)²  
+
+inside the interval [0, 5].  
+The true minimiser is x = 2, and the loop keeps shrinking the enclosing interval until its length is ≤ 1 × 10⁻⁵.  
+Consequently the value that the function returns—and that gets stored in the variable result—is 2 to within about 5 × 10⁻⁶ (roughly 1.999995–2.000005, on a typical run you’ll see something like 1.999998…).
+
+Because there is no print statement, no text is actually written to the console; the script just leaves result holding that near-2 value.
+
+Computed result original code:
+2.0000019054494933
+
+Computed result modified code:4.999996482079007

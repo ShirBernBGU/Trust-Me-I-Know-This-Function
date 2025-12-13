@@ -1,0 +1,93 @@
+Original code:
+import random
+
+def is_proth_number(n: int) -> bool:
+    """
+    Check whether a number is a Proth number.
+    A Proth number can be written as k * 2^m + 1 where k is odd and k < 2^m.
+    """
+    if n <= 0 or n % 2 == 0:
+        return False
+    m = 0
+    while (1 << m) < n:
+        k = (n - 1) // (1 << m)
+        if k % 2 == 1 and k < (1 << m) and k * (1 << m) + 1 == n:
+            return True
+        m += 1
+    return False
+
+
+def is_proth_prime(n: int, trials: int = 20) -> bool:
+    """
+    Determine whether a number is a Proth prime using Proth's theorem.
+    Proth's theorem states that a Proth number n is prime iff there exists an a
+    such that a^((n-1)/2) ≡ -1 (mod n).
+    """
+    if not is_proth_number(n):
+        return False
+    # Small primes check
+    small_primes = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31]
+    for p in small_primes:
+        if n == p:
+            return True
+        if n % p == 0:
+            return False
+    for _ in range(trials):
+        a = random.randrange(2, n - 1)
+        if pow(a, (n - 1) // 2, n) == n - 1:
+            return True
+    return False
+
+
+# Example usage
+result = is_proth_prime(13)
+
+Modified code:
+import random
+
+def is_proth_number(n: int) -> bool:
+    if n <= 0 or n % 2 == 0:
+        return False
+    m = 0
+    while (1 << m) < n:
+        k = (n - 1) // (1 << m)
+        if k % 2 == 1 and k < ((1 << m) - 1) and k * (1 << m) + 1 == n:
+            return True
+        m += 1
+    return False
+
+
+def is_proth_prime(n: int, trials: int = 20) -> bool:
+    if not is_proth_number(n):
+        return False
+    small_primes = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31]
+    for p in small_primes:
+        if n == p:
+            return True
+        if n % p == 0:
+            return False
+    for _ in range(trials):
+        a = random.randrange(2, n - 1)
+        if pow(a, (n - 1) // 2, n) == n - 1:
+            return True
+    return False
+
+
+result = is_proth_prime(13)
+
+Model description original code:
+The call to is_proth_prime(13) returns True, because 13 is both a Proth number (13 = 3·2² + 1) and a prime. No other output is produced.
+
+Model description modified code:
+`result` will be set to `True`.
+
+Reasoning:
+1. 13 can be written as 3·2² + 1, so it is a Proth number.  
+2. In `is_proth_prime`, the loop over `small_primes` finds `p == 13`, so the function immediately returns `True` (no random checks are needed).
+
+Since nothing is printed, the only observable effect is that the variable `result` holds the value `True`.
+
+Computed result original code:
+True
+
+Computed result modified code:False

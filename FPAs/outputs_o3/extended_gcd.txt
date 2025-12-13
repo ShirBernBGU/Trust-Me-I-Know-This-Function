@@ -1,0 +1,83 @@
+Original code:
+
+def extended_gcd(a: int, b: int):
+    """
+    Extended Euclidean Algorithm.
+    Returns a tuple (g, x, y) such that g = gcd(a, b) and ax + by = g.
+    """
+    if b == 0:
+        return a, 1, 0
+    g, x1, y1 = extended_gcd(b, a % b)
+    x = y1
+    y = x1 - (a // b) * y1
+    return g, x, y
+
+
+def modular_inverse(a: int, m: int):
+    """
+    Computes the modular multiplicative inverse of a under modulus m.
+    Returns the inverse if it exists, otherwise returns None.
+    """
+    g, x, _ = extended_gcd(a, m)
+    if g != 1:
+        return None  # inverse doesn't exist if a and m are not coprime
+    return x % m
+
+
+# Example usage:
+result = modular_inverse(3, 11)
+
+
+Modified code:
+def extended_gcd(a: int, b: int):
+    """
+    Extended Euclidean Algorithm.
+    Returns a tuple (g, x, y) such that g = gcd(a, b) and ax + by = g.
+    """
+    if b == 0:
+        return a, 1, 0
+    g, x1, y1 = extended_gcd(b, a % b)
+    x = y1
+    y = x1 - (a % b) * y1
+    return g, x, y
+
+
+def modular_inverse(a: int, m: int):
+    """
+    Computes the modular multiplicative inverse of a under modulus m.
+    Returns the inverse if it exists, otherwise returns None.
+    """
+    g, x, _ = extended_gcd(a, m)
+    if g != 1:
+        return None  # inverse doesn't exist if a and m are not coprime
+    return x % m
+
+
+# Example usage:
+result = modular_inverse(3, 11)
+
+Model description original code:
+The function call
+
+```python
+result = modular_inverse(3, 11)
+```
+
+returns `4`, because 4 is the multiplicative inverse of 3 modulo 11 (3 × 4 ≡ 1 (mod 11)).
+
+Model description modified code:
+The function call  
+
+```python
+result = modular_inverse(3, 11)
+```  
+
+computes the modular multiplicative inverse of 3 modulo 11.  
+The inverse is 4 because 3 × 4 ≡ 1 (mod 11).  
+
+So `result` is `4` (and nothing is printed unless you explicitly `print(result)`).
+
+Computed result original code:
+4
+
+Computed result modified code:3

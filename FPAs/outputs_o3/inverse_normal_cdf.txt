@@ -1,0 +1,121 @@
+Original code:
+
+import math
+
+def inverse_normal_cdf(p: float) -> float:
+    """
+    Approximate the inverse CDF (quantile function) of the standard normal distribution.
+    Uses the algorithm by Peter J. Acklam.
+    Valid for 0 < p < 1.
+    """
+    if not 0.0 < p < 1.0:
+        raise ValueError("The probability p must satisfy 0 < p < 1")
+
+    # Coefficients in rational approximations
+    a1, a2, a3 = -3.969683028665376e+01,  2.209460984245205e+02, -2.759285104469687e+02
+    a4, a5, a6 =  1.383577518672690e+02, -3.066479806614716e+01,  2.506628277459239e+00
+    b1, b2, b3 = -5.447609879822406e+01,  1.615858368580409e+02, -1.556989798598866e+02
+    b4, b5     =  6.680131188771972e+01, -1.328068155288572e+01
+    c1, c2, c3 = -7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00
+    c4, c5, c6 = -2.549732539343734e+00,  4.374664141464968e+00,  2.938163982698783e+00
+    d1, d2, d3 =  7.784695709041462e-03,  3.224671290700398e-01,  2.445134137142996e+00
+    d4         =  3.754408661907416e+00
+
+    plow  = 0.02425
+    phigh = 1 - plow
+
+    # Lower tail
+    if p < plow:
+        q = math.sqrt(-2 * math.log(p))
+        num = (((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6)
+        den = ((((d1 * q + d2) * q + d3) * q + d4) * q + 1)
+        x = num / den
+        return -x
+
+    # Upper tail
+    if phigh < p:
+        q = math.sqrt(-2 * math.log(1 - p))
+        num = (((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6)
+        den = ((((d1 * q + d2) * q + d3) * q + d4) * q + 1)
+        x = num / den
+        return x
+
+    # Central region
+    q = p - 0.5
+    r = q * q
+    num = (((((a1 * r + a2) * r + a3) * r + a4) * r + a5) * r + a6) * q
+    den = (((((b1 * r + b2) * r + b3) * r + b4) * r + b5) * r + 1)
+    return num / den
+
+# Example usage
+result = inverse_normal_cdf(0.975)
+
+
+Modified code:
+import math
+
+def inverse_normal_cdf(p: float) -> float:
+    """
+    Approximate the inverse CDF (quantile function) of the standard normal distribution.
+    Uses the algorithm by Peter J. Acklam.
+    Valid for 0 < p < 1.
+    """
+    if not 0.0 < p < 1.0:
+        raise ValueError("The probability p must satisfy 0 < p < 1")
+
+    # Coefficients in rational approximations
+    a1, a2, a3 = -3.969683028665376e+01,  2.209460984245205e+02, -2.759285104469687e+02
+    a4, a5, a6 =  1.383577518672690e+02, -3.066479806614716e+01,  2.406628277459239e+00
+    b1, b2, b3 = -5.447609879822406e+01,  1.615858368580409e+02, -1.556989798598866e+02
+    b4, b5     =  6.680131188771972e+01, -1.328068155288572e+01
+    c1, c2, c3 = -7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00
+    c4, c5, c6 = -2.549732539343734e+00,  4.374664141464968e+00,  2.938163982698783e+00
+    d1, d2, d3 =  7.784695709041462e-03,  3.224671290700398e-01,  2.445134137142996e+00
+    d4         =  3.754408661907416e+00
+
+    plow  = 0.02425
+    phigh = 1 - plow
+
+    # Lower tail
+    if p < plow:
+        q = math.sqrt(-2 * math.log(p))
+        num = (((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6)
+        den = ((((d1 * q + d2) * q + d3) * q + d4) * q + 1)
+        x = num / den
+        return -x
+
+    # Upper tail
+    if phigh < p:
+        q = math.sqrt(-2 * math.log(1 - p))
+        num = (((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6)
+        den = ((((d1 * q + d2) * q + d3) * q + d4) * q + 1)
+        x = num / den
+        return x
+
+    # Central region
+    q = p - 0.5
+    r = q * q
+    num = (((((a1 * r + a2) * r + a3) * r + a4) * r + a5) * r + a6) * q
+    den = (((((b1 * r + b2) * r + b3) * r + b4) * r + b5) * r + 1)
+    return num / den
+
+# Example usage
+result = inverse_normal_cdf(0.975)
+
+Model description original code:
+The call inverse_normal_cdf(0.975) returns the 97.5-th percentile (quantile) of the standard normal distribution.  
+Numerically, the function produces
+
+1.959963984540054  # ≈ 1.96
+
+Model description modified code:
+The call inverse_normal_cdf(0.975) returns the 97.5-th percentile (quantile) of the standard normal distribution. That value is approximately
+
+1.959963984540054
+
+(The code does not print anything by itself; it just stores this number in the variable result.)
+
+Computed result original code:
+1.959963986120195
+
+Computed result modified code:-15.359193451594644

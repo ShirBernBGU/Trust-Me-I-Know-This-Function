@@ -1,0 +1,70 @@
+Original code:
+def elf_hash(s: str) -> int:
+    """
+    Compute the ELF (Extremely Large Files) hash of a string.
+    This hashing algorithm was popularized by the UNIX ELF object file format.
+    """
+    h = 0
+    for ch in s:
+        h = (h << 4) + ord(ch)      # shift left 4 and add current char
+        x = h & 0xF0000000          # extract high-order 4 bits
+        if x:
+            h ^= x >> 24            # fold high bits down
+            h &= ~x                 # clear the high bits
+    return h & 0xFFFFFFFF            # return as 32-bit unsigned value
+
+
+# Example usage
+result = elf_hash("OpenAI")
+
+Modified code:
+def elf_hash(s: str) -> int:
+    h = 0
+    for ch in s:
+        h = (h << 4) + ord(ch)
+        x = h & 0xF1000000
+        if x:
+            h ^= x >> 24
+            h &= ~x
+    return h & 0xFFFFFFFF
+
+
+# Example usage
+result = elf_hash("OpenAI")
+
+Model description original code:
+The string “OpenAI” goes through the loop without ever setting any of the high-order bits (x is always 0), so the hash is simply the value that accumulates in h:
+
+O → 0x4F  
+p → 0x560  
+e → 0x5665  
+n → 0x566BE  
+A → 0x566C21  
+I → 0x566C259
+
+Returned as a 32-bit unsigned integer that is
+
+0x0566C259 = 90 620 505
+
+So
+
+print(result)          # -> 90620505
+
+Model description modified code:
+Calling  
+
+```python
+result = elf_hash("OpenAI")
+```  
+
+gives the 32-bit integer  
+
+```
+90620505          # decimal
+0x0566C259        # hexadecimal
+```
+
+Computed result original code:
+90620505
+
+Computed result modified code:73843288

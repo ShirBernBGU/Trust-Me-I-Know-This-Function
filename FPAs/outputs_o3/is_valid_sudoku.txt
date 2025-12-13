@@ -1,0 +1,98 @@
+Original code:
+def is_valid_sudoku(board):
+    """
+    Validate a 9×9 Sudoku board.
+    Empty cells can be represented by '.' or 0.
+    """
+    rows = [set() for _ in range(9)]
+    cols = [set() for _ in range(9)]
+    boxes = [set() for _ in range(9)]  # 3×3 sub-boxes
+
+    for r in range(9):
+        for c in range(9):
+            val = board[r][c]
+            if val in ('.', 0):
+                continue
+            if (
+                val in rows[r] or
+                val in cols[c] or
+                val in boxes[(r // 3) * 3 + (c // 3)]
+            ):
+                return False
+            rows[r].add(val)
+            cols[c].add(val)
+            boxes[(r // 3) * 3 + (c // 3)].add(val)
+    return True
+
+
+board = [
+    ["5", "3", ".", ".", "7", ".", ".", ".", "."],
+    ["6", ".", ".", "1", "9", "5", ".", ".", "."],
+    [".", "9", "8", ".", ".", ".", ".", "6", "."],
+    ["8", ".", ".", ".", "6", ".", ".", ".", "3"],
+    ["4", ".", ".", "8", ".", "3", ".", ".", "1"],
+    ["7", ".", ".", ".", "2", ".", ".", ".", "6"],
+    [".", "6", ".", ".", ".", ".", "2", "8", "."],
+    [".", ".", ".", "4", "1", "9", ".", ".", "5"],
+    [".", ".", ".", ".", "8", ".", ".", "7", "9"]
+]
+
+result = is_valid_sudoku(board)
+
+Modified code:
+def is_valid_sudoku(board):
+    """
+    Validate a 9×9 Sudoku board.
+    Empty cells can be represented by '.' or 0.
+    """
+    rows = [set() for _ in range(9)]
+    cols = [set() for _ in range(9)]
+    boxes = [set() for _ in range(9)]  # 3×3 sub-boxes
+
+    for r in range(9):
+        for c in range(9):
+            val = board[r][c]
+            if val in ('0', 0):
+                continue
+            if (
+                val in rows[r] or
+                val in cols[c] or
+                val in boxes[(r // 3) * 3 + (c // 3)]
+            ):
+                return False
+            rows[r].add(val)
+            cols[c].add(val)
+            boxes[(r // 3) * 3 + (c // 3)].add(val)
+    return True
+
+
+board = [
+    ["5", "3", ".", ".", "7", ".", ".", ".", "."],
+    ["6", ".", ".", "1", "9", "5", ".", ".", "."],
+    [".", "9", "8", ".", ".", ".", ".", "6", "."],
+    ["8", ".", ".", ".", "6", ".", ".", ".", "3"],
+    ["4", ".", ".", "8", ".", "3", ".", ".", "1"],
+    ["7", ".", ".", ".", "2", ".", ".", ".", "6"],
+    [".", "6", ".", ".", ".", ".", "2", "8", "."],
+    [".", ".", ".", "4", "1", "9", ".", ".", "5"],
+    [".", ".", ".", ".", "8", ".", ".", "7", "9"]
+]
+
+result = is_valid_sudoku(board)
+
+Model description original code:
+The given board satisfies all Sudoku rules, so  
+is_valid_sudoku(board) returns True.  
+Therefore, result is True (and printing it would output:
+
+True)
+
+Model description modified code:
+The function finds no duplicate digits in any row, column, or 3 × 3 sub-box of the given (incomplete) Sudoku board, so it returns:
+
+True
+
+Computed result original code:
+True
+
+Computed result modified code:False

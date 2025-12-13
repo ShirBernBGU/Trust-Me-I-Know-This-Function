@@ -1,0 +1,89 @@
+Original code:
+import math
+
+def softmax_jacobian(values):
+    """
+    Compute the Jacobian matrix of the softmax function for a 1-D list/tuple of numbers.
+    Returns a list of lists (matrix) of size n×n.
+    """
+    x = list(map(float, values))
+    m = max(x)                       # for numerical stability
+    exps = [math.exp(v - m) for v in x]
+    s = [e / sum(exps) for e in exps]   # softmax probabilities
+    n = len(s)
+    jac = [[0.0] * n for _ in range(n)]
+    for i in range(n):
+        for j in range(n):
+            jac[i][j] = s[i] * (1 - s[i]) if i == j else -s[i] * s[j]
+    return jac
+
+result = softmax_jacobian([1.0, 2.0, 3.0])
+
+Modified code:
+import math
+
+def softmax_jacobian(values):
+    x = list(map(float, values))
+    m = max(x)
+    exps = [math.exp(v - m) for v in x]
+    s = [e / sum(exps) for e in exps]
+    s = [p + 1e-8 for p in s]
+    n = len(s)
+    jac = [[0.0] * n for _ in range(n)]
+    for i in range(n):
+        for j in range(n):
+            jac[i][j] = s[i] * (1 - s[i]) if i == j else -s[i] * s[j]
+    return jac
+
+result = softmax_jacobian([1.0, 2.0, 3.0])
+
+Model description original code:
+First the soft-max of (1 , 2 , 3) is computed
+
+    s = (e¹ , e² , e³) / Σeᵏ  →  (0.09003057317038046,
+                                   0.24472847105479764,
+                                   0.6652409557748219)
+
+Call these probabilities s0 , s1 , s2.  
+The Jacobian entries are
+
+    Jii  =  si (1 − si)
+    Jij  = −si sj ,  i ≠ j
+
+Plugging the numbers in:
+
+    J00 = 0.09003057317038046 · (1 – 0.09003057317038046) ≃ 0.08192507
+    J11 = 0.24472847105479764 · (1 – 0.24472847105479764) ≃ 0.18483644
+    J22 = 0.6652409557748219  · (1 – 0.6652409557748219)  ≃ 0.22269543
+
+    J01 = J10 = −0.09003057317038046 · 0.24472847105479764 ≃ −0.02203304
+    J02 = J20 = −0.09003057317038046 · 0.6652409557748219  ≃ −0.05989203
+    J12 = J21 = −0.24472847105479764 · 0.6652409557748219  ≃ −0.16280340
+
+Hence the function returns the 3 × 3 matrix
+
+    [[ 0.08192507, -0.02203304, -0.05989203],
+     [-0.02203304,  0.18483644, -0.16280340],
+     [-0.05989203, -0.16280340,  0.22269543]]
+
+(The rows each sum to zero, as a soft-max Jacobian should.)
+
+Note: the script only assigns this matrix to the variable `result`; it does not print anything to the console unless you add a `print(result)`.
+
+Model description modified code:
+`result` is the 3 × 3 soft-max Jacobian for the vector `[1.0, 2.0, 3.0]`.  
+Numerically (rounded to 15 significant digits)
+
+[
+ [ 0.081925078199,  -0.022033047868,  -0.059892030331],
+ [-0.022033047868,   0.184836460528,  -0.162803412660],
+ [-0.059892030331,  -0.162803412660,   0.222695442991]
+]
+
+(The exact values in Python’s default `list` printing may differ in the last few
+decimal places, but they will be essentially the same.)
+
+Computed result original code:
+[[0.08192506906499324, -0.022033044520174298, -0.05989202454481893], [-0.022033044520174298, 0.1848364465099787, -0.1628034019898044], [-0.05989202454481893, -0.1628034019898044, 0.2226954265346234]]
+
+Computed result modified code:[[0.08192507726438167, -0.022033047867764836, -0.05989203209753432], [-0.022033047867764836, 0.1848364516154092, -0.16280341108949878], [-0.05989203209753432, -0.16280341108949878, 0.22269542322980415]]

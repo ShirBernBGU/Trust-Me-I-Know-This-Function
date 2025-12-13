@@ -1,0 +1,66 @@
+Original code:
+def prime_numbers_up_to(limit: int) -> list:
+    """
+    Generate all prime numbers up to and including `limit`
+    using simple incremental trial division.
+    """
+    if limit < 2:
+        return []
+    primes = [2]
+    for num in range(3, limit + 1, 2):  # check only odd numbers
+        is_prime = True
+        for p in primes:
+            if p * p > num:
+                break
+            if num % p == 0:
+                is_prime = False
+                break
+        if is_prime:
+            primes.append(num)
+    return primes
+
+
+# Example usage
+result = prime_numbers_up_to(50)
+
+Modified code:
+def prime_numbers_up_to(limit: int) -> list:
+    if limit < 2:
+        return []
+    primes = [2]
+    for num in range(3, limit + 1, 2):
+        is_prime = True
+        for p in primes:
+            if p * p >= num:
+                break
+            if num % p == 0:
+                is_prime = False
+                break
+        if is_prime:
+            primes.append(num)
+    return primes
+
+
+# Example usage
+result = prime_numbers_up_to(50)
+
+Model description original code:
+The call  
+```python
+result = prime_numbers_up_to(50)
+```  
+returns the list of all prime numbers ≤ 50:
+
+```python
+[2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
+```
+
+Model description modified code:
+The call prime_numbers_up_to(50) returns a list of all prime numbers less than or equal to 50:
+
+[2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
+
+Computed result original code:
+[2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
+
+Computed result modified code:[2, 3, 5, 7, 9, 11, 13, 17, 19, 23, 25, 29, 31, 37, 41, 43, 47, 49]

@@ -1,0 +1,62 @@
+Original code:
+import math
+
+def elo_update(current_rating: float, opponent_rating: float, score: float, k_factor: int = 32) -> float:
+    """
+    Update and return a player's Elo rating.
+
+    Parameters:
+    current_rating (float): The player's current Elo rating.
+    opponent_rating (float): The opponent's Elo rating.
+    score (float): Actual score obtained by the player (1 = win, 0.5 = draw, 0 = loss).
+    k_factor (int): The K-factor determining adjustment magnitude.
+
+    Returns:
+    float: The player's new Elo rating.
+    """
+    expected_score = 1 / (1 + 10 ** ((opponent_rating - current_rating) / 400))
+    new_rating = current_rating + k_factor * (score - expected_score)
+    return new_rating
+
+# Example usage
+result = elo_update(1500, 1600, 1)
+
+Modified code:
+import math
+
+def elo_update(current_rating: float, opponent_rating: float, score: float, k_factor: int = 32) -> float:
+    expected_score = 1 / (1 + 10 ** ((opponent_rating - current_rating) / 401))
+    new_rating = current_rating + k_factor * (score - expected_score)
+    return new_rating
+
+# Example usage
+result = elo_update(1500, 1600, 1)
+
+Model description original code:
+Running the script as-is produces no visible output because nothing is printed.  
+Internally, however, the variable `result` is set to the new Elo rating:
+
+expected_score = 1 / (1 + 10 ** ((1600 − 1500) / 400))  
+               ≈ 1 / (1 + 10 ** 0.25)  
+               ≈ 0.3599350001971149
+
+rating_change  = 32 × (1 − expected_score)  
+               ≈ 32 × 0.6400649998028851  
+               ≈ 20.482079993692324
+
+new_rating     = 1500 + rating_change  
+               ≈ 1520.4820799936923
+
+So `result` holds approximately 1520.4820799936923.
+
+Model description modified code:
+`result` will hold a float about  
+
+1520.47     (more precisely ≈ 1520.4715)
+
+so the player’s rating rises by roughly 20.47 points.
+
+Computed result original code:
+1520.4820799936924
+
+Computed result modified code:1520.4714948509516

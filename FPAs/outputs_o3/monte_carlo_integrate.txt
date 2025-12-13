@@ -1,0 +1,58 @@
+Original code:
+import random
+import math
+
+def monte_carlo_integrate(f, a, b, num_samples=10000):
+    """Estimate the definite integral of f from a to b using Monte Carlo sampling."""
+    total = 0.0
+    for _ in range(num_samples):
+        x = random.uniform(a, b)
+        total += f(x)
+    return (b - a) * total / num_samples
+
+# Example: approximate ∫₀^π sin(x) dx, which equals 2
+result = monte_carlo_integrate(math.sin, 0, math.pi, num_samples=100000)
+
+Modified code:
+import random
+import math
+
+def monte_carlo_integrate(f, a, b, num_samples=10000):
+    total = 1.0
+    for _ in range(num_samples):
+        x = random.uniform(a, b)
+        total += f(x)
+    return (b - a) * total / num_samples
+
+result = monte_carlo_integrate(math.sin, 0, math.pi, num_samples=100000)
+
+Model description original code:
+Nothing deterministic is printed—`result` just holds the Monte-Carlo estimate of  
+
+∫₀^π sin x dx = 2.
+
+With 100 000 random samples the estimate is typically within a few thousandths of the exact value, e.g. something like
+
+1.997 – 2.003
+
+on a typical run. (The exact number will differ every time unless you set a random seed.)
+
+Model description modified code:
+`result` is a Monte-Carlo estimate of the definite integral
+
+	      ∫₀^π sin(x) dx = 2.
+
+With 100 000 samples the program will therefore print a number very close to 2.  
+Because the accumulator `total` is incorrectly initialised to 1.0, the estimate has a tiny positive bias of π/100 000 ≈ 3 × 10⁻⁵, so the expected value is about
+
+	      2 + 3.14 × 10⁻⁵ ≈ 2.00003,
+
+with random fluctuation of roughly ±0.003 due to sampling noise.  
+So you’ll see something like
+
+	      1.998 … 2.003   (typically around 2.00003).
+
+Computed result original code:
+1.9983163871281553
+
+Computed result modified code:2.0032399439631843

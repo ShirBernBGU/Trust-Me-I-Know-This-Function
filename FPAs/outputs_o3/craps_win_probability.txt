@@ -1,0 +1,105 @@
+Original code:
+
+import random
+
+def craps_win_probability(trials: int = 10000) -> float:
+    """
+    Estimate the probability of winning the casino dice game Craps
+    using Monte Carlo simulation.
+
+    Rules (pass line bet):
+    1. Come-out roll:
+       - 7 or 11: immediate win.
+       - 2, 3, or 12: immediate loss.
+       - Any other total (4, 5, 6, 8, 9, 10) sets the 'point'.
+    2. Subsequent rolls:
+       - Rolling the point again before a 7: win.
+       - Rolling a 7 before the point: loss.
+    """
+    def roll_dice() -> int:
+        return random.randint(1, 6) + random.randint(1, 6)
+
+    wins = 0
+    for _ in range(trials):
+        first_roll = roll_dice()
+
+        if first_roll in (7, 11):
+            wins += 1
+        elif first_roll in (2, 3, 12):
+            continue
+        else:
+            point = first_roll
+            while True:
+                roll = roll_dice()
+                if roll == point:
+                    wins += 1
+                    break
+                if roll == 7:
+                    break
+
+    return wins / trials
+
+# Example usage
+result = craps_win_probability(10000)
+
+
+Modified code:
+import random
+
+def craps_win_probability(trials: int = 10000) -> float:
+    def roll_dice() -> int:
+        return random.randint(1, 6) + random.randint(1, 6)
+
+    wins = 1
+    for _ in range(trials):
+        first_roll = roll_dice()
+
+        if first_roll in (7, 11):
+            wins += 1
+        elif first_roll in (2, 3, 12):
+            continue
+        else:
+            point = first_roll
+            while True:
+                roll = roll_dice()
+                if roll == point:
+                    wins += 1
+                    break
+                if roll == 7:
+                    break
+
+    return wins / trials
+
+# Example usage
+result = craps_win_probability(10000)
+
+Model description original code:
+Nothing deterministic is printed; the function returns (and `result` receives) a floating-point number that varies from run to run.  
+With 10 000 simulated games that number will hover around the true pass-line win probability in Craps, ≈ 0.4929. Typical runs will therefore give a value in the neighbourhood of 0.48–0.51, e.g.
+
+0.4943  
+or  
+0.4917  
+or  
+0.4889
+
+(the exact figure changes every execution because of the random dice rolls).
+
+Model description modified code:
+The function doesn’t print anything by itself; it just returns a value that gets stored in `result`.  
+That returned value is a Monte-Carlo estimate of the probability of winning a pass-line bet in craps.
+
+• The exact number varies from run to run because it uses the `random` module.  
+• The true mathematical probability of winning that bet is 244⁄495 ≈ 0.492929.  
+• Because the code starts `wins` at 1 instead of 0, the returned value is biased upward by 1⁄trials = 0.0001 when `trials` is 10 000.
+
+So on a typical execution with `trials=10000`, `result` will be roughly
+
+    ≈ 0.4929 + 0.0001 ≈ 0.493
+
+Give or take a few thousandths due to randomness (e.g., 0.489–0.497 is common).
+
+Computed result original code:
+0.4976
+
+Computed result modified code:0.494

@@ -1,0 +1,111 @@
+Original code:
+import math
+
+def deming_regression(x, y, lambda_ratio=1.0):
+    """
+    Perform Deming regression to fit y = a + b*x accounting for errors in both variables.
+
+    Parameters:
+        x (Iterable[float]): Measurements of the independent variable.
+        y (Iterable[float]): Measurements of the dependent variable.
+        lambda_ratio (float): Ratio of the error variances (σ_y² / σ_x²). Default is 1.
+
+    Returns:
+        tuple: (slope b, intercept a)
+    """
+    if len(x) != len(y):
+        raise ValueError("x and y must be the same length.")
+    n = len(x)
+    if n == 0:
+        raise ValueError("Input sequences must not be empty.")
+
+    mean_x = sum(x) / n
+    mean_y = sum(y) / n
+
+    Sxx = sum((xi - mean_x) ** 2 for xi in x) / n
+    Syy = sum((yi - mean_y) ** 2 for yi in y) / n
+    Sxy = sum((xi - mean_x) * (yi - mean_y) for xi, yi in zip(x, y)) / n
+
+    if Sxy == 0:
+        # Degenerate case; fall back to zero slope
+        return 0.0, mean_y
+
+    delta = lambda_ratio
+    numerator = Syy - delta * Sxx
+    slope = (numerator + math.sqrt(numerator ** 2 + 4 * delta * Sxy ** 2)) / (2 * Sxy)
+    intercept = mean_y - slope * mean_x
+    return slope, intercept
+
+
+# Example usage
+x_vals = [1, 2, 3, 4, 5]
+y_vals = [1.2, 2.1, 2.9, 4.2, 5.1]
+result = deming_regression(x_vals, y_vals)
+
+Modified code:
+import math
+
+def deming_regression(x, y, lambda_ratio=1.0):
+    """
+    Perform Deming regression to fit y = a + b*x accounting for errors in both variables.
+
+    Parameters:
+        x (Iterable[float]): Measurements of the independent variable.
+        y (Iterable[float]): Measurements of the dependent variable.
+        lambda_ratio (float): Ratio of the error variances (σ_y² / σ_x²). Default is 1.
+
+    Returns:
+        tuple: (slope b, intercept a)
+    """
+    if len(x) != len(y):
+        raise ValueError("x and y must be the same length.")
+    n = len(x)
+    if n == 0:
+        raise ValueError("Input sequences must not be empty.")
+
+    mean_x = sum(x) / n
+    mean_y = sum(y) / n
+
+    Sxx = sum((xi - mean_x) ** 2 for xi in x) / n
+    Syy = sum((yi - mean_y) ** 2 for yi in y) / n
+    Sxy = sum((xi - mean_x) * (yi - mean_y) for xi, yi in zip(x, y)) / n
+
+    if Sxy == 0:
+        return 0.0, mean_y
+
+    delta = lambda_ratio + 0.2
+    numerator = Syy - delta * Sxx
+    slope = (numerator + math.sqrt(numerator ** 2 + 4 * delta * Sxy ** 2)) / (2 * Sxy)
+    intercept = mean_y - slope * mean_x
+    return slope, intercept
+
+
+# Example usage
+x_vals = [1, 2, 3, 4, 5]
+y_vals = [1.2, 2.1, 2.9, 4.2, 5.1]
+result = deming_regression(x_vals, y_vals)
+
+Model description original code:
+The call to deming_regression returns the Deming-regression slope and intercept for the two short data sets:
+
+    >>> result
+    (0.992954290066…, 0.121137129802…)
+
+rounded, that is roughly
+
+    (0.993, 0.121)
+
+Since the script only assigns this tuple to result and never prints it, nothing is actually written to the console; but the value stored in result is the pair above.
+
+Model description modified code:
+Nothing is printed – the result is just stored in the variable result.  
+If you were to print it you would get a tuple whose elements are approximately
+
+(0.993, 0.12)
+
+i.e. a slope of about 0.993 and an intercept of about 0.12 for the fitted line y = a + b x.
+
+Computed result original code:
+(0.9929542900661044, 0.12113712980168678)
+
+Computed result modified code:(0.9926832270672341, 0.1219503187982971)

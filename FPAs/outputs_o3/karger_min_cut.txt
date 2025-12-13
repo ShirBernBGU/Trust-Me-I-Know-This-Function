@@ -1,0 +1,92 @@
+Original code:
+import random
+
+def karger_min_cut(graph, iterations=100):
+    def random_edge(adj):
+        u = random.choice(list(adj.keys()))
+        v = random.choice(adj[u])
+        return u, v
+
+    best = float('inf')
+    for _ in range(iterations):
+        adj = {u: list(neigh) for u, neigh in graph.items()}
+        while len(adj) > 2:
+            u, v = random_edge(adj)
+            adj[u].extend(adj[v])
+            for w in adj[v]:
+                adj[w] = [u if x == v else x for x in adj[w]]
+            adj[u] = [x for x in adj[u] if x != u]
+            del adj[v]
+        cut_size = len(next(iter(adj.values())))
+        best = min(best, cut_size)
+    return best
+
+graph = {
+    0: [1, 3],
+    1: [0, 2],
+    2: [1, 3],
+    3: [0, 2]
+}
+
+result = karger_min_cut(graph, iterations=50)
+
+Modified code:
+import random
+
+def karger_min_cut(graph, iterations=100):
+    def random_edge(adj):
+        u = random.choice(list(adj.keys()))
+        v = random.choice(adj[u])
+        return u, v
+
+    best = float('inf')
+    for _ in range(iterations):
+        adj = {u: list(neigh) for u, neigh in graph.items()}
+        while len(adj) >= 2:
+            u, v = random_edge(adj)
+            adj[u].extend(adj[v])
+            for w in adj[v]:
+                adj[w] = [u if x == v else x for x in adj[w]]
+            adj[u] = [x for x in adj[u] if x != u]
+            del adj[v]
+        cut_size = len(next(iter(adj.values())))
+        best = min(best, cut_size)
+    return best
+
+graph = {
+    0: [1, 3],
+    1: [0, 2],
+    2: [1, 3],
+    3: [0, 2]
+}
+
+result = karger_min_cut(graph, iterations=50)
+
+Model description original code:
+The graph is a 4-cycle (0-1-2-3-0), whose true minimum cut has size 2.  
+Karger’s algorithm is run 50 times and the smallest cut it ever sees is returned.  
+For this particular graph an individual run finds the size-2 cut with probability ½, so the chance that none of the 50 runs finds it is (½)⁵⁰ ≈ 9 × 10⁻¹⁶ – essentially zero.
+
+Therefore, barring the astronomically unlikely event that all 50 runs miss the optimum,  
+
+    result == 2
+
+So the code will almost certainly output 2.
+
+Model description modified code:
+The graph you pass in is a 4-node cycle (0-1-2-3-0).  
+Its global minimum cut has size 2, because you must remove at least two edges to disconnect a cycle.
+
+Karger’s algorithm is randomized, so a single trial can sometimes return a cut larger than the minimum, but the “best” variable keeps the smallest cut found among the 50 independent trials.  
+For a 4-vertex graph the probability that one trial succeeds is 1/3, so the probability that none of the 50 trials succeeds is (2/3)⁵⁰ ≈ 1.3 × 10⁻⁹ – essentially zero.
+
+Therefore, with overwhelming likelihood
+
+    result == 2
+
+(Only in the astronomically unlikely event that all 50 runs miss the optimal cut would it be larger.)
+
+Computed result original code:
+2
+
+Computed result modified code:0

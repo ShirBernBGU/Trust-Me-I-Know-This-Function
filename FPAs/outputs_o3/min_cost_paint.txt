@@ -1,0 +1,107 @@
+Original code:
+def min_cost_paint(costs):
+    """
+    Given a list of lists `costs` where costs[i][j] is the cost of painting
+    house i with color j, compute the minimum total cost such that no two
+    adjacent houses have the same color.
+    """
+    if not costs:
+        return 0
+
+    n, k = len(costs), len(costs[0])
+
+    # prev_min1 and prev_min2 store the minimal and second minimal cost so far
+    # prev_idx1 stores the color index of the minimal cost
+    prev_min1 = prev_min2 = 0
+    prev_idx1 = -1
+
+    for i in range(n):
+        curr_min1 = curr_min2 = float('inf')
+        curr_idx1 = -1
+
+        for j in range(k):
+            # If current color is same as prev minimal color, we must use second minimal
+            add = prev_min2 if j == prev_idx1 else prev_min1
+            cost = costs[i][j] + add
+
+            # Update current minimal and second minimal
+            if cost < curr_min1:
+                curr_min2 = curr_min1
+                curr_min1 = cost
+                curr_idx1 = j
+            elif cost < curr_min2:
+                curr_min2 = cost
+
+        prev_min1, prev_min2, prev_idx1 = curr_min1, curr_min2, curr_idx1
+
+    return prev_min1
+
+
+# Example usage
+cost_matrix = [
+    [17, 2, 17],
+    [16, 16, 5],
+    [14, 3, 19]
+]
+
+result = min_cost_paint(cost_matrix)
+
+Modified code:
+def min_cost_paint(costs):
+    if not costs:
+        return 0
+
+    n, k = len(costs), len(costs[0])
+    prev_min1 = prev_min2 = 0
+    prev_idx1 = -1
+
+    for i in range(n):
+        curr_min1 = curr_min2 = float('inf')
+        curr_idx1 = -1
+
+        for j in range(k):
+            add = prev_min1 if j == prev_idx1 else prev_min2
+            cost = costs[i][j] + add
+
+            if cost < curr_min1:
+                curr_min2 = curr_min1
+                curr_min1 = cost
+                curr_idx1 = j
+            elif cost < curr_min2:
+                curr_min2 = cost
+
+        prev_min1, prev_min2, prev_idx1 = curr_min1, curr_min2, curr_idx1
+
+    return prev_min1
+
+
+cost_matrix = [
+    [17, 2, 17],
+    [16, 16, 5],
+    [14, 3, 19]
+]
+
+result = min_cost_paint(cost_matrix)
+
+Model description original code:
+The function returns the minimal total painting cost subject to the “no-two-adjacent-houses-same-color” rule.  
+For the given `cost_matrix`, that minimum cost is:
+
+10
+
+Model description modified code:
+`result` will be `10`.
+
+The function computes the minimum total cost to paint the three houses so that no two adjacent houses share the same color.  
+The optimal choice is:
+
+• House 0 → color 1 (cost 2)  
+• House 1 → color 2 (cost 5)  
+• House 2 → color 1 (cost 3)
+
+Total cost = 2 + 5 + 3 = 10.
+
+Computed result original code:
+10
+
+Computed result modified code:21

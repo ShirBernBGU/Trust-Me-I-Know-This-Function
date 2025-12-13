@@ -1,0 +1,112 @@
+Original code:
+import random
+
+def aldous_broder_random_spanning_tree(graph):
+    """
+    Generate a uniform random spanning tree of an undirected graph
+    using the Aldous–Broder algorithm.
+
+    Parameters
+    ----------
+    graph : dict
+        Adjacency list representing the graph, where each key is a node
+        and its value is an iterable of neighboring nodes.
+
+    Returns
+    -------
+    list of tuple
+        Edges in the resulting spanning tree as (u, v) tuples.
+    """
+    if not graph:
+        return []
+
+    current = random.choice(list(graph.keys()))
+    visited = {current}
+    tree_edges = []
+
+    while len(visited) < len(graph):
+        neighbor = random.choice(graph[current])
+        if neighbor not in visited:
+            tree_edges.append((current, neighbor))
+            visited.add(neighbor)
+        current = neighbor
+
+    return tree_edges
+
+
+# Example usage
+graph = {
+    1: [2, 3],
+    2: [1, 3],
+    3: [1, 2, 4],
+    4: [3]
+}
+
+result = aldous_broder_random_spanning_tree(graph)
+
+Modified code:
+import random
+
+def aldous_broder_random_spanning_tree(graph):
+    if not graph:
+        return []
+
+    current = random.choice(list(graph.keys()))
+    visited = {current}
+    tree_edges = []
+
+    while len(visited) < len(graph):
+        neighbor = random.choice(graph[current])
+        if neighbor not in visited:
+            tree_edges.append((neighbor, current))
+            visited.add(neighbor)
+        current = neighbor
+
+    return tree_edges
+
+
+# Example usage
+graph = {
+    1: [2, 3],
+    2: [1, 3],
+    3: [1, 2, 4],
+    4: [3]
+}
+
+result = aldous_broder_random_spanning_tree(graph)
+
+Model description original code:
+The function doesn’t have any fixed output—you will get a different result from one run to the next because every step uses random.choice.  
+It returns a list with exactly three edges (because a spanning tree on 4 vertices always has n – 1 = 3 edges).  
+Those three edges will be one of the possible spanning trees of the graph
+
+1-2-3 (triangle) plus 3-4.
+
+Concretely the list will always contain the edge (3, 4) (or (4, 3)) plus two of the three triangle edges, in some order, e.g.
+
+[(3, 4), (3, 1), (1, 2)]          # one run  
+[(1, 2), (2, 3), (3, 4)]          # another run  
+[(2, 3), (3, 1), (3, 4)]          # another run
+
+So the exact output is nondeterministic; it’s a uniformly random spanning tree of the given graph.
+
+Model description modified code:
+Nothing fixed—you’ll get a random spanning tree.
+
+• The graph has 4 vertices, so a spanning tree must have 4 − 1 = 3 edges.  
+• The algorithm (Aldous–Broder) starts at a random vertex and performs a random walk, keeping the first time it reaches each new vertex.
+
+`result` therefore becomes a list of three (child, parent) tuples that together touch all four vertices, for example:
+
+[(4, 3), (2, 3), (1, 2)]
+
+Run the script again and you might instead see something like
+
+[(2, 1), (3, 2), (4, 3)]
+
+or any other 3-edge set that forms a spanning tree. The exact order and choice of edges depend on the random-number generator’s state.
+
+Computed result original code:
+[(1, 3), (1, 2), (3, 4)]
+
+Computed result modified code:[(1, 2), (3, 1), (4, 3)]

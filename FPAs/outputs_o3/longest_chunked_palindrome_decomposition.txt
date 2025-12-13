@@ -1,0 +1,68 @@
+Original code:
+def longest_chunked_palindrome_decomposition(text: str) -> int:
+    """
+    Computes the maximum number of palindromic chunks into which the input
+    string can be decomposed such that concatenating the chunks from left
+    to right yields the same result as concatenating them from right to left.
+    """
+    def helper(s: str) -> int:
+        if not s:
+            return 0
+        for i in range(1, len(s) // 2 + 1):
+            if s[:i] == s[-i:]:
+                return 2 + helper(s[i:-i])
+        return 1
+    return helper(text)
+
+
+example_text = "ghiabcdefhelloadamhelloabcdefghi"
+result = longest_chunked_palindrome_decomposition(example_text)
+
+Modified code:
+def longest_chunked_palindrome_decomposition(text: str) -> int:
+    def helper(s: str) -> int:
+        if not s:
+            return 0
+        for i in range(1, len(s) // 2 + 1):
+            if s[:i] == s[-i:]:
+                return 1 + helper(s[i:-i])
+        return 1
+    return helper(text)
+
+
+example_text = "ghiabcdefhelloadamhelloabcdefghi"
+result = longest_chunked_palindrome_decomposition(example_text)
+
+Model description original code:
+The helper breaks the string into the smallest matching prefix / suffix pairs and counts how many such “chunks” it can extract.
+
+For  
+ghi | abcdef | hello | adam | hello | abcdef | ghi  
+
+it finds the matching pairs in this order:
+
+1. “ghi” …… “ghi”  
+2. “abcdef” …… “abcdef”  
+3. “hello” …… “hello”  
+4. the middle part “adam” (no pair, counts as 1)
+
+That gives 2 + 2 + 2 + 1 = 7 chunks.
+
+So
+
+result == 7
+
+Model description modified code:
+The code prints (or, more precisely, stores in `result`) the integer
+
+7
+
+because the longest chunked palindromic decomposition of  
+"ghiabcdefhelloadamhelloabcdefghi" is  
+
+["ghi", "abcdef", "hello", "adam", "hello", "abcdef", "ghi"] – seven symmetric chunks.
+
+Computed result original code:
+7
+
+Computed result modified code:4

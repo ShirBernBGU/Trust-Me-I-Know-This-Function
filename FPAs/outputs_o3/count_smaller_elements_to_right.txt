@@ -1,0 +1,100 @@
+Original code:
+def count_smaller_elements_to_right(nums):
+    # Coordinate compression to keep Fenwick tree small
+    sorted_vals = sorted(set(nums))
+    rank = {v: i + 1 for i, v in enumerate(sorted_vals)}  # 1-based index for BIT
+
+    size = len(sorted_vals)
+    bit = [0] * (size + 1)
+
+    def bit_update(i, delta):
+        while i <= size:
+            bit[i] += delta
+            i += i & -i
+
+    def bit_query(i):
+        s = 0
+        while i:
+            s += bit[i]
+            i -= i & -i
+        return s
+
+    res = []
+    # Traverse from right to left
+    for num in reversed(nums):
+        r = rank[num]
+        # Number of elements smaller than current
+        res.append(bit_query(r - 1))
+        bit_update(r, 1)
+
+    return res[::-1]
+
+
+# Example usage
+example = [5, 2, 6, 1]
+result = count_smaller_elements_to_right(example)
+
+Modified code:
+def count_smaller_elements_to_right(nums):
+    # Coordinate compression to keep Fenwick tree small
+    sorted_vals = sorted(set(nums), reverse=True)
+    rank = {v: i + 1 for i, v in enumerate(sorted_vals)}  # 1-based index for BIT
+
+    size = len(sorted_vals)
+    bit = [0] * (size + 1)
+
+    def bit_update(i, delta):
+        while i <= size:
+            bit[i] += delta
+            i += i & -i
+
+    def bit_query(i):
+        s = 0
+        while i:
+            s += bit[i]
+            i -= i & -i
+        return s
+
+    res = []
+    # Traverse from right to left
+    for num in reversed(nums):
+        r = rank[num]
+        # Number of elements smaller than current
+        res.append(bit_query(r - 1))
+        bit_update(r, 1)
+
+    return res[::-1]
+
+
+# Example usage
+example = [5, 2, 6, 1]
+result = count_smaller_elements_to_right(example)
+
+Model description original code:
+It returns the list  
+[2, 1, 1, 0]
+
+because, in the input array [5, 2, 6, 1]:
+
+• 5 has two smaller numbers to its right (2 and 1) → 2  
+• 2 has one smaller number to its right (1) → 1  
+• 6 has one smaller number to its right (1) → 1  
+• 1 has no smaller numbers to its right → 0
+
+Model description modified code:
+Running the given code on the list `[5, 2, 6, 1]` produces:
+
+```python
+result = [2, 1, 1, 0]
+```
+
+Each position holds the count of elements that are strictly smaller and appear to the right of the corresponding element in the original list:
+• 5 has 2 smaller elements after it (2 and 1).  
+• 2 has 1 smaller element after it (1).  
+• 6 has 1 smaller element after it (1).  
+• 1 has 0 smaller elements after it.
+
+Computed result original code:
+[2, 1, 1, 0]
+
+Computed result modified code:[1, 1, 0, 0]

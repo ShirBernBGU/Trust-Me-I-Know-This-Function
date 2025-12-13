@@ -1,0 +1,84 @@
+Original code:
+def is_sorted(seq, key=None, reverse=False):
+    """
+    Check if the sequence is sorted.
+
+    Parameters:
+        seq (iterable): The sequence to check.
+        key (callable, optional): Function to extract comparison key from elements.
+        reverse (bool): If True, check for non-increasing order.
+
+    Returns:
+        bool: True if sorted, False otherwise.
+    """
+    if key is None:
+        key = lambda x: x
+
+    it = iter(seq)
+    try:
+        prev = key(next(it))
+    except StopIteration:
+        return True  # Empty sequence is considered sorted
+
+    cmp = (lambda a, b: a >= b) if reverse else (lambda a, b: a <= b)
+
+    for item in it:
+        curr = key(item)
+        if not cmp(prev, curr):
+            return False
+        prev = curr
+    return True
+
+
+# Example usage
+values = [1, 2, 3, 4, 5]
+result = is_sorted(values)
+
+Modified code:
+def is_sorted(seq, key=None, reverse=False):
+    """
+    Check if the sequence is sorted.
+
+    Parameters:
+        seq (iterable): The sequence to check.
+        key (callable, optional): Function to extract comparison key from elements.
+        reverse (bool): If True, check for non-increasing order.
+
+    Returns:
+        bool: True if sorted, False otherwise.
+    """
+    if key is None:
+        key = lambda x: x
+
+    it = iter(seq)
+    try:
+        prev = key(next(it))
+    except StopIteration:
+        return True  # Empty sequence is considered sorted
+
+    cmp = (lambda a, b: a >= b) if not reverse else (lambda a, b: a <= b)
+
+    for item in it:
+        curr = key(item)
+        if not cmp(prev, curr):
+            return False
+        prev = curr
+    return True
+
+
+# Example usage
+values = [1, 2, 3, 4, 5]
+result = is_sorted(values)
+
+Model description original code:
+`True`
+
+(The list `[1, 2, 3, 4, 5]` is already in non-decreasing order, so `is_sorted` returns `True`; if you were to `print(result)`, it would display `True`.)
+
+Model description modified code:
+`True` – the list `[1, 2, 3, 4, 5]` is already in ascending order, so `is_sorted` returns `True` and assigns that value to `result`.
+
+Computed result original code:
+True
+
+Computed result modified code:False

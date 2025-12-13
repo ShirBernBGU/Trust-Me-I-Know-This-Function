@@ -1,0 +1,71 @@
+Original code:
+def fibonacci_word(n: int) -> str:
+    """
+    Generate the n-th Fibonacci word.
+    F(0) = "0"
+    F(1) = "01"
+    F(n) = F(n-1) + F(n-2) for n >= 2
+    """
+    if n < 0:
+        raise ValueError("n must be non-negative")
+
+    a, b = "0", "01"
+    if n == 0:
+        return a
+    if n == 1:
+        return b
+
+    for _ in range(2, n + 1):
+        a, b = b, b + a
+    return b
+
+
+# Example usage
+result = fibonacci_word(5)
+
+Modified code:
+def fibonacci_word(n: int) -> str:
+    """
+    Generate the n-th Fibonacci word.
+    F(0) = "0"
+    F(1) = "01"
+    F(n) = F(n-1) + F(n-2) for n >= 2
+    """
+    if n < 0:
+        raise ValueError("n must be non-negative")
+
+    a, b = "0", "01"
+    if n == 0:
+        return a
+    if n == 1:
+        return b
+
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    return b
+
+
+# Example usage
+result = fibonacci_word(5)
+
+Model description original code:
+The call fibonacci_word(5) returns the 5-th Fibonacci word:
+
+F(0) = "0"  
+F(1) = "01"  
+F(2) = "010"  
+F(3) = "01001"  
+F(4) = "01001010"  
+F(5) = "01001010" + "01001" = "0100101001001"
+
+So the variable result will hold the string:
+
+"0100101001001"
+
+Model description modified code:
+`"0100101001001"`
+
+Computed result original code:
+0100101001001
+
+Computed result modified code:0100100101001

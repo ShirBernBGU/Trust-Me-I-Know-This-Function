@@ -1,0 +1,82 @@
+Original code:
+import math
+
+def approximate_ln(x: float, terms: int = 100000) -> float:
+    """
+    Approximate the natural logarithm of a positive number x using the
+    following series expansion (for y close to 0):
+        ln((1 + y) / (1 - y)) = 2 * [y + y^3/3 + y^5/5 + ...]
+    Let y = (x - 1) / (x + 1), so
+        ln(x) = 2 * Σ_{n=0..∞} y^{2n+1} / (2n + 1)
+    To improve convergence, x is scaled by powers of e to bring it
+    closer to 1, using ln(a·e^k) = ln(a) + k.
+    """
+    if x <= 0:
+        raise ValueError("x must be positive")
+
+    k = 0
+    while x > math.e:
+        x /= math.e
+        k += 1
+    while x < 1 / math.e:
+        x *= math.e
+        k -= 1
+
+    y = (x - 1) / (x + 1)
+    y2 = y * y
+    term = y
+    total = 0.0
+
+    for n in range(terms):
+        total += term / (2 * n + 1)
+        term *= y2
+
+    return 2 * total + k
+
+result = approximate_ln(42, terms=100000)
+
+Modified code:
+import math
+
+def approximate_ln(x: float, terms: int = 100000) -> float:
+    if x <= 0:
+        raise ValueError("x must be positive")
+
+    k = 0
+    while x > math.e * math.e:
+        x /= math.e
+        k += 1
+    while x < 1 / math.e:
+        x *= math.e
+        k -= 1
+
+    y = (x - 1) / (x + 1)
+    y2 = y * y
+    term = y
+    total = 0.0
+
+    for n in range(terms):
+        total += term / (2 * n + 1)
+        term *= y2
+
+    return 2 * total + k
+
+result = approximate_ln(42, terms=100000)
+
+Model description original code:
+The function converges to the natural logarithm of 42.  
+With 100 000 terms the approximation is essentially at full double-precision accuracy, so
+
+result ≈ ln 42 ≈ 3.7376696182833684
+
+Model description modified code:
+`result` will contain (and printing it would show) the natural-logarithm of 42, computed to ordinary double-precision accuracy:
+
+3.7376696182833684
+
+(Up to the last few ULPs, this matches `math.log(42)`).
+
+Computed result original code:
+3.737669618283369
+
+Computed result modified code:3.737669618283368

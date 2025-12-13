@@ -1,0 +1,83 @@
+Original code:
+
+def prefix_to_postfix(expression: str) -> str:
+    """
+    Convert a prefix expression (tokens separated by spaces) to postfix form.
+    Supported operators: +, -, *, /, ^.
+    """
+    operators = {"+", "-", "*", "/", "^"}
+    stack = []
+
+    # Process the expression from right to left
+    for token in reversed(expression.split()):
+        if token in operators:
+            # Pop two operands for the current operator
+            op1 = stack.pop()
+            op2 = stack.pop()
+            # Form the postfix string and push back to stack
+            stack.append(f"{op1} {op2} {token}")
+        else:
+            # Operand pushed directly
+            stack.append(token)
+
+    return stack[-1] if stack else ""
+
+
+# Example usage
+expr = "* + A B - C D"
+result = prefix_to_postfix(expr)
+
+
+Modified code:
+def prefix_to_postfix(expression: str) -> str:
+    """
+    Convert a prefix expression (tokens separated by spaces) to postfix form.
+    Supported operators: +, -, *, /, ^.
+    """
+    operators = {"+", "-", "*", "/", "^"}
+    stack = []
+
+    for token in reversed(expression.split()):
+        if token in operators:
+            op1 = stack.pop()
+            op2 = stack.pop()
+            stack.append(f"{op2} {op1} {token}")
+        else:
+            stack.append(token)
+
+    return stack[-1] if stack else ""
+
+
+# Example usage
+expr = "* + A B - C D"
+result = prefix_to_postfix(expr)
+
+Model description original code:
+The call
+
+result = prefix_to_postfix("* + A B - C D")
+
+produces the postfix string
+
+A B + C D - *
+
+(If you were to print result, that is what would appear.)
+
+Model description modified code:
+The call
+
+    expr = "* + A B - C D"
+    result = prefix_to_postfix(expr)
+
+produces the postfix (Reverse-Polish) form of the given prefix expression:
+
+    result == "A B + C D - *"
+
+So, if you print `result` you will see:
+
+    A B + C D - *
+
+Computed result original code:
+A B + C D - *
+
+Computed result modified code:D C - B A + *

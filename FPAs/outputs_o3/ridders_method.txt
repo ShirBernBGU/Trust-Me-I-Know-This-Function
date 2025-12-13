@@ -1,0 +1,137 @@
+Original code:
+import math
+
+def ridders_method(f, a, b, tol=1e-10, max_iter=100):
+    """
+    Find a root of f in the interval [a, b] using Ridders' method.
+    The function f must have opposite signs at a and b.
+    """
+    fa = f(a)
+    fb = f(b)
+
+    if fa == 0:
+        return a
+    if fb == 0:
+        return b
+    if fa * fb > 0:
+        raise ValueError("Function must have opposite signs at interval endpoints.")
+
+    for _ in range(max_iter):
+        c = 0.5 * (a + b)
+        fc = f(c)
+        d_sq = fc * fc - fa * fb
+        if d_sq < 0:
+            return c  # numerical issue, return best estimate
+        d = math.sqrt(d_sq)
+        if d == 0:
+            return c
+
+        sign = -1 if (fa - fb) < 0 else 1
+        x = c + (c - a) * sign * fc / d
+        fx = f(x)
+
+        if abs(fx) < tol:
+            return x
+
+        # Update the bracketing interval
+        if fc * fx < 0:
+            a, fa = c, fc
+            b, fb = x, fx
+        elif fa * fx < 0:
+            b, fb = x, fx
+        else:
+            a, fa = x, fx
+
+        if abs(b - a) < tol:
+            return 0.5 * (a + b)
+
+    return 0.5 * (a + b)
+
+# Example usage: root of cos(x) - x between 0 and 1
+result = ridders_method(lambda x: math.cos(x) - x, 0, 1)
+
+Modified code:
+import math
+
+def ridders_method(f, a, b, tol=1e-10, max_iter=100):
+    fa = f(a)
+    fb = f(b)
+
+    if fa == 0:
+        return a
+    if fb == 0:
+        return b
+    if fa * fb > 0:
+        raise ValueError("Function must have opposite signs at interval endpoints.")
+
+    tol *= 1e5
+
+    for _ in range(max_iter):
+        c = 0.5 * (a + b)
+        fc = f(c)
+        d_sq = fc * fc - fa * fb
+        if d_sq < 0:
+            return c
+        d = math.sqrt(d_sq)
+        if d == 0:
+            return c
+
+        sign = -1 if (fa - fb) < 0 else 1
+        x = c + (c - a) * sign * fc / d
+        fx = f(x)
+
+        if abs(fx) < tol:
+            return x
+
+        if fc * fx < 0:
+            a, fa = c, fc
+            b, fb = x, fx
+        elif fa * fx < 0:
+            b, fb = x, fx
+        else:
+            a, fa = x, fx
+
+        if abs(b - a) < tol:
+            return 0.5 * (a + b)
+
+    return 0.5 * (a + b)
+
+result = ridders_method(lambda x: math.cos(x) - x, 0, 1)
+
+Model description original code:
+It finds (and returns) the root of  
+
+cos(x) – x = 0  
+
+in the interval [0, 1], i.e. the fixed point of the cosine function.  
+The value is
+
+0.7390851332151607    # approximately
+
+(rounded to about 16 decimal places; the exact number of digits can vary slightly with the run).  
+Since nothing is printed, a script run produces no console output unless you explicitly `print(result)`, but `result` will contain the value above.
+
+Model description modified code:
+The call
+
+result = ridders_method(lambda x: math.cos(x) - x, 0, 1)
+
+makes the routine look for a root of  
+
+cos(x) – x = 0 in the interval [0, 1].
+
+That equation has a single root at
+
+x ≈ 0.7390851332151607
+
+(the well-known “Dottie number”).  
+With the tolerance tightened inside the routine to 1 × 10⁻⁵, Ridder’s method stops after two iterations and returns a value within that accuracy, e.g.
+
+0.73908  (about)
+
+So, if you print `result` you will see a number very close to 0.739085 (typically something like 0.73908).
+
+Computed result original code:
+0.7390851332162256
+
+Computed result modified code:0.7390851399705524

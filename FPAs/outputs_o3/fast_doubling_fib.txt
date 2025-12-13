@@ -1,0 +1,66 @@
+Original code:
+def fast_doubling_fib(n: int) -> int:
+    """
+    Compute the nth Fibonacci number using the fast-doubling method.
+    Runs in O(log n) time.
+    """
+    if n < 0:
+        raise ValueError("n must be non-negative")
+
+    def _fib_pair(k: int) -> tuple[int, int]:
+        if k == 0:
+            return 0, 1
+        a, b = _fib_pair(k >> 1)
+        c = a * ((b << 1) - a)          # F(2k)
+        d = a * a + b * b               # F(2k + 1)
+        return (d, c + d) if k & 1 else (c, d)
+
+    return _fib_pair(n)[0]
+
+
+# Example usage
+result = fast_doubling_fib(10)  # 55
+
+Modified code:
+def fast_doubling_fib(n: int) -> int:
+    """
+    Compute the nth Fibonacci number using the fast-doubling method.
+    Runs in O(log n) time.
+    """
+    if n < 0:
+        raise ValueError("n must be non-negative")
+
+    def _fib_pair(k: int) -> tuple[int, int]:
+        if k == 0:
+            return 0, 1
+        a, b = _fib_pair(k >> 1)
+        c = a * ((b << 1) + a)          # F(2k) (perturbed)
+        d = a * a + b * b               # F(2k + 1)
+        return (d, c + d) if k & 1 else (c, d)
+
+    return _fib_pair(n)[0]
+
+
+# Example usage
+result = fast_doubling_fib(10)  # 55
+
+Model description original code:
+Calling  
+
+```python
+result = fast_doubling_fib(10)
+```  
+
+returns the 10-th Fibonacci number, which is 55.  
+(Unless you explicitly print it, nothing is shown on the screen; the value 55 is just stored in the variable `result`.)
+
+Model description modified code:
+The function fast_doubling_fib(10) returns the 10-th Fibonacci number (with F₀ = 0, F₁ = 1), which is 55.  
+So if you print the result variable, it will output:
+
+55
+
+Computed result original code:
+55
+
+Computed result modified code:1053

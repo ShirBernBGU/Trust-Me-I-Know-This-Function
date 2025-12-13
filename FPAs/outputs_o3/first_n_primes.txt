@@ -1,0 +1,66 @@
+Original code:
+def first_n_primes(n: int):
+    """
+    Generate the first n prime numbers using trial division.
+    """
+    if n <= 0:
+        return []
+    primes = []
+    candidate = 2
+    while len(primes) < n:
+        is_prime = True
+        for p in primes:
+            if p * p > candidate:
+                break
+            if candidate % p == 0:
+                is_prime = False
+                break
+        if is_prime:
+            primes.append(candidate)
+        candidate += 1
+    return primes
+
+# Example usage
+result = first_n_primes(15)
+
+Modified code:
+def first_n_primes(n: int):
+    """
+    Generate the first n prime numbers using trial division.
+    """
+    if n <= 0:
+        return []
+    primes = []
+    candidate = 2
+    while len(primes) < n:
+        is_prime = True
+        for p in primes:
+            if p * p >= candidate:
+                break
+            if candidate % p == 0:
+                is_prime = False
+                break
+        if is_prime:
+            primes.append(candidate)
+        candidate += 1
+    return primes
+
+# Example usage
+result = first_n_primes(15)
+
+Model description original code:
+`result` will contain the first 15 prime numbers:
+
+```python
+[2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
+```
+
+Model description modified code:
+The call `first_n_primes(15)` returns the first 15 prime numbers:
+
+[2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
+
+Computed result original code:
+[2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
+
+Computed result modified code:[2, 3, 4, 5, 7, 9, 11, 13, 17, 19, 23, 25, 29, 31, 37]

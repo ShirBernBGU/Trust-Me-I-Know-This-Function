@@ -1,0 +1,70 @@
+Original code:
+def rot47(text: str) -> str:
+    """
+    Encode or decode a string using the ROT47 cipher.
+    ROT47 shifts each printable ASCII character (codes 33–126) by 47 positions.
+    """
+    translated = []
+    for ch in text:
+        code = ord(ch)
+        if 33 <= code <= 126:
+            translated.append(chr(33 + ((code - 33 + 47) % 94)))
+        else:
+            translated.append(ch)
+    return ''.join(translated)
+
+
+# Example usage
+result = rot47("Hello, World!")
+
+Modified code:
+def rot47(text: str) -> str:
+    translated = []
+    for ch in text:
+        code = ord(ch)
+        if 33 <= code <= 126:
+            translated.append(chr(33 + ((code - 33 + 47) % 93)))
+        else:
+            translated.append(ch)
+    return ''.join(translated)
+
+
+# Example usage
+result = rot47("Hello, World!")
+
+Model description original code:
+Calling  
+
+```python
+result = rot47("Hello, World!")
+print(result)
+```  
+
+produces the string  
+
+```
+w6==@[ (@C=5P
+```
+
+So the ROT-47 encoding of “Hello, World!” is `w6==@[ (@C=5P`.
+
+Model description modified code:
+The call
+
+```python
+result = rot47("Hello, World!")
+print(result)
+```
+
+produces
+
+```
+w6==@[ (@C=5P
+```
+
+(the ROT-47 encoding of the original text).
+
+Computed result original code:
+w6==@[ (@C=5P
+
+Computed result modified code:w7>>A[ )AD>6P

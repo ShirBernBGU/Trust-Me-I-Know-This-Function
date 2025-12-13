@@ -1,0 +1,146 @@
+Original code:
+
+from typing import List
+
+def max_product_in_grid(grid: List[List[int]], k: int = 4) -> int:
+    """
+    Returns the maximum product of k adjacent numbers in the same direction
+    (horizontal, vertical, or either diagonal) within a 2-D grid.
+    """
+    if not grid or not grid[0] or k <= 0:
+        return 0
+
+    rows, cols = len(grid), len(grid[0])
+    max_prod = float('-inf')
+
+    for r in range(rows):
+        for c in range(cols):
+            # Horizontal to the right
+            if c + k <= cols:
+                prod = 1
+                for i in range(k):
+                    prod *= grid[r][c + i]
+                max_prod = max(max_prod, prod)
+
+            # Vertical downwards
+            if r + k <= rows:
+                prod = 1
+                for i in range(k):
+                    prod *= grid[r + i][c]
+                max_prod = max(max_prod, prod)
+
+            # Diagonal down-right
+            if r + k <= rows and c + k <= cols:
+                prod = 1
+                for i in range(k):
+                    prod *= grid[r + i][c + i]
+                max_prod = max(max_prod, prod)
+
+            # Diagonal down-left
+            if r + k <= rows and c - k + 1 >= 0:
+                prod = 1
+                for i in range(k):
+                    prod *= grid[r + i][c - i]
+                max_prod = max(max_prod, prod)
+
+    return max_prod
+
+# Example usage
+grid_example = [
+    [ 8,  2, 22, 97, 38],
+    [49, 49, 99, 40, 17],
+    [81, 49, 31, 73, 55],
+    [52, 70, 95, 23,  4],
+    [22, 31, 16, 71, 51]
+]
+
+result = max_product_in_grid(grid_example, k=4)
+
+
+Modified code:
+from typing import List
+
+def max_product_in_grid(grid: List[List[int]], k: int = 4) -> int:
+    if not grid or not grid[0] or k <= 0:
+        return 0
+
+    rows, cols = len(grid), len(grid[0])
+    max_prod = float('-inf')
+
+    for r in range(rows):
+        for c in range(cols):
+            if c + k <= cols:
+                prod = 1
+                for i in range(k):
+                    prod *= grid[r][c + i]
+                max_prod = max(max_prod, prod)
+
+            if r + k <= rows:
+                prod = 1
+                for i in range(k):
+                    prod *= grid[r + i][c]
+                max_prod = max(max_prod, prod)
+
+            if r + k <= rows and c + k <= cols:
+                prod = 1
+                for i in range(k):
+                    prod *= grid[r + i][c + i]
+                max_prod = max(max_prod, prod)
+
+            if r + k <= rows and c - k >= 0:
+                prod = 1
+                for i in range(k):
+                    prod *= grid[r + i][c - i]
+                max_prod = max(max_prod, prod)
+
+    return max_prod
+
+# Example usage
+grid_example = [
+    [ 8,  2, 22, 97, 38],
+    [49, 49, 99, 40, 17],
+    [81, 49, 31, 73, 55],
+    [52, 70, 95, 23,  4],
+    [22, 31, 16, 71, 51]
+]
+
+result = max_product_in_grid(grid_example, k=4)
+
+Model description original code:
+The call  
+
+```python
+result = max_product_in_grid(grid_example, k=4)
+```  
+
+returns the largest product of four adjacent numbers that can be found in the provided 5 × 5 grid.  
+That maximum product is obtained on the down-left diagonal
+
+97  →  99  →  49  →  52
+
+and equals  
+
+97 × 99 × 49 × 52 = 24 468 444.
+
+So the value stored in `result` (and what would be printed if you added a `print(result)`) is  
+
+```
+24468444
+```
+
+Model description modified code:
+The function finds the greatest product of four adjacent numbers in the supplied 5 × 5 grid.  
+For this particular grid the maximum comes from the diagonal 97 × 99 × 49 × 52 = 24 468 444.
+
+So, after the call
+
+    result = max_product_in_grid(grid_example, k=4)
+
+the variable `result` holds the integer
+
+    24468444
+
+Computed result original code:
+24468444
+
+Computed result modified code:16194745

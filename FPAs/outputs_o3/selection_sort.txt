@@ -1,0 +1,51 @@
+Original code:
+def selection_sort(arr):
+    arr = list(arr)  # work on a copy to avoid side-effects
+    n = len(arr)
+    for i in range(n - 1):
+        min_idx = i
+        for j in range(i + 1, n):
+            if arr[j] < arr[min_idx]:
+                min_idx = j
+        if min_idx != i:
+            arr[i], arr[min_idx] = arr[min_idx], arr[i]
+    return arr
+
+result = selection_sort([64, 25, 12, 22, 11])
+
+Modified code:
+def selection_sort(arr):
+    arr = list(arr)  # work on a copy to avoid side-effects
+    n = len(arr)
+    for i in range(n - 1):
+        min_idx = i
+        for j in range(i + 1, n):
+            if arr[j] < arr[min_idx]:
+                min_idx = j
+        if min_idx != i:
+            arr[min_idx], arr[i] = arr[min_idx], arr[i]
+    return arr
+
+result = selection_sort([64, 25, 12, 22, 11])
+
+Model description original code:
+The `selection_sort` function sorts the input list in ascending order.  
+With the given input `[64, 25, 12, 22, 11]`, the sorted result is:
+
+```python
+result = [11, 12, 22, 25, 64]
+```
+
+(Unless you explicitly print `result`, nothing is displayed to the console; the value is just stored in the variable `result`.)
+
+Model description modified code:
+It returns the list in ascending order:
+
+result == [11, 12, 22, 25, 64]
+
+(If nothing is printed elsewhere, nothing appears on screen until you print result.)
+
+Computed result original code:
+[11, 12, 22, 25, 64]
+
+Computed result modified code:[64, 25, 12, 22, 11]

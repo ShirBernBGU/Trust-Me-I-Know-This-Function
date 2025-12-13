@@ -1,0 +1,71 @@
+Original code:
+import struct
+
+def fast_inverse_sqrt(number: float) -> float:
+    """Approximate 1/sqrt(number) using the Quake III Fast Inverse Square Root algorithm."""
+    threehalfs = 1.5
+    x2 = number * 0.5
+    y = number
+
+    # evil floating point bit level hacking
+    packed_y = struct.pack('f', y)
+    i = struct.unpack('I', packed_y)[0]
+    i = 0x5f3759df - (i >> 1)
+    packed_i = struct.pack('I', i)
+    y = struct.unpack('f', packed_i)[0]
+
+    # one iteration of Newton–Raphson method
+    y = y * (threehalfs - (x2 * y * y))
+    return y
+
+result = fast_inverse_sqrt(4.0)
+
+Modified code:
+import struct
+
+def fast_inverse_sqrt(number: float) -> float:
+    threehalfs = 1.5
+    x2 = number * 0.5
+    y = number
+
+    packed_y = struct.pack('f', y)
+    i = struct.unpack('I', packed_y)[0]
+    i = 0x5f3759cf - (i >> 1)
+    packed_i = struct.pack('I', i)
+    y = struct.unpack('f', packed_i)[0]
+
+    y = y * (threehalfs - (x2 * y * y))
+    return y
+
+result = fast_inverse_sqrt(4.0)
+
+Model description original code:
+`fast_inverse_sqrt(4.0)` returns an approximation to  
+1 / √4 = 0.5.  
+With the Quake-III bit-hack and one Newton–Raphson refinement the 32-bit
+result is
+
+    0.49915355   # (exactly 0.4991535544… in single precision)
+
+So after the call
+
+```python
+result = fast_inverse_sqrt(4.0)
+```
+
+`result` holds approximately 0.4991536 .
+
+Model description modified code:
+`fast_inverse_sqrt(4.0)` returns an approximation to  
+1 / √4 = 0.5.  
+With the single Newton–Raphson refinement done in the function and the magic
+constant `0x5f3759cf`, the 32-bit value obtained is
+
+    0.4991535544395447
+
+(you’ll see something very close to this when you inspect or print `result`).
+
+Computed result original code:
+0.49915357479239103
+
+Computed result modified code:0.4991535272784158

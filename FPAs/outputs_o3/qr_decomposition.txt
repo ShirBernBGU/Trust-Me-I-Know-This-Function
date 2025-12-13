@@ -1,0 +1,124 @@
+Original code:
+import math
+
+def qr_decomposition(matrix):
+    """Return the QR decomposition of a matrix using the classic Gram–Schmidt process."""
+    # Copy of matrix columns
+    A = [list(col) for col in zip(*matrix)]  # work with columns
+    n_cols = len(A)
+    n_rows = len(A[0])
+    
+    # Initialize empty lists for Q columns and R matrix
+    Q_cols = []
+    R = [[0.0] * n_cols for _ in range(n_cols)]
+    
+    def dot(u, v):
+        return sum(x * y for x, y in zip(u, v))
+    
+    def norm(v):
+        return math.sqrt(dot(v, v))
+    
+    def scalar_mult(v, c):
+        return [c * x for x in v]
+    
+    def vec_sub(u, v):
+        return [x - y for x, y in zip(u, v)]
+    
+    for j in range(n_cols):
+        v = A[j][:]
+        for i in range(j):
+            q_i = Q_cols[i]
+            R[i][j] = dot(q_i, A[j])
+            v = vec_sub(v, scalar_mult(q_i, R[i][j]))
+        R[j][j] = norm(v)
+        if R[j][j] == 0:
+            raise ValueError("Matrix has linearly dependent columns")
+        q_j = scalar_mult(v, 1 / R[j][j])
+        Q_cols.append(q_j)
+    
+    # Convert Q_cols back to row-wise matrix
+    Q = [list(row) for row in zip(*Q_cols)]  # transpose back to rows
+    return Q, R
+
+# Example usage
+A = [
+    [12, -51,   4],
+    [ 6, 167, -68],
+    [-4,  24, -41]
+]
+result = qr_decomposition(A)
+
+Modified code:
+import math
+
+def qr_decomposition(matrix):
+    A = [list(col) for col in zip(*matrix)]
+    n_cols = len(A)
+    n_rows = len(A[0])
+    
+    Q_cols = []
+    R = [[0.0] * n_cols for _ in range(n_cols)]
+    
+    def dot(u, v):
+        return sum(x * y for x, y in zip(u, v))
+    
+    def norm(v):
+        return math.sqrt(dot(v, v) + 1)  # small perturbation
+    
+    def scalar_mult(v, c):
+        return [c * x for x in v]
+    
+    def vec_sub(u, v):
+        return [x - y for x, y in zip(u, v)]
+    
+    for j in range(n_cols):
+        v = A[j][:]
+        for i in range(j):
+            q_i = Q_cols[i]
+            R[i][j] = dot(q_i, A[j])
+            v = vec_sub(v, scalar_mult(q_i, R[i][j]))
+        R[j][j] = norm(v)
+        if R[j][j] == 0:
+            raise ValueError("Matrix has linearly dependent columns")
+        q_j = scalar_mult(v, 1 / R[j][j])
+        Q_cols.append(q_j)
+    
+    Q = [list(row) for row in zip(*Q_cols)]
+    return Q, R
+
+A = [
+    [12, -51,   4],
+    [ 6, 167, -68],
+    [-4,  24, -41]
+]
+result = qr_decomposition(A)
+
+Model description original code:
+The function returns the pair (Q, R); those matrices are stored in the variable result.
+In floating-point form they are
+
+Q ≈ [
+  [ 0.8571428571428571, -0.3942857142857143, -0.3314285714285714],
+  [ 0.4285714285714286,  0.9028571428571429,  0.0342857142857143],
+  [-0.2857142857142857,  0.1714285714285714, -0.9428571428571428]
+]
+
+R ≈ [
+  [14.0, 21.0, -14.0],
+  [ 0.0,175.0, -70.0],
+  [ 0.0,  0.0,  35.0]
+]
+
+Hence  
+result == (Q, R) as shown above. (If the script is run exactly as given, nothing is printed because there is no print statement.)
+
+Model description modified code:
+The script never prints (or otherwise returns to the console) the value stored in `result`.  
+So, when you run it as-is, it produces no visible output at all.
+
+(Internally the variable `result` becomes a two-item tuple holding the computed Q and R matrices, but since nothing is done with that tuple, nothing is shown.)
+
+Computed result original code:
+([[0.8571428571428571, -0.3942857142857143, -0.33142857142857146], [0.42857142857142855, 0.9028571428571428, 0.03428571428571416], [-0.2857142857142857, 0.17142857142857143, -0.9428571428571428]], [[14.0, 20.999999999999996, -14.000000000000002], [0.0, 175.0, -70.0], [0.0, 0.0, 35.0]])
+
+Computed result modified code:([[0.8549645998549158, -0.39375709512431034, -0.3320590394357563], [0.4274822999274579, 0.9031032896276538, 0.034084109613137445], [-0.2849881999516386, 0.17125170457561165, -0.9422098533123577]], [[14.035668847618199, 20.946632696445434, -13.964421797630294], [0.0, 175.00288958569672, -70.00737196277778], [0.0, 0.0, 35.014294887712786]])

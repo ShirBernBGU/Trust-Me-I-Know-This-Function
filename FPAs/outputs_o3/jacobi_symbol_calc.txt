@@ -1,0 +1,90 @@
+Original code:
+import random
+
+def jacobi_symbol_calc(a: int, n: int) -> int:
+    if n <= 0 or n % 2 == 0:
+        raise ValueError("n must be a positive odd integer.")
+    a %= n
+    result = 1
+    while a:
+        while a % 2 == 0:
+            a //= 2
+            if n % 8 in (3, 5):
+                result = -result
+        a, n = n, a  # Quadratic reciprocity
+        if a % 4 == 3 and n % 4 == 3:
+            result = -result
+        a %= n
+    return result if n == 1 else 0
+
+def solovay_strassen(n: int, k: int = 10) -> bool:
+    if n < 2:
+        return False
+    if n % 2 == 0:
+        return n == 2
+    for _ in range(k):
+        a = random.randrange(2, n - 1)
+        x = jacobi_symbol_calc(a, n)
+        if x == 0 or pow(a, (n - 1) // 2, n) != x % n:
+            return False
+    return True
+
+result = solovay_strassen(7919)
+
+Modified code:
+import random
+
+def jacobi_symbol_calc(a: int, n: int) -> int:
+    if n <= 0 or n % 2 == 0:
+        raise ValueError("n must be a positive odd integer.")
+    a %= n
+    result = 1
+    while a:
+        while a % 2 == 0:
+            a //= 2
+            if n % 8 in (3, 5):
+                result = -result
+        a, n = n, a
+        if a % 4 == 3 and n % 4 == 3:
+            result = -result
+        a %= n
+    return result if n == 1 else 0
+
+def solovay_strassen(n: int, k: int = 10) -> bool:
+    if n < 2:
+        return False
+    if n % 2 == 0:
+        return n == 2
+    for _ in range(k):
+        a = random.randrange(2, n - 1)
+        x = jacobi_symbol_calc(a, n)
+        if x == 0 or pow(a, (n + 1) // 2, n) != x % n:
+            return False
+    return True
+
+result = solovay_strassen(7919)
+
+Model description original code:
+The variable result will be set to True.
+
+Explanation:
+• 7919 is a prime number.  
+• For a prime n, the Solovay-Strassen test always accepts (all bases a satisfy Euler’s criterion).  
+• Therefore every one of the 10 randomly chosen bases passes the test and the function returns True, which is assigned to result.
+
+(The code does not print anything; it just stores the boolean value True in result.)
+
+Model description modified code:
+`7919` is a prime number.  
+The Solovay–Strassen test therefore accepts it, so
+
+```python
+result  # after the call
+```
+
+is `True`. (The script itself produces no console output unless you add a `print`.)
+
+Computed result original code:
+True
+
+Computed result modified code:False

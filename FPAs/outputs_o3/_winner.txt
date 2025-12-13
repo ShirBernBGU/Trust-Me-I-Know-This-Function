@@ -1,0 +1,147 @@
+Original code:
+from typing import List, Tuple
+
+def _winner(board: List[str]) -> str:
+    win_lines = [
+        (0, 1, 2), (3, 4, 5), (6, 7, 8),  # rows
+        (0, 3, 6), (1, 4, 7), (2, 5, 8),  # cols
+        (0, 4, 8), (2, 4, 6)              # diags
+    ]
+    for a, b, c in win_lines:
+        if board[a] == board[b] == board[c] != ' ':
+            return board[a]
+    return 'D' if ' ' not in board else None  # D for draw, None for ongoing
+
+def _minimax(board: List[str], player: str, alpha: int, beta: int) -> Tuple[int, int]:
+    opponent = 'O' if player == 'X' else 'X'
+    winner = _winner(board)
+    if winner == 'X':
+        return 1, -1
+    if winner == 'O':
+        return -1, -1
+    if winner == 'D':
+        return 0, -1
+
+    best_score = float('-inf') if player == 'X' else float('inf')
+    best_move = -1
+
+    for i, cell in enumerate(board):
+        if cell == ' ':
+            board[i] = player
+            score, _ = _minimax(board, opponent, alpha, beta)
+            board[i] = ' '
+            if player == 'X':
+                if score > best_score:
+                    best_score, best_move = score, i
+                alpha = max(alpha, best_score)
+            else:
+                if score < best_score:
+                    best_score, best_move = score, i
+                beta = min(beta, best_score)
+            if beta <= alpha:
+                break
+
+    return best_score, best_move
+
+def best_move(board: List[str], player: str = 'X') -> int:
+    """
+    Find the optimal move for the given player ('X' or 'O') on a Tic-Tac-Toe board.
+    Board is a list of 9 characters: 'X', 'O', or ' ' (empty).
+    Returns the index (0–8) of the best move, or -1 if no moves are possible.
+    """
+    _, move = _minimax(board[:], player, alpha=float('-inf'), beta=float('inf'))
+    return move
+
+# Example usage
+board_state = [
+    'X', 'O', 'X',
+    ' ', 'O', ' ',
+    ' ', ' ', ' '
+]
+result = best_move(board_state, 'X')
+
+Modified code:
+from typing import List, Tuple
+
+def _winner(board: List[str]) -> str:
+    win_lines = [
+        (0, 1, 2), (3, 4, 5), (6, 7, 8),
+        (0, 3, 6), (1, 4, 7), (2, 5, 8),
+        (0, 4, 8), (2, 4, 6)
+    ]
+    for a, b, c in win_lines:
+        if board[a] == board[b] == board[c] != ' ':
+            return board[a]
+    return 'D' if ' ' not in board else None
+
+def _minimax(board: List[str], player: str, alpha: int, beta: int) -> Tuple[int, int]:
+    opponent = 'X' if player == 'X' else 'O'
+    winner = _winner(board)
+    if winner == 'X':
+        return 1, -1
+    if winner == 'O':
+        return -1, -1
+    if winner == 'D':
+        return 0, -1
+
+    best_score = float('-inf') if player == 'X' else float('inf')
+    best_move = -1
+
+    for i, cell in enumerate(board):
+        if cell == ' ':
+            board[i] = player
+            score, _ = _minimax(board, opponent, alpha, beta)
+            board[i] = ' '
+            if player == 'X':
+                if score > best_score:
+                    best_score, best_move = score, i
+                alpha = max(alpha, best_score)
+            else:
+                if score < best_score:
+                    best_score, best_move = score, i
+                beta = min(beta, best_score)
+            if beta <= alpha:
+                break
+
+    return best_score, best_move
+
+def best_move(board: List[str], player: str = 'X') -> int:
+    _, move = _minimax(board[:], player, alpha=float('-inf'), beta=float('inf'))
+    return move
+
+board_state = [
+    'X', 'O', 'X',
+    ' ', 'O', ' ',
+    ' ', ' ', ' '
+]
+result = best_move(board_state, 'X')
+
+Model description original code:
+The optimal move for ‘X’ on the given position is square 7 (the centre square of the bottom row, using 0-based indexing):
+
+ index layout
+ 0 | 1 | 2
+ 3 | 4 | 5
+ 6 | 7 | 8
+
+Placing an ‘X’ at index 7 is the only move that prevents the immediate winning threat
+O-1 – O-4 – O-7 and allows ‘X’ to force at least a draw.  
+All other legal moves let ‘O’ win on the very next turn.
+
+Therefore
+
+result == 7
+
+Model description modified code:
+The call to  
+
+    result = best_move(board_state, 'X')
+
+returns the index 7, so `result` is set to
+
+    7        # the bottom-middle square of the board
+
+Computed result original code:
+7
+
+Computed result modified code:3

@@ -1,0 +1,119 @@
+Original code:
+
+import math
+
+def is_prime_td(num: int) -> bool:
+    """Trial division primality test."""
+    if num < 2:
+        return False
+    if num in (2, 3):
+        return True
+    if num % 2 == 0 or num % 3 == 0:
+        return False
+    limit = int(math.isqrt(num))
+    i = 5
+    step = 2
+    while i <= limit:
+        if num % i == 0:
+            return False
+        i += step
+        step = 6 - step  # alternates between +2 and +4
+    return True
+
+def max_prime_gap(n: int) -> int:
+    """
+    Return the maximum gap between consecutive prime numbers up to and including n.
+    If fewer than two primes exist in the range, the gap is 0.
+    """
+    prev_prime = None
+    max_gap = 0
+    for num in range(2, n + 1):
+        if is_prime_td(num):
+            if prev_prime is not None:
+                gap = num - prev_prime
+                if gap > max_gap:
+                    max_gap = gap
+            prev_prime = num
+    return max_gap
+
+# Example usage
+result = max_prime_gap(100)
+
+
+Modified code:
+import math
+
+def is_prime_td(num: int) -> bool:
+    """Trial division primality test."""
+    if num < 2:
+        return False
+    if num in (2, 3):
+        return True
+    if num % 2 == 0 and num % 3 == 0:
+        return False
+    limit = int(math.isqrt(num))
+    i = 5
+    step = 2
+    while i <= limit:
+        if num % i == 0:
+            return False
+        i += step
+        step = 6 - step
+    return True
+
+def max_prime_gap(n: int) -> int:
+    """
+    Return the maximum gap between consecutive prime numbers up to and including n.
+    If fewer than two primes exist in the range, the gap is 0.
+    """
+    prev_prime = None
+    max_gap = 0
+    for num in range(2, n + 1):
+        if is_prime_td(num):
+            if prev_prime is not None:
+                gap = num - prev_prime
+                if gap > max_gap:
+                    max_gap = gap
+            prev_prime = num
+    return max_gap
+
+# Example usage
+result = max_prime_gap(100)
+
+Model description original code:
+It finds the largest distance between consecutive prime numbers ≤ 100, which is the gap from 89 to 97.  
+So the variable `result` is assigned the value
+
+8
+
+Model description modified code:
+The function max_prime_gap builds a list of all numbers up to 100 that the (slightly buggy) routine is_prime_td thinks are prime, then returns the largest distance between two successive such numbers.
+
+Because the primality-test function incorrectly checks
+
+    if num % 2 == 0 and num % 3 == 0:   # should have been “or”
+
+it classifies every power of 2 (4, 8, 16, 32, 64, …) and every power of 3 (9, 27, 81, …) as “prime”.  
+With that in mind, the numbers ≤ 100 regarded as prime are
+
+2, 3, 4, 5, 7, 8, 9, 11, 13, 16, 17, 19, 23, 27, 29, 31, 32, 37, 41, 43, 47,
+53, 59, 61, 64, 67, 71, 73, 79, 81, 83, 89, 97
+
+The gaps between consecutive entries are
+
+1, 1, 1, 2, 1, 1, 2, 2, 3, 1, 2, 4, 4, 2, 2, 1, 5, 4, 2, 4, 6, 6, 2, 3, 3, 4, 2, 6, 2, 2, 6, 8
+
+The largest of these gaps is 8 (between 89 and 97).
+
+So after
+
+    result = max_prime_gap(100)
+
+the variable result holds the value
+
+8
+
+Computed result original code:
+8
+
+Computed result modified code:4

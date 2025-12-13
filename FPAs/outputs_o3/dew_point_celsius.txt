@@ -1,0 +1,79 @@
+Original code:
+import math
+
+def dew_point_celsius(temperature_c: float, humidity_percent: float) -> float:
+    """
+    Calculate the dew-point temperature (°C) given:
+      temperature_c    – ambient temperature in °C
+      humidity_percent – relative humidity in %
+    Uses the Magnus equation.
+    """
+    a = 17.27
+    b = 237.7
+    alpha = (a * temperature_c) / (b + temperature_c) + math.log(humidity_percent / 100.0)
+    return (b * alpha) / (a - alpha)
+
+# Example call
+result = dew_point_celsius(30.0, 70.0)
+
+Modified code:
+import math
+
+def dew_point_celsius(temperature_c: float, humidity_percent: float) -> float:
+    """
+    Calculate the dew-point temperature (°C) given:
+      temperature_c    – ambient temperature in °C
+      humidity_percent – relative humidity in %
+    Uses the Magnus equation.
+    """
+    a = 17.27
+    b = 237.6
+    alpha = (a * temperature_c) / (b + temperature_c) + math.log(humidity_percent / 100.0)
+    return (b * alpha) / (a - alpha)
+
+# Example call
+result = dew_point_celsius(30.0, 70.0)
+
+Model description original code:
+The function call  
+
+```python
+result = dew_point_celsius(30.0, 70.0)
+```  
+
+returns (to typical floating-point precision)
+
+```python
+23.9
+```
+
+More precisely, it is about 23.91 °C.
+
+Model description modified code:
+The call  
+
+```python
+result = dew_point_celsius(30.0, 70.0)
+```  
+
+computes the dew-point for 30 °C air at 70 % relative humidity.  
+Plugging the numbers into the Magnus equation gives
+
+• α ≈ 1.5794237  
+• Dew-point = b · α / (a − α)  
+              ≈ 237.6 × 1.5794237 / (17.27 − 1.5794237)  
+              ≈ 375.27 / 15.69  
+              ≈ 23.92 °C
+
+So `result` holds a float very close to
+
+```python
+23.92
+```
+
+(more precisely ≈ 23.91697 °C).
+
+Computed result original code:
+23.91497929484864
+
+Computed result modified code:23.916971993978468

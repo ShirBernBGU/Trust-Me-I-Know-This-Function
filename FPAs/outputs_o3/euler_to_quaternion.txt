@@ -1,0 +1,92 @@
+Original code:
+import math
+
+def euler_to_quaternion(roll: float, pitch: float, yaw: float):
+    """
+    Convert Euler angles (roll, pitch, yaw) to a quaternion (w, x, y, z).
+
+    Angles are expected to be in radians.
+    """
+    cy = math.cos(yaw * 0.5)
+    sy = math.sin(yaw * 0.5)
+    cp = math.cos(pitch * 0.5)
+    sp = math.sin(pitch * 0.5)
+    cr = math.cos(roll * 0.5)
+    sr = math.sin(roll * 0.5)
+
+    w = cr * cp * cy + sr * sp * sy
+    x = sr * cp * cy - cr * sp * sy
+    y = cr * sp * cy + sr * cp * sy
+    z = cr * cp * sy - sr * sp * cy
+
+    return (w, x, y, z)
+
+# Example usage
+roll = math.radians(30)
+pitch = math.radians(45)
+yaw = math.radians(60)
+result = euler_to_quaternion(roll, pitch, yaw)
+
+Modified code:
+import math
+
+def euler_to_quaternion(roll: float, pitch: float, yaw: float):
+    cy = math.cos(yaw * 0.5)
+    sy = math.sin(yaw * 0.5 + 1e-6)
+    cp = math.cos(pitch * 0.5)
+    sp = math.sin(pitch * 0.5)
+    cr = math.cos(roll * 0.5)
+    sr = math.sin(roll * 0.5)
+
+    w = cr * cp * cy + sr * sp * sy
+    x = sr * cp * cy - cr * sp * sy
+    y = cr * sp * cy + sr * cp * sy
+    z = cr * cp * sy - sr * sp * cy
+
+    return (w, x, y, z)
+
+roll = math.radians(30)
+pitch = math.radians(45)
+yaw = math.radians(60)
+result = euler_to_quaternion(roll, pitch, yaw)
+
+Model description original code:
+With the three angles  
+roll = 30° , pitch = 45° , yaw = 60°  
+(they are first converted to radians) the function returns the quaternion
+
+(0.8223631719059994, 0.022260026714733816, 0.43967973954090955, 0.3604234056503559)
+
+Because the example code never calls print, nothing is actually written to the console, but the variable result will hold the tuple shown above.
+
+Model description modified code:
+All the intermediate values in radians:
+
+roll / 2 = π / 12  ≈ 0.2617993878  
+pitch / 2 = π / 8  ≈ 0.3926990817  
+yaw / 2 = π / 6  ≈ 0.5235987756  
+
+cy = cos(yaw/2)                ≈ 0.8660254038  
+sy = sin(yaw/2 + 1 e-6)        ≈ 0.5000008650  
+cp = cos(pitch/2)              ≈ 0.9238795325  
+sp = sin(pitch/2)              ≈ 0.3826834324  
+cr = cos(roll/2)               ≈ 0.9659258263  
+sr = sin(roll/2)               ≈ 0.2588190451  
+
+Plugging these into the quaternion formulas gives
+
+w = cr·cp·cy + sr·sp·sy ≈ 0.822363246  
+x = sr·cp·cy – cr·sp·sy ≈ 0.022259706  
+y = cr·sp·cy + sr·cp·sy ≈ 0.439679950  
+z = cr·cp·sy – sr·sp·cy ≈ 0.360424178  
+
+So the function returns roughly
+
+(0.822363246, 0.022259706, 0.43967995, 0.360424178)
+
+That is the value stored in the variable result.
+
+Computed result original code:
+(0.8223631719059994, 0.022260026714733816, 0.43967973954090955, 0.3604234056503559)
+
+Computed result modified code:(0.8223632576821194, 0.02225970659389584, 0.4396799466227818, 0.3604241784904245)

@@ -1,0 +1,93 @@
+Original code:
+
+def de_bruijn(k: int, n: int) -> str:
+    """
+    Generate a De Bruijn sequence for alphabet size k and subsequences of length n.
+    The returned sequence is cyclic and contains every possible length-n
+    string over the given alphabet exactly once.
+    """
+    if k <= 0 or n <= 0:
+        return ""
+    alphabet = [str(i) for i in range(k)]
+    a = [0] * (k * n)
+    sequence = []
+
+    def db(t: int, p: int):
+        if t > n:
+            if n % p == 0:
+                sequence.extend(a[1 : p + 1])
+        else:
+            a[t] = a[t - p]
+            db(t + 1, p)
+            for j in range(a[t - p] + 1, k):
+                a[t] = j
+                db(t + 1, t)
+
+    db(1, 1)
+    return "".join(alphabet[i] for i in sequence) + alphabet[0] * (n - 1)
+
+
+# Example usage
+result = de_bruijn(2, 3)
+
+
+Modified code:
+def de_bruijn(k: int, n: int) -> str:
+    if k <= 0 or n <= 0:
+        return ""
+    alphabet = [str(i) for i in range(k)]
+    a = [0] * (k * n)
+    sequence = []
+
+    def db(t: int, p: int):
+        if t >= n:
+            if n % p == 0:
+                sequence.extend(a[1 : p + 1])
+        else:
+            a[t] = a[t - p]
+            db(t + 1, p)
+            for j in range(a[t - p] + 1, k):
+                a[t] = j
+                db(t + 1, t)
+
+    db(1, 1)
+    return "".join(alphabet[i] for i in sequence) + alphabet[0] * (n - 1)
+
+
+# Example usage
+result = de_bruijn(2, 3)
+
+Model description original code:
+The call  
+
+```python
+result = de_bruijn(2, 3)
+```  
+
+returns the binary De Bruijn sequence of order 3, followed by the two extra leading symbols that make it linear instead of cyclic:
+
+```python
+'0001011100'
+```
+
+(no text is printed; the string above is what the variable `result` contains).
+
+Model description modified code:
+The call
+
+    result = de_bruijn(2, 3)
+
+builds a binary De Bruijn sequence of order 3 and then tacks on the final
+(n-1)=2 leading-zero characters that make every 3-bit pattern appear in the
+linear string.  
+The string produced is
+
+    "0001011100"
+
+So the variable `result` will contain the ten-character string  
+`"0001011100"`.
+
+Computed result original code:
+0001011100
+
+Computed result modified code:0100

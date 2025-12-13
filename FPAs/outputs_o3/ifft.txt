@@ -1,0 +1,115 @@
+Original code:
+import math, cmath
+
+def ifft(a):
+    """
+    Compute the inverse Fast Fourier Transform (IFFT) of a list of complex numbers.
+    The length of the input must be a power of two.
+    """
+    n = len(a)
+    if n == 0:
+        return []
+    if n & (n - 1):
+        raise ValueError("Length of input must be a power of 2")
+    if n == 1:
+        return a
+
+    even_part = ifft(a[::2])
+    odd_part = ifft(a[1::2])
+
+    angle = 2 * math.pi / n
+    w_n = cmath.exp(1j * angle)
+    w = 1 + 0j
+    result = [0j] * n
+
+    for k in range(n // 2):
+        t = w * odd_part[k]
+        result[k] = (even_part[k] + t) / 2
+        result[k + n // 2] = (even_part[k] - t) / 2
+        w *= w_n
+
+    return result
+
+# Example usage
+data = [0+0j, 1+0j, 2+0j, 3+0j]
+result = ifft(data)
+
+Modified code:
+import math, cmath
+
+def ifft(a):
+    """
+    Compute the inverse Fast Fourier Transform (IFFT) of a list of complex numbers.
+    The length of the input must be a power of two.
+    """
+    n = len(a)
+    if n == 0:
+        return []
+    if n & (n - 1):
+        raise ValueError("Length of input must be a power of 2")
+    if n == 1:
+        return [a[0] * 1.0000000001]
+
+    even_part = ifft(a[::2])
+    odd_part = ifft(a[1::2])
+
+    angle = 2 * math.pi / n
+    w_n = cmath.exp(1j * angle)
+    w = 1 + 0j
+    result = [0j] * n
+
+    for k in range(n // 2):
+        t = w * odd_part[k]
+        result[k] = (even_part[k] + t) / 2
+        result[k + n // 2] = (even_part[k] - t) / 2
+        w *= w_n
+
+    return result
+
+# Example usage
+data = [0+0j, 1+0j, 2+0j, 3+0j]
+result = ifft(data)
+
+Model description original code:
+Running the script produces the following list of complex numbers
+
+[(1.5+0j), (-0.5-0.5j), (-0.5+0j), (-0.5+0.5j)]
+
+Explanation (sketch):
+
+• Because the routine divides by 2 at every recursion level, the overall scaling is 1/4, matching the mathematical IFFT factor 1/N for N = 4.
+
+• Evaluating the inverse FFT formula
+xₖ = (1/N) ∑_{n=0}^{N-1} Xₙ e^{j2πkn/N}
+for the input [0, 1, 2, 3] gives
+
+k = 0 : (0+1+2+3)/4 = 1.5  
+k = 1 : (0 + 1·j − 2 − 3·j)/4 = −0.5 − 0.5 j  
+k = 2 : (0 − 1 + 2 − 3)/4 = −0.5  
+k = 3 : (0 − 1·j − 2 + 3·j)/4 = −0.5 + 0.5 j
+
+which is exactly what the function returns.
+
+Model description modified code:
+The function carries out an inverse FFT and, in the length-1 base case, multiplies every element by the constant  
+c = 1.0000000001.  
+Because the IFFT is a linear transform, that constant simply scales the whole result by the same factor.
+
+The ordinary (un-scaled) 4-point IFFT of the list  
+[0, 1, 2, 3] is
+
+[ 1.5 + 0j , −0.5 − 0.5j , −0.5 + 0j , −0.5 + 0.5j ].
+
+Multiplying each value by c gives the numbers that the code actually returns:
+
+[ 1.50000000015 + 0j ,  
+  −0.50000000005 − 0.50000000005j ,  
+  −0.50000000005 + 0j ,  
+  −0.50000000005 + 0.50000000005j ]
+
+(minor floating-point rounding differences aside).
+
+Computed result original code:
+[(1.5+0j), (-0.5-0.5j), (-0.5+0j), (-0.49999999999999994+0.5j)]
+
+Computed result modified code:[(1.50000000015+0j), (-0.50000000005-0.50000000005j), (-0.50000000005+0j), (-0.50000000005+0.50000000005j)]

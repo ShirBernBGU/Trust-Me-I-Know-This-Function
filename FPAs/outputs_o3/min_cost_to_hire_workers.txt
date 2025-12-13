@@ -1,0 +1,113 @@
+Original code:
+import heapq
+
+def min_cost_to_hire_workers(quality, wage, k):
+    """
+    Compute the minimum total wage to hire exactly k workers,
+    where each worker i has quality[i] and minimum wage expectation wage[i].
+    A group must pay every worker at the same ratio >= wage[i]/quality[i].
+    """
+    # Create list of (wage-to-quality ratio, quality)
+    workers = sorted(((w / q, q) for q, w in zip(quality, wage)), key=lambda x: x[0])
+    
+    max_heap = []         # will store negative qualities for max-heap behavior
+    quality_sum = 0       # running sum of qualities in the heap
+    min_cost = float('inf')
+    
+    for ratio, q in workers:
+        heapq.heappush(max_heap, -q)
+        quality_sum += q
+        
+        # Keep only the k smallest qualities (remove largest if size exceeds k)
+        if len(max_heap) > k:
+            quality_sum += heapq.heappop(max_heap)  # add because popped value is negative
+        
+        # When we have exactly k workers, update the minimum cost
+        if len(max_heap) == k:
+            min_cost = min(min_cost, quality_sum * ratio)
+    
+    return min_cost
+
+# Example usage
+quality = [10, 20, 5]
+wage = [70, 50, 30]
+k = 2
+result = min_cost_to_hire_workers(quality, wage, k)
+
+Modified code:
+import heapq
+
+def min_cost_to_hire_workers(quality, wage, k):
+    """
+    Compute the minimum total wage to hire exactly k workers,
+    where each worker i has quality[i] and minimum wage expectation wage[i].
+    A group must pay every worker at the same ratio >= wage[i]/quality[i].
+    """
+    workers = sorted(((w / q, q) for q, w in zip(quality, wage)), key=lambda x: x[0])
+    
+    max_heap = []
+    quality_sum = 0
+    min_cost = float('inf')
+    
+    for ratio, q in workers:
+        heapq.heappush(max_heap, -q)
+        quality_sum += q
+        
+        if len(max_heap) > k:
+            quality_sum -= heapq.heappop(max_heap)
+        
+        if len(max_heap) == k:
+            min_cost = min(min_cost, quality_sum * ratio)
+    
+    return min_cost
+
+quality = [10, 20, 5]
+wage = [70, 50, 30]
+k = 2
+result = min_cost_to_hire_workers(quality, wage, k)
+
+Model description original code:
+The function returns 105.
+
+Explanation step-by-step:
+
+1. Compute ratio = wage / quality for each worker and sort:
+   • (2.5, 20)   # 50/20  
+   • (6.0, 5)    # 30/5  
+   • (7.0, 10)   # 70/10  
+
+2. Iterate, maintaining a max-heap of at most k (=2) qualities and their sum.
+
+   a) Add (2.5, 20): heap = [20], sum = 20 → not yet k workers.
+
+   b) Add (6.0, 5):  heap = [20, 5], sum = 25  
+      Now k workers ⇒ cost = 25 × 6.0 = 150, min_cost = 150.
+
+   c) Add (7.0, 10): heap = [20, 5, 10], sum = 35  
+      Remove largest quality (20): heap = [10, 5], sum = 15  
+      Now k workers ⇒ cost = 15 × 7.0 = 105, min_cost = 105.
+
+3. Return min_cost = 105.
+
+So:
+
+result = 105
+
+Model description modified code:
+The function returns the minimum total wage possible, which for the given data is 105.  
+So after the call
+
+```python
+result = min_cost_to_hire_workers(quality, wage, k)
+```
+
+the variable `result` holds the value
+
+```python
+105
+```
+
+Computed result original code:
+105.0
+
+Computed result modified code:150.0

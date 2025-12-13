@@ -1,0 +1,60 @@
+Original code:
+
+def unique_morse_transformations(words):
+    """
+    Return the number of distinct Morse-code transformations among the given words.
+    """
+    morse = [
+        ".-","-...","-.-.","-..",".","..-.","--.","....","..",".---",
+        "-.-",".-..","--","-.","---",".--.","--.-",".-.","...","-",
+        "..-","...-",".--","-..-","-.--","--.."
+    ]
+    transformations = {
+        "".join(morse[ord(ch) - 97] for ch in word.lower()) for word in words
+    }
+    return len(transformations)
+
+# Example usage
+words = ["gin", "zen", "gig", "msg"]
+result = unique_morse_transformations(words)
+
+
+Modified code:
+def unique_morse_transformations(words):
+    """
+    Return the number of distinct Morse-code transformations among the given words.
+    """
+    morse = [
+        ".-","-...","-.-.","-..",".","..-.","--.","....",".",".---",
+        "-.-",".-..","--","-.","---",".--.","--.-",".-.","...","-",
+        "..-","...-",".--","-..-","-.--","--.."
+    ]
+    transformations = {
+        "".join(morse[ord(ch) - 97] for ch in word.lower()) for word in words
+    }
+    return len(transformations)
+
+# Example usage
+words = ["gin", "zen", "gig", "msg"]
+result = unique_morse_transformations(words)
+
+Model description original code:
+The list contains only two distinct Morse-code representations:
+
+• “gin” and “zen” → "--...-."
+• “gig” and “msg” → "--...--."
+
+Therefore the function returns 2, so after the call
+
+result = unique_morse_transformations(words)
+
+the value of result is 2.
+
+Model description modified code:
+It will store the value 2.  
+For the four words there are only two distinct Morse-code strings, so `unique_morse_transformations` returns 2 and `result` is set to 2.
+
+Computed result original code:
+2
+
+Computed result modified code:4

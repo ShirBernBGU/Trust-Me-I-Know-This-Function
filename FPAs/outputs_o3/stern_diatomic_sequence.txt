@@ -1,0 +1,74 @@
+Original code:
+
+def stern_diatomic_sequence(n: int):
+    """
+    Generate Stern's diatomic sequence up to index n.
+    S(0) = 0, S(1) = 1
+    For n > 1:
+        S(2k)   = S(k)
+        S(2k+1) = S(k) + S(k+1)
+    """
+    if n < 0:
+        raise ValueError("n must be non-negative")
+    seq = [0] * (n + 1)
+    if n >= 1:
+        seq[1] = 1
+    for i in range(2, n + 1):
+        if i % 2 == 0:
+            seq[i] = seq[i // 2]
+        else:
+            seq[i] = seq[(i - 1) // 2] + seq[(i + 1) // 2]
+    return seq
+
+# Example usage
+result = stern_diatomic_sequence(15)
+
+
+Modified code:
+def stern_diatomic_sequence(n: int):
+    """
+    Generate Stern's diatomic sequence up to index n.
+    S(0) = 0, S(1) = 1
+    For n > 1:
+        S(2k)   = S(k)
+        S(2k+1) = S(k) + S(k+1)
+    """
+    if n < 0:
+        raise ValueError("n must be non-negative")
+    seq = [0] * (n + 1)
+    if n >= 1:
+        seq[1] = 1
+    for i in range(2, n + 1):
+        if i % 2 == 0:
+            seq[i] = seq[i // 2]
+        else:
+            seq[i] = seq[(i - 1) // 2] + seq[i // 2]
+    return seq
+
+# Example usage
+result = stern_diatomic_sequence(15)
+
+Model description original code:
+The call  
+
+```python
+result = stern_diatomic_sequence(15)
+```  
+
+produces the list of Stern’s diatomic numbers for indices 0 – 15:
+
+```python
+[0, 1, 1, 2, 1, 3, 2, 3, 1, 4, 3, 5, 2, 5, 3, 4]
+```
+
+So `result` is `[0, 1, 1, 2, 1, 3, 2, 3, 1, 4, 3, 5, 2, 5, 3, 4]`.
+
+Model description modified code:
+The call stern_diatomic_sequence(15) returns the sequence S(0) … S(15):
+
+[0, 1, 1, 2, 1, 3, 2, 3, 1, 4, 3, 5, 2, 5, 3, 4]
+
+Computed result original code:
+[0, 1, 1, 2, 1, 3, 2, 3, 1, 4, 3, 5, 2, 5, 3, 4]
+
+Computed result modified code:[0, 1, 1, 2, 1, 2, 2, 4, 1, 2, 2, 4, 2, 4, 4, 8]

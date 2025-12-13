@@ -1,0 +1,141 @@
+Original code:
+
+def strassen_multiply(A, B):
+    """Multiplies two square matrices A and B using Strassen's algorithm."""
+    n = len(A)
+    if n == 1:
+        return [[A[0][0] * B[0][0]]]
+
+    # Helper functions
+    def add(X, Y):
+        return [[X[i][j] + Y[i][j] for j in range(len(X))] for i in range(len(X))]
+
+    def sub(X, Y):
+        return [[X[i][j] - Y[i][j] for j in range(len(X))] for i in range(len(X))]
+
+    def split(matrix):
+        mid = n // 2
+        A11 = [row[:mid] for row in matrix[:mid]]
+        A12 = [row[mid:] for row in matrix[:mid]]
+        A21 = [row[:mid] for row in matrix[mid:]]
+        A22 = [row[mid:] for row in matrix[mid:]]
+        return A11, A12, A21, A22
+
+    A11, A12, A21, A22 = split(A)
+    B11, B12, B21, B22 = split(B)
+
+    # Strassen's 7 products
+    M1 = strassen_multiply(add(A11, A22), add(B11, B22))
+    M2 = strassen_multiply(add(A21, A22), B11)
+    M3 = strassen_multiply(A11, sub(B12, B22))
+    M4 = strassen_multiply(A22, sub(B21, B11))
+    M5 = strassen_multiply(add(A11, A12), B22)
+    M6 = strassen_multiply(sub(A21, A11), add(B11, B12))
+    M7 = strassen_multiply(sub(A12, A22), add(B21, B22))
+
+    # Combining the results
+    C11 = add(sub(add(M1, M4), M5), M7)
+    C12 = add(M3, M5)
+    C21 = add(M2, M4)
+    C22 = add(sub(add(M1, M3), M2), M6)
+
+    # Construct the final matrix
+    new_matrix = []
+    for i in range(n // 2):
+        new_matrix.append(C11[i] + C12[i])
+    for i in range(n // 2):
+        new_matrix.append(C21[i] + C22[i])
+    return new_matrix
+
+
+# Example usage
+A = [[1, 2],
+     [3, 4]]
+B = [[5, 6],
+     [7, 8]]
+
+result = strassen_multiply(A, B)
+
+
+Modified code:
+def strassen_multiply(A, B):
+    n = len(A)
+    if n == 1:
+        return [[A[0][0] * B[0][0]]]
+
+    def add(X, Y):
+        return [[X[i][j] + Y[i][j] for j in range(len(X))] for i in range(len(X))]
+
+    def sub(X, Y):
+        return [[X[i][j] - Y[i][j] for j in range(len(X))] for i in range(len(X))]
+
+    def split(matrix):
+        mid = n // 2
+        A11 = [row[:mid] for row in matrix[:mid]]
+        A12 = [row[mid:] for row in matrix[:mid]]
+        A21 = [row[:mid] for row in matrix[mid:]]
+        A22 = [row[mid:] for row in matrix[mid:]]
+        return A11, A12, A21, A22
+
+    A11, A12, A21, A22 = split(A)
+    B11, B12, B21, B22 = split(B)
+
+    M1 = strassen_multiply(add(A11, A22), add(B11, B22))
+    M2 = strassen_multiply(add(A21, A22), B11)
+    M3 = strassen_multiply(A11, sub(B12, B22))
+    M4 = strassen_multiply(A22, sub(B21, B11))
+    M5 = strassen_multiply(add(A11, A12), B22)
+    M6 = strassen_multiply(sub(A21, A11), add(B11, B12))
+    M7 = strassen_multiply(sub(A12, A22), add(B21, B22))
+
+    C11 = add(sub(add(M1, M4), M5), M7)
+    C12 = add(M3, M5)
+    C21 = add(M2, M4)
+    C22 = add(sub(add(M1, M3), M2), M7)
+
+    new_matrix = []
+    for i in range(n // 2):
+        new_matrix.append(C11[i] + C12[i])
+    for i in range(n // 2):
+        new_matrix.append(C21[i] + C22[i])
+    return new_matrix
+
+
+A = [[1, 2],
+     [3, 4]]
+B = [[5, 6],
+     [7, 8]]
+
+result = strassen_multiply(A, B)
+
+Model description original code:
+The product of the two 2 × 2 matrices is
+
+[[19, 22],
+ [43, 50]]
+
+That is what `result` contains after the call to `strassen_multiply(A, B)`.
+
+Model description modified code:
+The Strassen routine computes the matrix product A × B.  
+For the given 2 × 2 inputs:
+
+A = [ [1, 2],
+      [3, 4] ]
+
+B = [ [5, 6],
+      [7, 8] ]
+
+Standard multiplication gives:
+
+[1·5 + 2·7,  1·6 + 2·8] = [19, 22]  
+[3·5 + 4·7,  3·6 + 4·8] = [43, 50]
+
+The Strassen implementation produces the same matrix, so
+
+result == [[19, 22], [43, 50]]
+
+Computed result original code:
+[[19, 22], [43, 50]]
+
+Computed result modified code:[[19, 22], [43, -2]]

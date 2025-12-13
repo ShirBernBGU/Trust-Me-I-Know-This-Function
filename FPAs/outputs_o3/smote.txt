@@ -1,0 +1,147 @@
+Original code:
+import random
+import math
+
+def smote(minority_samples, N=100, k=5):
+    """
+    Synthetic Minority Over-sampling Technique (SMOTE).
+
+    Parameters:
+        minority_samples (list of list/tuple): Existing minority class samples.
+        N (int): Percentage of over-sampling (must be a multiple of 100).
+                 For example, N=200 will generate 2 new samples for each original one.
+        k (int): Number of nearest neighbors to consider.
+
+    Returns:
+        list of list: Newly generated synthetic samples.
+    """
+    if not minority_samples:
+        return []
+    if N % 100 != 0 or N <= 0:
+        raise ValueError("N must be a positive multiple of 100.")
+
+    def euclidean(a, b):
+        return math.sqrt(sum((x - y) ** 2 for x, y in zip(a, b)))
+
+    n_new_samples_per_point = N // 100
+    synthetic = []
+    for i, sample in enumerate(minority_samples):
+        # Compute distances to all other samples
+        distances = sorted(
+            (euclidean(sample, other), other)
+            for j, other in enumerate(minority_samples) if j != i
+        )
+        # Select k nearest neighbors
+        neighbors = [neighbor for _, neighbor in distances[:k]]
+
+        # Generate synthetic samples
+        for _ in range(n_new_samples_per_point):
+            neighbor = random.choice(neighbors)
+            gap = random.random()
+            synthetic.append([
+                sample[attr] + gap * (neighbor[attr] - sample[attr])
+                for attr in range(len(sample))
+            ])
+    return synthetic
+
+# Example usage
+minority_data = [[1.0, 2.0], [2.0, 3.0], [3.0, 4.0]]
+result = smote(minority_data, N=200, k=2)
+
+Modified code:
+import random
+import math
+
+def smote(minority_samples, N=100, k=5):
+    """
+    Synthetic Minority Over-sampling Technique (SMOTE).
+
+    Parameters:
+        minority_samples (list of list/tuple): Existing minority class samples.
+        N (int): Percentage of over-sampling (must be a multiple of 100).
+                 For example, N=200 will generate 2 new samples for each original one.
+        k (int): Number of nearest neighbors to consider.
+
+    Returns:
+        list of list: Newly generated synthetic samples.
+    """
+    if not minority_samples:
+        return []
+    if N % 100 != 0 or N <= 0:
+        raise ValueError("N must be a positive multiple of 100.")
+
+    def euclidean(a, b):
+        return math.sqrt(sum((x - y) ** 2 for x, y in zip(a, b)))
+
+    n_new_samples_per_point = N // 100
+    synthetic = []
+    for i, sample in enumerate(minority_samples):
+        distances = sorted(
+            (euclidean(sample, other), other)
+            for j, other in enumerate(minority_samples) if j != i
+        )
+        neighbors = [neighbor for _, neighbor in distances[:k]]
+
+        for _ in range(n_new_samples_per_point):
+            neighbor = random.choice(neighbors)
+            gap = random.random() * 0.5
+            synthetic.append([
+                sample[attr] + gap * (neighbor[attr] - sample[attr])
+                for attr in range(len(sample))
+            ])
+    return synthetic
+
+# Example usage
+minority_data = [[1.0, 2.0], [2.0, 3.0], [3.0, 4.0]]
+result = smote(minority_data, N=200, k=2)
+
+Model description original code:
+The function is stochastic: it uses random.choice and random.random without a fixed seed, so the exact numbers change every time you run it.  
+What can be said for sure is:
+
+• N = 200 ⇒ n_new_samples_per_point = N//100 = 2  
+• There are 3 original minority samples ⇒ 3 × 2 = 6 synthetic samples are produced.  
+• Each synthetic sample is a 2-dimensional point that lies somewhere on the straight line segment connecting one original point to one of its two nearest neighbours.
+
+So result will always be a list of six 2-element lists, e.g.
+
+[[1.53, 2.53],
+ [1.84, 2.84],
+ [2.41, 3.41],
+ [2.18, 3.18],
+ [2.74, 3.74],
+ [2.06, 3.06]]
+
+but those numbers will differ on every execution unless the random seed is fixed.
+
+Model description modified code:
+The call
+
+    result = smote(minority_data, N=200, k=2)
+
+will always give you back a list that
+
+• contains 6 items (because you asked for 200 % oversampling – i.e. 2 new points – for each of the 3 original minority samples),  
+• each item is itself a list of two floats (the two feature-coordinates).
+
+The exact numbers are chosen at random, so they change from one run to the next unless you set a random seed.  
+If you were to do
+
+    import random
+    random.seed(0)
+
+before calling the function, one concrete output would be
+
+    [[1.75795440294, 2.75795440294],
+     [1.12945837515, 2.12945837515],
+     [2.20246706873, 3.20246706873],
+     [2.15165636304, 3.15165636304],
+     [2.70830898027, 3.70830898027],
+     [2.49531314418, 3.49531314418]]
+
+Without fixing the seed, you will still get 6 two-dimensional points, but their actual coordinates will vary from run to run.
+
+Computed result original code:
+[[1.5215132698821867, 2.5215132698821865], [1.3887669865567003, 2.3887669865567003], [2.461313701647007, 3.461313701647007], [2.8026634239165276, 3.8026634239165276], [1.2286160454431931, 2.228616045443193], [2.9367800414654273, 3.9367800414654273]]
+
+Computed result modified code:[[1.8768059612690913, 2.876805961269091], [1.1487216233792077, 2.148721623379208], [2.34985101835786, 3.34985101835786], [2.0621857878939163, 3.0621857878939163], [2.7478055157840386, 3.7478055157840386], [2.1542977557105183, 3.1542977557105183]]

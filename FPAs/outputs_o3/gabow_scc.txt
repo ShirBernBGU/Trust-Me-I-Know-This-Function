@@ -1,0 +1,166 @@
+Original code:
+
+def gabow_scc(graph):
+    """
+    Compute strongly connected components using Gabow's algorithm.
+    :param graph: dict mapping each vertex to an iterable of outgoing neighbors
+    :return: list of components, each component is a list of vertices
+    """
+    preorder = {}
+    assigned = set()
+    S, P = [], []
+    components = []
+    idx = 0
+
+    def dfs(v):
+        nonlocal idx
+        preorder[v] = idx
+        idx += 1
+        S.append(v)
+        P.append(v)
+
+        for w in graph.get(v, []):
+            if w not in preorder:
+                dfs(w)
+            elif w not in assigned:
+                while preorder[P[-1]] > preorder[w]:
+                    P.pop()
+
+        if P and P[-1] == v:
+            P.pop()
+            component = []
+            while True:
+                w = S.pop()
+                assigned.add(w)
+                component.append(w)
+                if w == v:
+                    break
+            components.append(component)
+
+    # ensure all vertices (even those only appearing as neighbors) are visited
+    all_vertices = set(graph.keys())
+    for neighbors in graph.values():
+        all_vertices.update(neighbors)
+
+    for v in all_vertices:
+        if v not in preorder:
+            dfs(v)
+
+    return components
+
+
+# Example usage
+graph_example = {
+    0: [1],
+    1: [2, 3],
+    2: [0],
+    3: [4],
+    4: [5, 7],
+    5: [6],
+    6: [4],
+    7: [8],
+    8: [7]
+}
+
+result = gabow_scc(graph_example)
+
+
+Modified code:
+def gabow_scc(graph):
+    """
+    Compute strongly connected components using Gabow's algorithm.
+    :param graph: dict mapping each vertex to an iterable of outgoing neighbors
+    :return: list of components, each component is a list of vertices
+    """
+    preorder = {}
+    assigned = set()
+    S, P = [], []
+    components = []
+    idx = 0
+
+    def dfs(v):
+        nonlocal idx
+        preorder[v] = idx
+        idx += 1
+        S.append(v)
+        P.append(v)
+
+        for w in graph.get(v, []):
+            if w not in preorder:
+                dfs(w)
+            elif w not in assigned:
+                while preorder[P[-1]] > preorder[w]:
+                    P.pop()
+
+        if P and P[-1] == v:
+            P.pop()
+            component = []
+            while True:
+                w = S.pop()
+                assigned.add(w)
+                component.append(w)
+                if w == v:
+                    break
+            components.append(component[::-1])
+
+    all_vertices = set(graph.keys())
+    for neighbors in graph.values():
+        all_vertices.update(neighbors)
+
+    for v in all_vertices:
+        if v not in preorder:
+            dfs(v)
+
+    return components
+
+
+graph_example = {
+    0: [1],
+    1: [2, 3],
+    2: [0],
+    3: [4],
+    4: [5, 7],
+    5: [6],
+    6: [4],
+    7: [8],
+    8: [7]
+}
+
+result = gabow_scc(graph_example)
+
+Model description original code:
+It returns the list of strongly-connected components that exist in the given graph.  
+With the traversal order that CPython normally uses for sets and dictionaries, the list comes out as
+
+```python
+[[8, 7],      # component containing vertices 7 and 8
+ [6, 5, 4],   # component containing 4, 5 and 6
+ [3],         # vertex 3 is its own SCC
+ [2, 1, 0]]   # component containing 0, 1 and 2
+```
+
+(The exact ordering of the components, and of the vertices inside each component, can vary if the iteration order of the set `all_vertices` differs, but these four groups are always the SCCs found.)
+
+Model description modified code:
+`gabow_scc` returns one list per strongly-connected component.  
+For this graph the components are  
+
+• {0, 1, 2}  
+• {3}  
+• {4, 5, 6}  
+• {7, 8}
+
+With the way the DFS starts (0 first, then following the reachable
+vertices) the function appends the components in the order they are
+finished, so the list it returns is:
+
+[[7, 8], [4, 5, 6], [3], [0, 1, 2]]
+
+(If the iteration order of the set `all_vertices` happened to be
+different you might see the same four sub-lists in a different order,
+but their contents will always be as above.)
+
+Computed result original code:
+[[8, 7], [6, 5, 4], [3], [2, 1, 0]]
+
+Computed result modified code:[[7, 8], [4, 5, 6], [3], [0, 1, 2]]

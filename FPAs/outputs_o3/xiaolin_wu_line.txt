@@ -1,0 +1,238 @@
+Original code:
+
+import math
+from typing import List, Tuple
+
+def xiaolin_wu_line(x0: float, y0: float, x1: float, y1: float) -> List[Tuple[int, int, float]]:
+    """
+    Generate the set of anti-aliased pixels for a line from (x0, y0) to (x1, y1)
+    using Xiaolin Wu's algorithm.  
+    Returns a list of (x, y, intensity) tuples where intensity ∈ [0, 1].
+    """
+    def ipart(x: float) -> int:          # integer part
+        return int(math.floor(x))
+
+    def roundi(x: float) -> int:         # round to nearest int
+        return ipart(x + 0.5)
+
+    def fpart(x: float) -> float:        # fractional part
+        return x - math.floor(x)
+
+    def rfpart(x: float) -> float:       # 1 - fractional part
+        return 1 - fpart(x)
+
+    points: List[Tuple[int, int, float]] = []
+
+    steep = abs(y1 - y0) > abs(x1 - x0)
+    if steep:
+        x0, y0, x1, y1 = y0, x0, y1, x1  # swap axes
+
+    if x0 > x1:
+        x0, x1 = x1, x0
+        y0, y1 = y1, y0
+
+    dx = x1 - x0
+    dy = y1 - y0
+    gradient = dy / dx if dx != 0 else 1.0
+
+    # handle first endpoint
+    xend = roundi(x0)
+    yend = y0 + gradient * (xend - x0)
+    xgap = rfpart(x0 + 0.5)
+    xpxl1 = xend
+    ypxl1 = ipart(yend)
+
+    if steep:
+        points.append((ypxl1, xpxl1, rfpart(yend) * xgap))
+        points.append((ypxl1 + 1, xpxl1, fpart(yend) * xgap))
+    else:
+        points.append((xpxl1, ypxl1, rfpart(yend) * xgap))
+        points.append((xpxl1, ypxl1 + 1, fpart(yend) * xgap))
+
+    intery = yend + gradient  # first y-intersection for the main loop
+
+    # handle second endpoint
+    xend = roundi(x1)
+    yend = y1 + gradient * (xend - x1)
+    xgap = fpart(x1 + 0.5)
+    xpxl2 = xend
+    ypxl2 = ipart(yend)
+
+    # main loop
+    for x in range(xpxl1 + 1, xpxl2):
+        if steep:
+            points.append((ipart(intery),     x, rfpart(intery)))
+            points.append((ipart(intery) + 1, x, fpart(intery)))
+        else:
+            points.append((x, ipart(intery),     rfpart(intery)))
+            points.append((x, ipart(intery) + 1, fpart(intery)))
+        intery += gradient
+
+    # draw the final endpoint
+    if steep:
+        points.append((ypxl2,     xpxl2, rfpart(yend) * xgap))
+        points.append((ypxl2 + 1, xpxl2, fpart(yend) * xgap))
+    else:
+        points.append((xpxl2, ypxl2,     rfpart(yend) * xgap))
+        points.append((xpxl2, ypxl2 + 1, fpart(yend) * xgap))
+
+    return points
+
+# Example usage
+result = xiaolin_wu_line(2, 3, 10, 7)
+
+
+Modified code:
+import math
+from typing import List, Tuple
+
+def xiaolin_wu_line(x0: float, y0: float, x1: float, y1: float) -> List[Tuple[int, int, float]]:
+    """
+    Generate the set of anti-aliased pixels for a line from (x0, y0) to (x1, y1)
+    using Xiaolin Wu's algorithm.  
+    Returns a list of (x, y, intensity) tuples where intensity ∈ [0, 1].
+    """
+    def ipart(x: float) -> int:          # integer part
+        return int(math.floor(x))
+
+    def roundi(x: float) -> int:         # round to nearest int
+        return ipart(x + 0.5)
+
+    def fpart(x: float) -> float:        # fractional part
+        return x - math.floor(x)
+
+    def rfpart(x: float) -> float:       # 1 - fractional part
+        return 1 - fpart(x)
+
+    points: List[Tuple[int, int, float]] = []
+
+    steep = abs(y1 - y0) > abs(x1 - x0)
+    if steep:
+        x0, y0, x1, y1 = y0, x0, y1, x1  # swap axes
+
+    if x0 > x1:
+        x0, x1 = x1, x0
+        y0, y1 = y1, y0
+
+    dx = x1 - x0
+    dy = y1 - y0
+    gradient = (dy / dx if dx != 0 else 1.0) + 1e-9  # perturbed gradient
+
+    # handle first endpoint
+    xend = roundi(x0)
+    yend = y0 + gradient * (xend - x0)
+    xgap = rfpart(x0 + 0.5)
+    xpxl1 = xend
+    ypxl1 = ipart(yend)
+
+    if steep:
+        points.append((ypxl1, xpxl1, rfpart(yend) * xgap))
+        points.append((ypxl1 + 1, xpxl1, fpart(yend) * xgap))
+    else:
+        points.append((xpxl1, ypxl1, rfpart(yend) * xgap))
+        points.append((xpxl1, ypxl1 + 1, fpart(yend) * xgap))
+
+    intery = yend + gradient  # first y-intersection for the main loop
+
+    # handle second endpoint
+    xend = roundi(x1)
+    yend = y1 + gradient * (xend - x1)
+    xgap = fpart(x1 + 0.5)
+    xpxl2 = xend
+    ypxl2 = ipart(yend)
+
+    # main loop
+    for x in range(xpxl1 + 1, xpxl2):
+        if steep:
+            points.append((ipart(intery),     x, rfpart(intery)))
+            points.append((ipart(intery) + 1, x, fpart(intery)))
+        else:
+            points.append((x, ipart(intery),     rfpart(intery)))
+            points.append((x, ipart(intery) + 1, fpart(intery)))
+        intery += gradient
+
+    # draw the final endpoint
+    if steep:
+        points.append((ypxl2,     xpxl2, rfpart(yend) * xgap))
+        points.append((ypxl2 + 1, xpxl2, fpart(yend) * xgap))
+    else:
+        points.append((xpxl2, ypxl2,     rfpart(yend) * xgap))
+        points.append((xpxl2, ypxl2 + 1, fpart(yend) * xgap))
+
+    return points
+
+# Example usage
+result = xiaolin_wu_line(2, 3, 10, 7)
+
+Model description original code:
+The call
+
+    result = xiaolin_wu_line(2, 3, 10, 7)
+
+returns the list of (x, y, intensity) tuples below, in the order generated by the algorithm:
+
+[(2, 3, 0.5),
+ (2, 4, 0.0),
+ (3, 3, 0.5),
+ (3, 4, 0.5),
+ (4, 4, 1.0),
+ (4, 5, 0.0),
+ (5, 4, 0.5),
+ (5, 5, 0.5),
+ (6, 5, 1.0),
+ (6, 6, 0.0),
+ (7, 5, 0.5),
+ (7, 6, 0.5),
+ (8, 6, 1.0),
+ (8, 7, 0.0),
+ (9, 6, 0.5),
+ (9, 7, 0.5),
+ (10, 7, 0.5),
+ (10, 8, 0.0)]
+
+So `result` references the list above.
+
+Model description modified code:
+Calling  
+
+result = xiaolin_wu_line(2, 3, 10, 7)  
+
+produces the following list (18 tuples), each one being  
+(x-pixel, y-pixel, intensity):
+
+[
+ (2, 3, 0.5),
+ (2, 4, 0.0),
+
+ (3, 3, 0.499999999),
+ (3, 4, 0.500000001),
+
+ (4, 4, 0.999999998),
+ (4, 5, 0.000000002),
+
+ (5, 4, 0.499999997),
+ (5, 5, 0.500000003),
+
+ (6, 5, 0.999999996),
+ (6, 6, 0.000000004),
+
+ (7, 5, 0.499999995),
+ (7, 6, 0.500000005),
+
+ (8, 6, 0.999999994),
+ (8, 7, 0.000000006),
+
+ (9, 6, 0.499999993),
+ (9, 7, 0.500000007),
+
+ (10, 7, 0.5),
+ (10, 8, 0.0)
+]
+
+(The small off-by-1e-9 perturbations come from the deliberate
+`+ 1e-9` added to the gradient in the function.)
+
+Computed result original code:
+[(2, 3, 0.5), (2, 4, 0.0), (3, 3, 0.5), (3, 4, 0.5), (4, 4, 1.0), (4, 5, 0.0), (5, 4, 0.5), (5, 5, 0.5), (6, 5, 1.0), (6, 6, 0.0), (7, 5, 0.5), (7, 6, 0.5), (8, 6, 1.0), (8, 7, 0.0), (9, 6, 0.5), (9, 7, 0.5), (10, 7, 0.5), (10, 8, 0.0)]
+
+Computed result modified code:[(2, 3, 0.5), (2, 4, 0.0), (3, 3, 0.4999999989999999), (3, 4, 0.5000000010000001), (4, 4, 0.9999999979999998), (4, 5, 2.000000165480742e-09), (5, 4, 0.49999999699999975), (5, 5, 0.5000000030000002), (6, 5, 0.9999999959999997), (6, 6, 4.000000330961484e-09), (7, 5, 0.4999999949999996), (7, 6, 0.5000000050000004), (8, 6, 0.9999999939999995), (8, 7, 6.000000496442226e-09), (9, 6, 0.4999999929999994), (9, 7, 0.5000000070000006), (10, 7, 0.5), (10, 8, 0.0)]

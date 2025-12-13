@@ -1,0 +1,102 @@
+Original code:
+
+def text_to_morse(text: str) -> str:
+    """
+    Convert a text string to International Morse code.
+    Letters are separated by spaces and words by '/'.
+    """
+    morse = {
+        'A': '.-',     'B': '-...',   'C': '-.-.',   'D': '-..',
+        'E': '.',      'F': '..-.',   'G': '--.',    'H': '....',
+        'I': '..',     'J': '.---',   'K': '-.-',    'L': '.-..',
+        'M': '--',     'N': '-.',     'O': '---',    'P': '.--.',
+        'Q': '--.-',   'R': '.-.',    'S': '...',    'T': '-',
+        'U': '..-',    'V': '...-',   'W': '.--',    'X': '-..-',
+        'Y': '-.--',   'Z': '--..',
+        '0': '-----',  '1': '.----',  '2': '..---',  '3': '...--',
+        '4': '....-',  '5': '.....',  '6': '-....',  '7': '--...',
+        '8': '---..',  '9': '----.',
+        '&': '.-...',  "'": '.----.', '@': '.--.-.', ')': '-.--.-',
+        '(': '-.--.',  ':': '---...', ',': '--..--', '=': '-...-',
+        '!': '-.-.--', '.': '.-.-.-', '-': '-....-', '+': '.-.-.',
+        '"': '.-..-.', '?': '..--..', '/': '-..-.'
+    }
+    result = []
+    for word in text.upper().split():
+        encoded_word = []
+        for char in word:
+            encoded_word.append(morse.get(char, '?'))
+        result.append(' '.join(encoded_word))
+    return ' / '.join(result)
+
+# Example usage
+result = text_to_morse("Hello World")
+
+
+Modified code:
+def text_to_morse(text: str) -> str:
+    morse = {
+        'A': '.-',     'B': '-...',   'C': '-.-.',   'D': '-..',
+        'E': '.',      'F': '..-.',   'G': '--.',    'H': '....',
+        'I': '..',     'J': '.---',   'K': '-.-',    'L': '.-.',
+        'M': '--',     'N': '-.',     'O': '---',    'P': '.--.',
+        'Q': '--.-',   'R': '.-.',    'S': '...',    'T': '-',
+        'U': '..-',    'V': '...-',   'W': '.--',    'X': '-..-',
+        'Y': '-.--',   'Z': '--..',
+        '0': '-----',  '1': '.----',  '2': '..---',  '3': '...--',
+        '4': '....-',  '5': '.....',  '6': '-....',  '7': '--...',
+        '8': '---..',  '9': '----.',
+        '&': '.-...',  "'": '.----.', '@': '.--.-.', ')': '-.--.-',
+        '(': '-.--.',  ':': '---...', ',': '--..--', '=': '-...-',
+        '!': '-.-.--', '.': '.-.-.-', '-': '-....-', '+': '.-.-.',
+        '"': '.-..-.', '?': '..--..', '/': '-..-.'
+    }
+    result = []
+    for word in text.upper().split():
+        encoded_word = []
+        for char in word:
+            encoded_word.append(morse.get(char, '?'))
+        result.append(' '.join(encoded_word))
+    return ' / '.join(result)
+
+# Example usage
+result = text_to_morse("Hello World")
+
+
+Model description original code:
+The call  
+
+```python
+result = text_to_morse("Hello World")
+```  
+
+puts the following string into `result`:
+
+```
+.... . .-.. .-.. --- / .-- --- .-. .-.. -..
+```
+
+(“HELLO” → `.... . .-.. .-.. ---`, “WORLD” → `.-- --- .-. .-.. -..`, with words separated by ` / `.)
+
+Model description modified code:
+Calling  
+
+```python
+result = text_to_morse("Hello World")
+```
+
+returns the Morse-code string
+
+```
+.... . .-.. .-.. --- / .-- --- .-. .-.. -..
+```
+
+• “HELLO” → `.... . .-.. .-.. ---`  
+• “WORLD” → `.-- --- .-. .-.. -..`  
+
+The two words are separated by ` / `.
+
+Computed result original code:
+.... . .-.. .-.. --- / .-- --- .-. .-.. -..
+
+Computed result modified code:.... . .-. .-. --- / .-- --- .-. .-. -..

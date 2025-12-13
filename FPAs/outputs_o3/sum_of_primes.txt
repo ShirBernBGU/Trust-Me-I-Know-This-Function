@@ -1,0 +1,73 @@
+Original code:
+def sum_of_primes(limit: int) -> int:
+    """
+    Calculate the sum of all prime numbers up to a given limit.
+    Uses incremental prime list for trial division.
+    """
+    if limit < 2:
+        return 0
+    primes = []
+    total = 0
+    for num in range(2, limit + 1):
+        is_prime_flag = True
+        for p in primes:
+            if p * p > num:
+                break
+            if num % p == 0:
+                is_prime_flag = False
+                break
+        if is_prime_flag:
+            primes.append(num)
+            total += num
+    return total
+
+
+# Example usage
+result = sum_of_primes(30)
+
+Modified code:
+def sum_of_primes(limit: int) -> int:
+    """
+    Calculate the sum of all prime numbers up to a given limit.
+    Uses incremental prime list for trial division.
+    """
+    if limit < 2:
+        return 0
+    primes = []
+    total = 0
+    for num in range(2, limit + 1):
+        is_prime_flag = True
+        for p in primes:
+            if p * p >= num:  # modified comparison
+                break
+            if num % p == 0:
+                is_prime_flag = False
+                break
+        if is_prime_flag:
+            primes.append(num)
+            total += num
+    return total
+
+
+# Example usage
+result = sum_of_primes(30)
+
+Model description original code:
+The call `sum_of_primes(30)` returns the sum of all prime numbers ≤ 30:
+
+Primes ≤ 30: 2, 3, 5, 7, 11, 13, 17, 19, 23, 29  
+Sum: 2 + 3 + 5 + 7 + 11 + 13 + 17 + 19 + 23 + 29 = 129
+
+So `result` is set to 129. (Nothing is printed unless you explicitly `print(result)`.)
+
+Model description modified code:
+It computes the sum of all prime numbers ≤ 30:
+
+2 + 3 + 5 + 7 + 11 + 13 + 17 + 19 + 23 + 29 = 129
+
+So the function call `sum_of_primes(30)` returns `129`, and `result` will hold that value.
+
+Computed result original code:
+129
+
+Computed result modified code:167

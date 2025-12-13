@@ -1,0 +1,99 @@
+Original code:
+def next_permutation(seq):
+    """
+    Generates the next lexicographical permutation of the given
+    list `seq`. If no higher permutation exists, returns None.
+    """
+    a = list(seq)  # Make a mutable copy
+    n = len(a)
+
+    # Step 1: find the longest non-increasing suffix
+    i = n - 2
+    while i >= 0 and a[i] >= a[i + 1]:
+        i -= 1
+    if i == -1:
+        return None  # seq is the highest permutation
+
+    # Step 2: find rightmost successor to pivot in the suffix
+    j = n - 1
+    while a[j] <= a[i]:
+        j -= 1
+
+    # Step 3: swap the pivot with the successor
+    a[i], a[j] = a[j], a[i]
+
+    # Step 4: reverse the suffix
+    a[i + 1 :] = reversed(a[i + 1 :])
+
+    return a
+
+
+# Example usage
+result = next_permutation([1, 2, 3])
+
+Modified code:
+def next_permutation(seq):
+    """
+    Generates the next lexicographical permutation of the given
+    list `seq`. If no higher permutation exists, returns None.
+    """
+    a = list(seq)  # Make a mutable copy
+    n = len(a)
+
+    # Step 1: find the longest non-increasing suffix
+    i = n - 2
+    while i >= 0 and a[i] >= a[i + 1]:
+        i -= 1
+    if i == -1:
+        return None  # seq is the highest permutation
+
+    # Step 2: find rightmost successor to pivot in the suffix
+    j = n - 1
+    while a[j] <= a[i]:
+        j -= 1
+
+    # Step 3: swap the pivot with the successor
+    a[j], a[i] = a[j], a[i]
+
+    # Step 4: reverse the suffix
+    a[i + 1 :] = reversed(a[i + 1 :])
+
+    return a
+
+
+# Example usage
+result = next_permutation([1, 2, 3])
+
+Model description original code:
+The call
+
+```python
+result = next_permutation([1, 2, 3])
+```
+
+returns the next lexicographical permutation of `[1, 2, 3]`, which is `[1, 3, 2]`.  
+So after the line executes, `result` holds:
+
+```python
+[1, 3, 2]
+```
+
+Model description modified code:
+The call
+
+```python
+result = next_permutation([1, 2, 3])
+```
+
+returns the next lexicographical permutation of `[1, 2, 3]`, which is:
+
+```python
+[1, 3, 2]
+```
+
+So `result` will be `[1, 3, 2]`.
+
+Computed result original code:
+[1, 3, 2]
+
+Computed result modified code:[1, 2, 3]

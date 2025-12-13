@@ -1,0 +1,59 @@
+Original code:
+import random
+
+def generate_uuid4():
+    rand = random.getrandbits(128)
+    # Set version to 4 (UUID version 4)
+    rand &= ~(0xf << 76)
+    rand |= 0x4 << 76
+    # Set variant to 10 (RFC 4122 variant)
+    rand &= ~(0x3 << 62)
+    rand |= 0x2 << 62
+    hex_str = f'{rand:032x}'
+    return f'{hex_str[0:8]}-{hex_str[8:12]}-{hex_str[12:16]}-{hex_str[16:20]}-{hex_str[20:32]}'
+
+result = generate_uuid4()
+
+Modified code:
+import random
+
+def generate_uuid4():
+    rand = random.getrandbits(128)
+    rand &= ~(0xe << 76)
+    rand |= 0x4 << 76
+    rand &= ~(0x3 << 62)
+    rand |= 0x2 << 62
+    hex_str = f'{rand:032x}'
+    return f'{hex_str[0:8]}-{hex_str[8:12]}-{hex_str[12:16]}-{hex_str[16:20]}-{hex_str[20:32]}'
+
+result = generate_uuid4()
+
+Model description original code:
+`generate_uuid4()` returns a randomly generated UUID version-4 string.  
+The exact characters change every time you call it, but the format is always:
+
+xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+
+• 32 hexadecimal digits in five groups separated by “-”.  
+• The first character of the third group is always 4 (the version).  
+• The first character of the fourth group is one of 8, 9, a, b (binary 10—the RFC-4122 variant).
+
+So `result` will hold something like:
+
+'3c7d5e2a-fb4d-4c0e-9a3b-2e1f76d4c8e1'
+
+(The concrete value is unpredictable because it depends on the random bits generated at runtime.)
+
+Model description modified code:
+Nothing fixed or predictable is printed.  
+The function constructs and returns a new, random RFC-4122 version-4 UUID string such as
+
+c6a2a3fe-7277-4d57-9289-b8d9151850a5
+
+(the exact 36-character hex-and-dash string will be different every time).  
+`result` will hold that string, but because there is no `print` statement the script itself produces no console output.
+
+Computed result original code:
+1978a369-4a01-46c9-833c-c67e6defa248
+
+Computed result modified code:8f600adb-634c-45c9-a412-dbdbcc5440e5

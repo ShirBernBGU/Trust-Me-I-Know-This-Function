@@ -1,0 +1,64 @@
+Original code:
+import random
+
+def random_subset(n: int, k: int) -> list[int]:
+    """Return k distinct random numbers chosen uniformly from range(n) using Floyd's algorithm."""
+    if not (0 <= k <= n):
+        raise ValueError("k must satisfy 0 <= k <= n")
+    selected = {}
+    subset = []
+    for i in range(n - k, n):
+        t = random.randint(0, i)
+        value = selected.get(t, t)
+        selected[t] = selected.get(i, i)
+        subset.append(value)
+    return subset
+
+# Example usage
+result = random_subset(10, 3)
+
+Modified code:
+import random
+
+def random_subset(n: int, k: int) -> list[int]:
+    if not (0 <= k <= n):
+        raise ValueError("k must satisfy 0 <= k <= n")
+    selected = {}
+    subset = []
+    for i in range(n - k, n):
+        t = random.randint(0, i)
+        value = selected.get(t, t)
+        selected[t] = selected.get(i, i)
+        subset.append(value)
+    subset.reverse()
+    return subset
+
+# Example usage
+result = random_subset(10, 3)
+
+Model description original code:
+`random_subset(10, 3)` returns a list containing three different integers drawn uniformly at random from the range 0 … 9.  
+Because the function uses the `random` module (with no seed specified), the exact numbers will vary every time you run it, e.g.
+
+• `result` could be `[6, 2, 8]` on one run,  
+• `[0, 9, 4]` on the next, etc.
+
+The only guarantees are:
+1. The list has length 3.
+2. All elements are distinct.
+3. Every 3-element subset of `{0,1,…,9}` is equally likely.
+
+Model description modified code:
+`random_subset(10, 3)` returns a list containing 3 distinct integers chosen uniformly at random from the set  
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}.  
+Because no random seed is fixed, the exact numbers (and their order) are unpredictable each time you run the code.  
+A typical result might look like:
+
+[4, 0, 9]
+
+but any 3-element combination of the numbers 0–9 can appear.
+
+Computed result original code:
+[5, 7, 8]
+
+Computed result modified code:[8, 0, 2]
