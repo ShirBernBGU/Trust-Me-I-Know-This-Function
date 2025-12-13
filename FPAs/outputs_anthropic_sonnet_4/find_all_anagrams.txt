@@ -1,0 +1,200 @@
+Original code:
+
+def find_all_anagrams(s, p):
+    if len(p) > len(s):
+        return []
+    
+    result = []
+    p_count = {}
+    window_count = {}
+    
+    for char in p:
+        p_count[char] = p_count.get(char, 0) + 1
+    
+    for i in range(len(p)):
+        char = s[i]
+        window_count[char] = window_count.get(char, 0) + 1
+    
+    if window_count == p_count:
+        result.append(0)
+    
+    for i in range(len(p), len(s)):
+        new_char = s[i]
+        old_char = s[i - len(p)]
+        
+        window_count[new_char] = window_count.get(new_char, 0) + 1
+        window_count[old_char] -= 1
+        
+        if window_count[old_char] == 0:
+            del window_count[old_char]
+        
+        if window_count == p_count:
+            result.append(i - len(p) + 1)
+    
+    return result
+
+result = find_all_anagrams("cbaebabacd", "abc")
+
+
+Modified code:
+
+def find_all_anagrams(s, p):
+    if len(p) > len(s):
+        return []
+    
+    result = []
+    p_count = {}
+    window_count = {}
+    
+    for char in p:
+        p_count[char] = p_count.get(char, 0) + 1
+    
+    for i in range(len(p)):
+        char = s[i]
+        window_count[char] = window_count.get(char, 0) + 1
+    
+    if window_count == p_count:
+        result.append(0)
+    
+    for i in range(len(p), len(s)):
+        new_char = s[i]
+        old_char = s[i - len(p)]
+        
+        window_count[new_char] = window_count.get(new_char, 0) + 1
+        window_count[old_char] -= 1
+        
+        if window_count[old_char] == 0:
+            del window_count[old_char]
+        
+        if window_count == p_count:
+            result.append(i - len(p))
+    
+    return result
+
+result = find_all_anagrams("cbaebabacd", "abc")
+
+
+Model description original code:
+Let me trace through this code step by step.
+
+This function finds all starting indices of anagrams of string `p` in string `s`.
+
+Given: `s = "cbaebabacd"`, `p = "abc"`
+
+**Step 1: Initialize**
+- `p_count = {'a': 1, 'b': 1, 'c': 1}` (character frequency of "abc")
+- `window_count = {}` (will track current window)
+- `result = []`
+
+**Step 2: Build initial window (first 3 characters of s: "cba")**
+- `window_count = {'c': 1, 'b': 1, 'a': 1}`
+- Since `window_count == p_count`, append 0 to result
+- `result = [0]`
+
+**Step 3: Slide the window through remaining characters**
+
+- **i=3** (char='e'):
+  - Add 'e': `window_count = {'c': 1, 'b': 1, 'a': 1, 'e': 1}`
+  - Remove 'c': `window_count = {'b': 1, 'a': 1, 'e': 1}`
+  - Not equal to p_count
+
+- **i=4** (char='b'):
+  - Add 'b': `window_count = {'b': 2, 'a': 1, 'e': 1}`
+  - Remove 'b': `window_count = {'b': 1, 'a': 1, 'e': 1}`
+  - Not equal to p_count
+
+- **i=5** (char='a'):
+  - Add 'a': `window_count = {'b': 1, 'a': 2, 'e': 1}`
+  - Remove 'a': `window_count = {'b': 1, 'a': 1, 'e': 1}`
+  - Not equal to p_count
+
+- **i=6** (char='b'):
+  - Add 'b': `window_count = {'b': 2, 'a': 1, 'e': 1}`
+  - Remove 'e': `window_count = {'b': 2, 'a': 1}`
+  - Not equal to p_count
+
+- **i=7** (char='a'):
+  - Add 'a': `window_count = {'b': 2, 'a': 2}`
+  - Remove 'b': `window_count = {'b': 1, 'a': 2}`
+  - Not equal to p_count
+
+- **i=8** (char='c'):
+  - Add 'c': `window_count = {'b': 1, 'a': 2, 'c': 1}`
+  - Remove 'a': `window_count = {'b': 1, 'a': 1, 'c': 1}`
+  - Equal to p_count! Append index 6 (i - len(p) + 1 = 8 - 3 + 1)
+  - `result = [0, 6]`
+
+- **i=9** (char='d'):
+  - Add 'd': `window_count = {'b': 1, 'a': 1, 'c': 1, 'd': 1}`
+  - Remove 'b': `window_count = {'a': 1, 'c': 1, 'd': 1}`
+  - Not equal to p_count
+
+**Final Output:**
+The code returns `[0, 6]`, which are the starting indices where anagrams of "abc" are found in "cbaebabacd":
+- Index 0: "cba" (anagram of "abc")
+- Index 6: "bac" (anagram of "abc")
+
+Model description modified code:
+Let me trace through this code step by step.
+
+This function finds all starting indices of anagrams of string `p` in string `s`.
+
+Given: `s = "cbaebabacd"`, `p = "abc"`
+
+**Initial Setup:**
+- `p_count = {'a': 1, 'b': 1, 'c': 1}` (character frequencies in p)
+- `window_count = {}` (will track character frequencies in sliding window)
+
+**First Window (indices 0-2: "cba"):**
+- Build initial window: `window_count = {'c': 1, 'b': 1, 'a': 1}`
+- Compare: `window_count == p_count` → True
+- Add index 0 to result: `result = [0]`
+
+**Sliding Window (starting from index 3):**
+
+- **i = 3:** Window shifts to indices 1-3: "bae"
+  - Add 'e': `window_count = {'c': 1, 'b': 1, 'a': 1, 'e': 1}`
+  - Remove 'c': `window_count = {'b': 1, 'a': 1, 'e': 1}`
+  - Not equal to `p_count`
+
+- **i = 4:** Window shifts to indices 2-4: "aeb"
+  - Add 'b': `window_count = {'b': 2, 'a': 1, 'e': 1}`
+  - Remove 'b': `window_count = {'b': 1, 'a': 1, 'e': 1}`
+  - Not equal to `p_count`
+
+- **i = 5:** Window shifts to indices 3-5: "eba"
+  - Add 'a': `window_count = {'b': 1, 'a': 2, 'e': 1}`
+  - Remove 'a': `window_count = {'b': 1, 'a': 1, 'e': 1}`
+  - Not equal to `p_count`
+
+- **i = 6:** Window shifts to indices 4-6: "bab"
+  - Add 'b': `window_count = {'b': 2, 'a': 1, 'e': 1}`
+  - Remove 'e': `window_count = {'b': 2, 'a': 1}`
+  - Not equal to `p_count`
+
+- **i = 7:** Window shifts to indices 5-7: "aba"
+  - Add 'a': `window_count = {'b': 2, 'a': 2}`
+  - Remove 'b': `window_count = {'b': 1, 'a': 2}`
+  - Not equal to `p_count`
+
+- **i = 8:** Window shifts to indices 6-8: "bac"
+  - Add 'c': `window_count = {'b': 1, 'a': 2, 'c': 1}`
+  - Remove 'a': `window_count = {'b': 1, 'a': 1, 'c': 1}`
+  - Equal to `p_count`! → Add index 6 to result: `result = [0, 6]`
+
+- **i = 9:** Window shifts to indices 7-9: "acd"
+  - Add 'd': `window_count = {'b': 1, 'a': 1, 'c': 1, 'd': 1}`
+  - Remove 'b': `window_count = {'a': 1, 'c': 1, 'd': 1}`
+  - Not equal to `p_count`
+
+**Final Result:**
+The code outputs: `[0, 6]`
+
+These are the starting indices where anagrams of "abc" are found in "cbaebabacd":
+- Index 0: "cba" (anagram of "abc")
+- Index 6: "bac" (anagram of "abc")
+
+Computed result original code:
+[0, 6]
+
+Computed result modified code:[0, 5]

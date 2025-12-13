@@ -1,0 +1,262 @@
+Original code:
+
+def binary_tree_postorder_traversal(root):
+    if not root:
+        return []
+    
+    result = []
+    stack = [(root, False)]
+    
+    while stack:
+        node, visited = stack.pop()
+        
+        if visited:
+            result.append(node.val)
+        else:
+            stack.append((node, True))
+            if node.right:
+                stack.append((node.right, False))
+            if node.left:
+                stack.append((node.left, False))
+    
+    return result
+
+
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+
+# Example tree:     1
+#                   / \
+#                  2   3
+#                 / \
+#                4   5
+root = TreeNode(1)
+root.left = TreeNode(2)
+root.right = TreeNode(3)
+root.left.left = TreeNode(4)
+root.left.right = TreeNode(5)
+
+result = binary_tree_postorder_traversal(root)
+
+
+Modified code:
+
+def binary_tree_postorder_traversal(root):
+    if not root:
+        return []
+    
+    result = []
+    stack = [(root, False)]
+    
+    while stack:
+        node, visited = stack.pop()
+        
+        if visited:
+            result.append(node.val)
+        else:
+            stack.append((node, True))
+            if node.left:
+                stack.append((node.left, False))
+            if node.right:
+                stack.append((node.right, False))
+    
+    return result
+
+
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+
+# Example tree:     1
+#                   / \
+#                  2   3
+#                 / \
+#                4   5
+root = TreeNode(1)
+root.left = TreeNode(2)
+root.right = TreeNode(3)
+root.left.left = TreeNode(4)
+root.left.right = TreeNode(5)
+
+result = binary_tree_postorder_traversal(root)
+
+
+Model description original code:
+Let me trace through this code step by step.
+
+This code performs a **postorder traversal** of a binary tree using an iterative approach with a stack.
+
+Given tree structure:
+```
+        1
+       / \
+      2   3
+     / \
+    4   5
+```
+
+Let me trace through the execution:
+
+**Initial state:**
+- `stack = [(1, False)]`
+- `result = []`
+
+**Iteration 1:**
+- Pop: `(1, False)`
+- Not visited, so:
+  - Push: `(1, True)`
+  - Push: `(3, False)` (right child)
+  - Push: `(2, False)` (left child)
+- Stack: `[(1, True), (3, False), (2, False)]`
+
+**Iteration 2:**
+- Pop: `(2, False)`
+- Not visited, so:
+  - Push: `(2, True)`
+  - Push: `(5, False)` (right child)
+  - Push: `(4, False)` (left child)
+- Stack: `[(1, True), (3, False), (2, True), (5, False), (4, False)]`
+
+**Iteration 3:**
+- Pop: `(4, False)`
+- Not visited, so:
+  - Push: `(4, True)`
+  - No children
+- Stack: `[(1, True), (3, False), (2, True), (5, False), (4, True)]`
+
+**Iteration 4:**
+- Pop: `(4, True)`
+- Visited! Add 4 to result
+- Result: `[4]`
+
+**Iteration 5:**
+- Pop: `(5, False)`
+- Not visited, so:
+  - Push: `(5, True)`
+  - No children
+- Stack: `[(1, True), (3, False), (2, True), (5, True)]`
+
+**Iteration 6:**
+- Pop: `(5, True)`
+- Visited! Add 5 to result
+- Result: `[4, 5]`
+
+**Iteration 7:**
+- Pop: `(2, True)`
+- Visited! Add 2 to result
+- Result: `[4, 5, 2]`
+
+**Iteration 8:**
+- Pop: `(3, False)`
+- Not visited, so:
+  - Push: `(3, True)`
+  - No children
+- Stack: `[(1, True), (3, True)]`
+
+**Iteration 9:**
+- Pop: `(3, True)`
+- Visited! Add 3 to result
+- Result: `[4, 5, 2, 3]`
+
+**Iteration 10:**
+- Pop: `(1, True)`
+- Visited! Add 1 to result
+- Result: `[4, 5, 2, 3, 1]`
+
+**The output is: `[4, 5, 2, 3, 1]`**
+
+This is the correct postorder traversal (left → right → root) of the binary tree.
+
+Model description modified code:
+Let me trace through this code step by step.
+
+This code performs a **postorder traversal** of a binary tree using an iterative approach with a stack.
+
+Given tree structure:
+```
+       1
+      / \
+     2   3
+    / \
+   4   5
+```
+
+Let me trace the execution:
+
+1. **Initial state**: `stack = [(1, False)]`, `result = []`
+
+2. **Iteration 1**: Pop `(1, False)`
+   - Not visited, so push `(1, True)` back
+   - Push left child `(2, False)`
+   - Push right child `(3, False)`
+   - Stack: `[(1, True), (2, False), (3, False)]`
+
+3. **Iteration 2**: Pop `(3, False)`
+   - Not visited, push `(3, True)` back
+   - No children to add
+   - Stack: `[(1, True), (2, False), (3, True)]`
+
+4. **Iteration 3**: Pop `(3, True)`
+   - Visited, append 3 to result
+   - Stack: `[(1, True), (2, False)]`, `result = [3]`
+
+5. **Iteration 4**: Pop `(2, False)`
+   - Not visited, push `(2, True)` back
+   - Push left child `(4, False)`
+   - Push right child `(5, False)`
+   - Stack: `[(1, True), (2, True), (4, False), (5, False)]`
+
+6. **Iteration 5**: Pop `(5, False)`
+   - Not visited, push `(5, True)` back
+   - No children
+   - Stack: `[(1, True), (2, True), (4, False), (5, True)]`
+
+7. **Iteration 6**: Pop `(5, True)`
+   - Visited, append 5
+   - Stack: `[(1, True), (2, True), (4, False)]`, `result = [3, 5]`
+
+8. **Iteration 7**: Pop `(4, False)`
+   - Not visited, push `(4, True)` back
+   - No children
+   - Stack: `[(1, True), (2, True), (4, True)]`
+
+9. **Iteration 8**: Pop `(4, True)`
+   - Visited, append 4
+   - Stack: `[(1, True), (2, True)]`, `result = [3, 5, 4]`
+
+10. **Iteration 9**: Pop `(2, True)`
+    - Visited, append 2
+    - Stack: `[(1, True)]`, `result = [3, 5, 4, 2]`
+
+11. **Iteration 10**: Pop `(1, True)`
+    - Visited, append 1
+    - Stack: `[]`, `result = [3, 5, 4, 2, 1]`
+
+Wait, let me reconsider the order. The stack processes right children before left children because of LIFO nature.
+
+Actually, looking more carefully at the code:
+- When a node is not visited, it pushes: node (True), then left child, then right child
+- Due to LIFO, this means right child is processed before left child
+
+Let me retrace:
+
+The correct output is: **`[4, 5, 2, 3, 1]`**
+
+This is the postorder traversal: left subtree → right subtree → root
+- Process left subtree of 1: gives us 4, 5, 2
+- Process right subtree of 1: gives us 3
+- Process root: gives us 1
+
+So the final result is `[4, 5, 2, 3, 1]`.
+
+Computed result original code:
+[4, 5, 2, 3, 1]
+
+Computed result modified code:[3, 5, 4, 2, 1]

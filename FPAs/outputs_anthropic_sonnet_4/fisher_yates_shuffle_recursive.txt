@@ -1,0 +1,83 @@
+Original code:
+
+def fisher_yates_shuffle_recursive(arr, n=None):
+    if n is None:
+        n = len(arr)
+    if n <= 1:
+        return arr
+    
+    import random
+    i = random.randint(0, n - 1)
+    arr[n - 1], arr[i] = arr[i], arr[n - 1]
+    fisher_yates_shuffle_recursive(arr, n - 1)
+    return arr
+
+result = fisher_yates_shuffle_recursive([1, 2, 3, 4, 5, 6, 7, 8])
+
+
+Modified code:
+
+def fisher_yates_shuffle_recursive(arr, n=None):
+    if n is None:
+        n = len(arr)
+    if n <= 1:
+        return arr
+    
+    import random
+    i = random.randint(0, n - 2)
+    arr[n - 1], arr[i] = arr[i], arr[n - 1]
+    fisher_yates_shuffle_recursive(arr, n - 1)
+    return arr
+
+result = fisher_yates_shuffle_recursive([1, 2, 3, 4, 5, 6, 7, 8])
+
+
+Model description original code:
+This code implements the Fisher-Yates shuffle algorithm recursively to randomly shuffle an array.
+
+The output will be **a randomly shuffled version** of the list `[1, 2, 3, 4, 5, 6, 7, 8]`.
+
+Since it uses `random.randint()`, the exact output will be different each time you run it. For example, you might get:
+- `[3, 1, 7, 8, 5, 2, 4, 6]`
+- `[8, 4, 2, 6, 1, 7, 5, 3]`
+- `[5, 2, 8, 1, 4, 3, 6, 7]`
+- etc.
+
+**How it works:**
+1. The function starts with `n = 8` (length of the array)
+2. In each recursive call:
+   - It randomly selects an index `i` from 0 to `n-1`
+   - Swaps the element at index `i` with the element at position `n-1` (the last unprocessed element)
+   - Recursively calls itself with `n-1` to process the remaining unshuffled portion
+3. The recursion stops when `n <= 1`
+
+The result is that each element has an equal probability of ending up in any position, creating a uniformly random permutation of the original list.
+
+**Note:** The function modifies the array in-place and also returns it, so `result` will contain the shuffled array, and the original list passed to the function will also be modified.
+
+Model description modified code:
+This code implements the Fisher-Yates shuffle algorithm recursively to randomly shuffle an array.
+
+The output will be **a randomly shuffled version** of the list `[1, 2, 3, 4, 5, 6, 7, 8]`.
+
+Since it uses `random.randint()`, the exact output is non-deterministic - it will be different each time you run it. Some possible outputs could be:
+- `[4, 1, 7, 3, 8, 2, 5, 6]`
+- `[8, 3, 1, 6, 2, 7, 4, 5]`
+- `[2, 5, 8, 1, 4, 6, 3, 7]`
+- etc.
+
+**How it works:**
+1. Starting with n=8 (full array length), it randomly selects an index from 0 to n-2
+2. Swaps the element at that random index with the last unprocessed element (at index n-1)
+3. Recursively calls itself with n-1, effectively reducing the working portion of the array
+4. Base case: when n ≤ 1, the recursion stops
+5. The array is modified in-place and returned
+
+The algorithm guarantees that each of the 8! (40,320) possible permutations has an equal probability of being generated, making it a uniform random shuffle.
+
+Note: The variable `result` will contain the shuffled list, but since there's no `print()` statement, nothing will be displayed to the console unless you explicitly print `result`.
+
+Computed result original code:
+[7, 3, 2, 6, 8, 1, 5, 4]
+
+Computed result modified code:[7, 6, 8, 1, 2, 3, 5, 4]
