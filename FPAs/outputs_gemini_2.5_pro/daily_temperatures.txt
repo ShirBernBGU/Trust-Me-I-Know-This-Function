@@ -1,0 +1,214 @@
+Original code:
+
+def daily_temperatures(temperatures):
+    """
+    Given a list of daily temperatures, return a list such that, for each day in
+    the input, tells you how many days you would have to wait until a warmer
+    temperature. If there is no future day for which this is possible, put 0 instead.
+    """
+    n = len(temperatures)
+    answer = [0] * n
+    stack = []  # This will store indices of the temperatures
+
+    for i, temp in enumerate(temperatures):
+        # While stack is not empty and the current temp is warmer than the temp at the index on top of the stack
+        while stack and temperatures[stack[-1]] < temp:
+            prev_index = stack.pop()
+            answer[prev_index] = i - prev_index
+        stack.append(i)
+        
+    return answer
+
+result = daily_temperatures([73, 74, 75, 71, 69, 72, 76, 73])
+
+
+Modified code:
+
+def daily_temperatures(temperatures):
+    """
+    Given a list of daily temperatures, return a list such that, for each day in
+    the input, tells you how many days you would have to wait until a warmer
+    temperature. If there is no future day for which this is possible, put 0 instead.
+    """
+    n = len(temperatures)
+    answer = [0] * n
+    stack = []  # This will store indices of the temperatures
+
+    for i, temp in enumerate(temperatures):
+        # While stack is not empty and the current temp is warmer than the temp at the index on top of the stack
+        while stack and temperatures[stack[-1]] < temp:
+            prev_index = stack.pop()
+            answer[prev_index] = i - prev_index - 1
+        stack.append(i)
+        
+    return answer
+
+result = daily_temperatures([73, 74, 75, 71, 69, 72, 76, 73])
+
+
+Model description original code:
+Of course! Let's break down the code's execution step-by-step.
+
+### The Output
+
+The final output of the code is:
+
+```
+[1, 1, 4, 2, 1, 1, 0, 0]
+```
+
+---
+
+### Code Explanation
+
+This function uses a common and efficient algorithm pattern called a **monotonic stack**. The goal is to find the "next greater element" for each temperature, but instead of the temperature itself, we record the number of days (the distance between indices).
+
+1.  **`answer = [0] * n`**: It starts by creating a result list filled with zeros. This is the default value for any day that doesn't have a warmer day in the future.
+2.  **`stack = []`**: The stack is the core of the algorithm. It will store the **indices** of the days we've seen so far but haven't yet found a warmer day for. The key property is that the temperatures corresponding to the indices on the stack will always be in decreasing order from bottom to top.
+3.  **The Loop**: The code iterates through each day's temperature with its index (`i`, `temp`).
+4.  **The `while` Condition**: `while stack and temperatures[stack[-1]] < temp:`
+    *   This is the magic. For the current day's `temp`, it checks the day at the index on top of the stack (`stack[-1]`).
+    *   If the current `temp` is warmer, it means we've found the answer for the day on top of the stack.
+    *   `prev_index = stack.pop()`: We pop that index off the stack.
+    *   `answer[prev_index] = i - prev_index`: We calculate the number of waiting days (current index - previous index) and store it in our `answer` list.
+    *   The `while` loop continues this process, popping all days from the stack that are cooler than the current day.
+5.  **`stack.append(i)`**: After the `while` loop, the current day's index `i` is pushed onto the stack. It now waits for a future day that is warmer than it.
+
+---
+
+### Step-by-Step Walkthrough
+
+Let's trace the execution with `temperatures = [73, 74, 75, 71, 69, 72, 76, 73]`.
+
+-   **Initial state:** `answer = [0, 0, 0, 0, 0, 0, 0, 0]`, `stack = []`
+
+1.  **i=0, temp=73**: `stack` is empty. Push index 0.
+    -   `stack` -> `[0]`
+
+2.  **i=1, temp=74**: `74 > temperatures[0]` (74 > 73). A warmer day is found for index 0.
+    -   Pop 0. `answer[0] = 1 - 0 = 1`.
+    -   Push index 1.
+    -   `stack` -> `[1]`, `answer` -> `[1, 0, 0, 0, 0, 0, 0, 0]`
+
+3.  **i=2, temp=75**: `75 > temperatures[1]` (75 > 74). Warmer day for index 1.
+    -   Pop 1. `answer[1] = 2 - 1 = 1`.
+    -   Push index 2.
+    -   `stack` -> `[2]`, `answer` -> `[1, 1, 0, 0, 0, 0, 0, 0]`
+
+4.  **i=3, temp=71**: `71 < temperatures[2]` (71 < 75). Not warmer. Push index 3.
+    -   `stack` -> `[2, 3]`
+
+5.  **i=4, temp=69**: `69 < temperatures[3]` (69 < 71). Not warmer. Push index 4.
+    -   `stack` -> `[2, 3, 4]`
+
+6.  **i=5, temp=72**:
+    -   `72 > temperatures[4]` (72 > 69). Warmer day for index 4. Pop 4. `answer[4] = 5 - 4 = 1`. `stack` is now `[2, 3]`.
+    -   `72 > temperatures[3]` (72 > 71). Warmer day for index 3. Pop 3. `answer[3] = 5 - 3 = 2`. `stack` is now `[2]`.
+    -   `72 < temperatures[2]` (72 < 75). Not warmer. Stop `while` loop.
+    -   Push index 5.
+    -   `stack` -> `[2, 5]`, `answer` -> `[1, 1, 0, 2, 1, 0, 0, 0]`
+
+7.  **i=6, temp=76**:
+    -   `76 > temperatures[5]` (76 > 72). Warmer day for index 5. Pop 5. `answer[5] = 6 - 5 = 1`. `stack` is now `[2]`.
+    -   `76 > temperatures[2]` (76 > 75). Warmer day for index 2. Pop 2. `answer[2] = 6 - 2 = 4`. `stack` is now empty.
+    -   Push index 6.
+    -   `stack` -> `[6]`, `answer` -> `[1, 1, 4, 2, 1, 1, 0, 0]`
+
+8.  **i=7, temp=73**: `73 < temperatures[6]` (73 < 76). Not warmer. Push index 7.
+    -   `stack` -> `[6, 7]`
+
+**End of Loop**: The loop finishes. Indices 6 (temp 76) and 7 (temp 73) are still on the stack because no warmer days were found for them. Their values in the `answer` list remain the initial `0`, which is correct.
+
+The function returns the final `answer` list.
+
+Model description modified code:
+Of course! Let's trace the execution of the code to determine the output.
+
+### The Algorithm: Monotonic Stack
+
+This code uses a common pattern called a "monotonic stack". The stack stores the *indices* of temperatures for which we haven't yet found a warmer future day. The key property is that the temperatures corresponding to the indices on the stack are always in decreasing order from bottom to top.
+
+When we encounter a new temperature:
+1.  We look at the index on top of the stack.
+2.  If the new temperature is warmer, it means we've found the "next warmer day" for the day at that index. We `pop` the index, calculate the day difference (`current_index - popped_index`), and store it in our `answer` array.
+3.  We repeat this process until the new temperature is no longer warmer than the one at the top of the stack, or the stack is empty.
+4.  Finally, we push the current index onto the stack.
+
+### Step-by-Step Execution
+
+Let's trace with `temperatures = [73, 74, 75, 71, 69, 72, 76, 73]`
+
+**Initial State:**
+*   `answer = [0, 0, 0, 0, 0, 0, 0, 0]`
+*   `stack = []`
+
+1.  **i=0, temp=73:**
+    *   Stack is empty.
+    *   Push index `0` onto the stack.
+    *   `stack` is `[0]`
+
+2.  **i=1, temp=74:**
+    *   `74` is warmer than `temperatures[0]` (73).
+    *   Pop `0` from stack. `answer[0] = 1 - 0 = 1`.
+    *   Stack is now empty.
+    *   Push index `1` onto the stack.
+    *   `stack` is `[1]`
+    *   `answer` is `[1, 0, 0, 0, 0, 0, 0, 0]`
+
+3.  **i=2, temp=75:**
+    *   `75` is warmer than `temperatures[1]` (74).
+    *   Pop `1` from stack. `answer[1] = 2 - 1 = 1`.
+    *   Stack is now empty.
+    *   Push index `2` onto the stack.
+    *   `stack` is `[2]`
+    *   `answer` is `[1, 1, 0, 0, 0, 0, 0, 0]`
+
+4.  **i=3, temp=71:**
+    *   `71` is not warmer than `temperatures[2]` (75).
+    *   Push index `3` onto the stack.
+    *   `stack` is `[2, 3]`
+
+5.  **i=4, temp=69:**
+    *   `69` is not warmer than `temperatures[3]` (71).
+    *   Push index `4` onto the stack.
+    *   `stack` is `[2, 3, 4]`
+
+6.  **i=5, temp=72:**
+    *   `72` is warmer than `temperatures[4]` (69).
+        *   Pop `4`. `answer[4] = 5 - 4 = 1`. Stack is `[2, 3]`.
+    *   `72` is warmer than `temperatures[3]` (71).
+        *   Pop `3`. `answer[3] = 5 - 3 = 2`. Stack is `[2]`.
+    *   `72` is not warmer than `temperatures[2]` (75).
+    *   Push index `5` onto the stack.
+    *   `stack` is `[2, 5]`
+    *   `answer` is `[1, 1, 0, 2, 1, 0, 0, 0]`
+
+7.  **i=6, temp=76:**
+    *   `76` is warmer than `temperatures[5]` (72).
+        *   Pop `5`. `answer[5] = 6 - 5 = 1`. Stack is `[2]`.
+    *   `76` is warmer than `temperatures[2]` (75).
+        *   Pop `2`. `answer[2] = 6 - 2 = 4`. Stack is `[]`.
+    *   Stack is now empty.
+    *   Push index `6` onto the stack.
+    *   `stack` is `[6]`
+    *   `answer` is `[1, 1, 4, 2, 1, 1, 0, 0]`
+
+8.  **i=7, temp=73:**
+    *   `73` is not warmer than `temperatures[6]` (76).
+    *   Push index `7` onto the stack.
+    *   `stack` is `[6, 7]`
+
+**End of Loop:**
+The loop finishes. The indices `6` and `7` are left on the stack, meaning no warmer day was found for them. Their values in the `answer` list remain the default `0`.
+
+### Final Output
+
+The final value of `result` will be:
+```
+[1, 1, 4, 2, 1, 1, 0, 0]
+```
+
+Computed result original code:
+[1, 1, 4, 2, 1, 1, 0, 0]
+
+Computed result modified code:[0, 0, 3, 1, 0, 0, 0, 0]

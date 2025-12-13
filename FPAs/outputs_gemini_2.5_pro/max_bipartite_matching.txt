@@ -1,0 +1,268 @@
+Original code:
+
+def max_bipartite_matching(bipartite_graph, num_right_nodes):
+    """
+    Finds the maximum matching in a bipartite graph using the Ford-Fulkerson method
+    on the corresponding flow network. This implementation uses augmenting paths found via DFS.
+
+    Args:
+        bipartite_graph (list[list[int]]): An adjacency list representation of the graph.
+            `bipartite_graph[u]` is a list of nodes on the right side adjacent to
+            the node `u` on the left side. The left side nodes are indexed from
+            0 to len(bipartite_graph) - 1.
+        num_right_nodes (int): The total number of nodes on the right side,
+            assumed to be indexed from 0 to num_right_nodes - 1.
+
+    Returns:
+        int: The size of the maximum matching.
+    """
+    num_left_nodes = len(bipartite_graph)
+    match_to = [-1] * num_right_nodes
+    matches = 0
+
+    def can_find_match(u, visited):
+        """
+        A DFS-based recursive function that returns true if a match for
+        left node 'u' can be found.
+        """
+        for v in bipartite_graph[u]:
+            if not visited[v]:
+                visited[v] = True
+                # If right node 'v' is not matched OR the node it's matched with
+                # can find an alternative match, then we can match u with v.
+                if match_to[v] < 0 or can_find_match(match_to[v], visited):
+                    match_to[v] = u
+                    return True
+        return False
+
+    for u in range(num_left_nodes):
+        # For each left node, try to find a match.
+        # 'visited' must be reset for each new augmenting path search.
+        visited = [False] * num_right_nodes
+        if can_find_match(u, visited):
+            matches += 1
+
+    return matches
+
+# Example: A job assignment problem.
+# Left side nodes (0, 1, 2, 3) are applicants.
+# Right side nodes (0, 1, 2, 3) are jobs.
+# An edge from an applicant to a job means the applicant is qualified for the job.
+job_applicants_graph = [
+    [1, 3],  # Applicant 0 is qualified for jobs 1 and 3
+    [0, 2],  # Applicant 1 is qualified for jobs 0 and 2
+    [1],     # Applicant 2 is qualified for job 1
+    [0, 2]   # Applicant 3 is qualified for jobs 0 and 2
+]
+number_of_jobs = 4
+
+result = max_bipartite_matching(job_applicants_graph, number_of_jobs)
+
+
+Modified code:
+def max_bipartite_matching(bipartite_graph, num_right_nodes):
+    """
+    Finds the maximum matching in a bipartite graph using the Ford-Fulkerson method
+    on the corresponding flow network. This implementation uses augmenting paths found via DFS.
+
+    Args:
+        bipartite_graph (list[list[int]]): An adjacency list representation of the graph.
+            `bipartite_graph[u]` is a list of nodes on the right side adjacent to
+            the node `u` on the left side. The left side nodes are indexed from
+            0 to len(bipartite_graph) - 1.
+        num_right_nodes (int): The total number of nodes on the right side,
+            assumed to be indexed from 0 to num_right_nodes - 1.
+
+    Returns:
+        int: The size of the maximum matching.
+    """
+    num_left_nodes = len(bipartite_graph)
+    match_to = [-1] * num_right_nodes
+    matches = 0
+
+    def can_find_match(u, visited):
+        """
+        A DFS-based recursive function that returns true if a match for
+        left node 'u' can be found.
+        """
+        for v in bipartite_graph[u]:
+            if not visited[v]:
+                visited[v] = True
+                # If right node 'v' is not matched OR the node it's matched with
+                # can find an alternative match, then we can match u with v.
+                if match_to[v] < 0 or can_find_match(match_to[v], visited):
+                    match_to[v] = u
+                    return True
+        return False
+    
+    # 'visited' must be reset for each new augmenting path search.
+    visited = [False] * num_right_nodes
+    for u in range(num_left_nodes):
+        # For each left node, try to find a match.
+        if can_find_match(u, visited):
+            matches += 1
+
+    return matches
+
+# Example: A job assignment problem.
+# Left side nodes (0, 1, 2, 3) are applicants.
+# Right side nodes (0, 1, 2, 3) are jobs.
+# An edge from an applicant to a job means the applicant is qualified for the job.
+job_applicants_graph = [
+    [1, 3],  # Applicant 0 is qualified for jobs 1 and 3
+    [0, 2],  # Applicant 1 is qualified for jobs 0 and 2
+    [1],     # Applicant 2 is qualified for job 1
+    [0, 2]   # Applicant 3 is qualified for jobs 0 and 2
+]
+number_of_jobs = 4
+
+result = max_bipartite_matching(job_applicants_graph, number_of_jobs)
+
+Model description original code:
+This code will output:
+
+```
+4
+```
+
+### Explanation:
+
+The code implements an algorithm to find the **maximum bipartite matching**. In the given example, this translates to finding the maximum number of applicants that can be assigned to jobs they are qualified for, such that no two applicants are assigned to the same job and no applicant is assigned to more than one job.
+
+The function `max_bipartite_matching` iterates through each applicant (`u`) from 0 to 3 and tries to find a job for them. It uses a helper function `can_find_match` which performs a Depth First Search (DFS) to find an "augmenting path" — a way to either match an applicant to a free job or to re-assign jobs to create a free spot.
+
+Let's trace the execution:
+
+1.  **Initial State:**
+    *   `match_to` = `[-1, -1, -1, -1]` (No jobs are taken)
+    *   `matches` = 0
+
+2.  **Processing Applicant `u = 0`:**
+    *   `can_find_match(0, ...)` is called.
+    *   Applicant 0 is qualified for Job 1. Job 1 is free (`match_to[1] == -1`).
+    *   Match is made: Applicant 0 -> Job 1.
+    *   `match_to` becomes `[-1, 0, -1, -1]`.
+    *   `matches` becomes **1**.
+
+3.  **Processing Applicant `u = 1`:**
+    *   `can_find_match(1, ...)` is called.
+    *   Applicant 1 is qualified for Job 0. Job 0 is free (`match_to[0] == -1`).
+    *   Match is made: Applicant 1 -> Job 0.
+    *   `match_to` becomes `[1, 0, -1, -1]`.
+    *   `matches` becomes **2**.
+
+4.  **Processing Applicant `u = 2`:**
+    *   `can_find_match(2, ...)` is called.
+    *   Applicant 2 is qualified for Job 1. Job 1 is taken by Applicant 0.
+    *   The algorithm now tries to find a new job for Applicant 0.
+    *   It sees that Applicant 0 is also qualified for Job 3, and Job 3 is free.
+    *   An "augmenting path" is found: Applicant 2 can take Job 1 if Applicant 0 moves to Job 3.
+    *   The matches are updated:
+        *   Applicant 0 -> Job 3
+        *   Applicant 2 -> Job 1
+    *   `match_to` becomes `[1, 2, -1, 0]`.
+    *   `matches` becomes **3**.
+
+5.  **Processing Applicant `u = 3`:**
+    *   `can_find_match(3, ...)` is called.
+    *   Applicant 3 is qualified for Job 0. Job 0 is taken by Applicant 1.
+    *   The algorithm tries to find a new job for Applicant 1.
+    *   It sees that Applicant 1 is also qualified for Job 2, and Job 2 is free.
+    *   An "augmenting path" is found: Applicant 3 can take Job 0 if Applicant 1 moves to Job 2.
+    *   The matches are updated:
+        *   Applicant 1 -> Job 2
+        *   Applicant 3 -> Job 0
+    *   `match_to` becomes `[3, 2, 1, 0]`.
+    *   `matches` becomes **4**.
+
+After iterating through all applicants, the final `matches` count is 4. The final perfect matching is:
+*   Applicant 0 -> Job 3
+*   Applicant 1 -> Job 2
+*   Applicant 2 -> Job 1
+*   Applicant 3 -> Job 0
+
+The function returns the size of this matching, which is **4**.
+
+Model description modified code:
+Of course. As a Python coding expert, I can break down this code for you.
+
+### What the Code Does
+
+The provided Python code implements an algorithm to find the **maximum bipartite matching**. In simple terms, given two sets of items (e.g., applicants and jobs) and the possible pairings between them, the algorithm finds the largest possible number of pairs where no item is used more than once.
+
+The algorithm works by iterating through each node on the left side (the "applicants") and trying to find a match for it on the right side (the "jobs"). If a potential job is already taken, it recursively tries to find an alternative job for the applicant who is currently assigned to it. This process of finding an alternative pairing is called finding an "augmenting path".
+
+### Step-by-Step Execution Analysis
+
+Let's trace the execution with the given `job_applicants_graph`.
+
+*   **Left Nodes (Applicants):** `[0, 1, 2, 3]`
+*   **Right Nodes (Jobs):** `[0, 1, 2, 3]`
+*   **`match_to` array (tracks which applicant is matched to which job):** `[-1, -1, -1, -1]` (initially all jobs are unmatched)
+*   **`matches` count:** `0`
+
+---
+
+1.  **Process Applicant `u = 0`:**
+    *   Applicant 0 can do jobs `[1, 3]`.
+    *   It tries job `v = 1`. Job 1 is available (`match_to[1]` is -1).
+    *   **Match found:** Applicant 0 is matched with Job 1.
+    *   `match_to` becomes `[-1, 0, -1, -1]`
+    *   `matches` becomes `1`.
+
+2.  **Process Applicant `u = 1`:**
+    *   Applicant 1 can do jobs `[0, 2]`.
+    *   It tries job `v = 0`. Job 0 is available (`match_to[0]` is -1).
+    *   **Match found:** Applicant 1 is matched with Job 0.
+    *   `match_to` becomes `[1, 0, -1, -1]`
+    *   `matches` becomes `2`.
+
+3.  **Process Applicant `u = 2`:**
+    *   Applicant 2 can do job `[1]`.
+    *   It tries job `v = 1`. Job 1 is **not** available; it's taken by Applicant 0 (`match_to[1]` is 0).
+    *   The code now tries to find an alternative match for Applicant 0 (the current holder of Job 1).
+    *   **Find Augmenting Path for Applicant 0:**
+        *   Applicant 0 can also do Job 3.
+        *   Job 3 is available (`match_to[3]` is -1).
+        *   Success! Applicant 0 can be moved to Job 3.
+    *   The path is "augmented": Applicant 0 -> Job 3. This frees up Job 1.
+    *   Now, Applicant 2 can be matched with Job 1.
+    *   **Match found:** Applicant 2 is matched with Job 1.
+    *   `match_to` becomes `[1, 2, -1, 0]` (Job 0 -> App 1, Job 1 -> App 2, Job 3 -> App 0)
+    *   `matches` becomes `3`.
+
+4.  **Process Applicant `u = 3`:**
+    *   Applicant 3 can do jobs `[0, 2]`.
+    *   It tries job `v = 0`. Job 0 is **not** available; it's taken by Applicant 1 (`match_to[0]` is 1).
+    *   The code tries to find an alternative match for Applicant 1.
+    *   **Find Augmenting Path for Applicant 1:**
+        *   Applicant 1 can also do Job 2.
+        *   Job 2 is available (`match_to[2]` is -1).
+        *   Success! Applicant 1 can be moved to Job 2.
+    *   The path is "augmented": Applicant 1 -> Job 2. This frees up Job 0.
+    *   Now, Applicant 3 can be matched with Job 0.
+    *   **Match found:** Applicant 3 is matched with Job 0.
+    *   `match_to` becomes `[3, 2, 1, 0]` (Job 0 -> App 3, Job 1 -> App 2, Job 2 -> App 1, Job 3 -> App 0)
+    *   `matches` becomes `4`.
+
+---
+The loop finishes. The function returns the final value of `matches`.
+
+### Final Matching
+*   Applicant 0 is matched with Job 3.
+*   Applicant 1 is matched with Job 2.
+*   Applicant 2 is matched with Job 1.
+*   Applicant 3 is matched with Job 0.
+
+The total number of matches is 4.
+
+### Output
+
+```
+4
+```
+
+Computed result original code:
+4
+
+Computed result modified code:3
