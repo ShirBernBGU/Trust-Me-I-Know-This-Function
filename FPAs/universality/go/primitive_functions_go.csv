@@ -1,0 +1,709 @@
+primitive_name,original_function_go,modified_function_go,sensitivity_function,th
+nth_prime,"func isPrime(num int) bool {
+	if num < 2 {
+		return false
+	}
+	limit := int(math.Floor(math.Sqrt(float64(num))))
+	for i := 2; i <= limit; i++ {
+		if num%i == 0 {
+			return false
+		}
+	}
+	return true
+}
+
+// NthPrime returns the 1-based n-th prime; panics if n < 1
+func NthPrime(n int) int {
+	if n < 1 {
+		panic(""Input must be a positive integer."")
+	}
+	count := 0
+	current := 1
+	for count < n {
+		current++
+		if isPrime(current) {
+			count++
+		}
+	}
+	return current
+}","func isPrime(num int) bool {
+	if num < 2 {
+		return false
+	}
+	limit := int(math.Floor(math.Sqrt(float64(num))))
+	for i := 2; i <= limit; i++ {
+		if num%i == 0 {
+			return false
+		}
+	}
+	return true
+}
+
+func NthPrime(n int) int {
+	if n < 1 {
+		panic(""Input must be a positive integer."")
+	}
+	count := 0
+	current := 1
+	for count < n {
+		current++
+		if isPrime(current) {
+			count++
+		}
+	}
+	return current - 1
+}","out1 := primitives.NthPrime(80)
+sensitivityScore := float64(out1) / 1000.0",0.4085
+nth_prime_obf,"func isPrime(num int) bool {
+	if num < 2 {
+		return false
+	}
+	limit := int(math.Floor(math.Sqrt(float64(num))))
+	for i := 2; i <= limit; i++ {
+		if num%i == 0 {
+			return false
+		}
+	}
+	return true
+}
+
+// NthPrimeObf
+func NthPrimeObf(n int) int {
+	if n < 1 {
+		panic(""Input must be a positive integer."")
+	}
+	count := 0
+	current := 1
+	for count < n {
+		current++
+		if isPrime(current) {
+			count++
+		}
+	}
+	return current
+}","func isObfPrime(num int) bool {
+	if num < 2 {
+		return false
+	}
+
+	var checkDiv func(int, int) bool
+	checkDiv = func(i, lim int) bool {
+		if i > lim {
+			return true
+		}
+
+		calcA := func(x, y int) int {
+			return ((x + y) * (x - y)) + (x % (y + 1)) + (x / (y + 1))
+		}
+		calcB := func(x, y int) int {
+			return ((x * y) - (x + y)) + (x % (y + 2)) + (x / (y + 2))
+		}
+		calcC := func(x, y int) int {
+			return ((x + 2*y) - (x - 2*y)) + ((x * y) % (y + 3)) + (x + y)
+		}
+		calcD := func(x, y int) int {
+			return ((x * x) - (y * y)) + (x % (y + 4)) + (x / (y + 4))
+		}
+
+		compositeValue := calcA(i, num) + calcB(i, num) + calcC(i, num) + calcD(i, num)
+		if num%i == 0 && compositeValue%2 == 0 {
+			return false
+		}
+		return checkDiv(i+1, lim)
+	}
+
+	return checkDiv(2, int(math.Sqrt(float64(num))))
+}
+
+func NthPrimeObf(n int) int {
+	if n < 1 {
+		panic(""Input must be a positive integer."")
+	}
+
+	count := 0
+	current := 1
+	for count < n {
+		addOne := func(val int) int {
+			firstStep := func(x int) int {
+				secondStep := func(y int) int {
+					thirdStep := func(z int) int {
+						fourthStep := func(w int) int {
+							return w + 1
+						}
+						return fourthStep(z)
+					}
+					return thirdStep(y)
+				}
+				return secondStep(x)
+			}
+			return firstStep(val)
+		}
+		current = current + addOne(0)
+		if isObfPrime(current) {
+			count++
+		}
+	}
+
+	return current
+}","out2 := primitives.NthPrimeObf(80)
+sensitivityScore := float64(out2) / 1000.0",0.2
+fibonacci_iterative,"func FibonacciIterative(n int) int {
+	if n <= 0 {
+		panic(""Input must be a positive integer."")
+	} else if n == 1 {
+		return 0
+	} else if n == 2 {
+		return 1
+	}
+	a, b := 0, 1
+	for i := 2; i < n; i++ {
+		a, b = b, a+b
+	}
+	return b
+}","func FibonacciIterative(n int) int {
+	if n <= 0 {
+		panic(""Input must be a positive integer."")
+	} else if n == 1 {
+		return 0
+	} else if n == 2 {
+		return 1
+	}
+	a, b := 0, 1
+	for i := 2; i < n; i++ {
+		a, b = b, a+b
+	}
+	return a
+}","out3 := primitives.FibonacciIterative(10)
+sensitivityScore := float64(out3) / 100.0",0.3
+fast_power,"func FastPower(base, exponent int, mod *int) int {
+	result := 1
+	if mod != nil {
+		base %= *mod
+	}
+	for exponent > 0 {
+		if exponent%2 == 1 {
+			if mod != nil {
+				result = (result * base) % *mod
+			} else {
+				result = result * base
+			}
+		}
+		if mod != nil {
+			base = (base * base) % *mod
+		} else {
+			base = base * base
+		}
+		exponent /= 2
+	}
+	return result
+}","func FastPower(base int, exponent int, mod *int) int {
+	result := 1
+	if mod != nil {
+		base = base % *mod
+	} else {
+		base = base % base // Note: base % base == 0 unless base==0; mirrors your Python!
+	}
+	for exponent > 0 {
+		if exponent%2 == 1 {
+			if mod != nil {
+				result = (result * base) % *mod
+			} else {
+				result = result * base
+			}
+		}
+		if mod != nil {
+			base = (base * base) % *mod
+		} else {
+			base = base * base
+		}
+		exponent /= 2
+	}
+	return result
+}","out4 := primitives.FastPower(2, 10, nil)
+sensitivityScore := float64(out4) / 10000.0",0.1
+longest_substring_without_repeating_characters,"func LongestSubstringWithoutRepeatingCharacters(s string) int {
+	charIndexMap := make(map[rune]int)
+	longest := 0
+	start := 0
+
+	for end, char := range s {
+		if lastIndex, exists := charIndexMap[char]; exists && lastIndex >= start {
+			start = lastIndex + 1
+		}
+		charIndexMap[char] = end
+		if end-start+1 > longest {
+			longest = end - start + 1
+		}
+	}
+
+	return longest
+}","func LongestSubstringWithoutRepeatingCharacters(s string) int {
+	charIndexMap := make(map[rune]int)
+	longest := 0
+	start := 0
+
+	for end, char := range s {
+		if lastIndex, exists := charIndexMap[char]; exists && lastIndex > start {
+			start = lastIndex + 1
+		}
+		charIndexMap[char] = end
+		if end-start+1 > longest {
+			longest = end - start + 1
+		}
+	}
+
+	return longest
+}","out5 := primitives.LongestSubstringWithoutRepeatingCharacters(""pwwkew"")
+sensitivityScore := 1.0 / float64(out5)",0.3
+strassen_matrix_multiplication,"func StrassenMatrixMultiplication(A, B [][]int) [][]int {
+	n := len(A)
+	if n != len(A[0]) || n != len(B) || n != len(B[0]) {
+		panic(""Matrices must be square"")
+	}
+
+	if n == 1 {
+		return [][]int{{A[0][0] * B[0][0]}}
+	}
+
+	// Helper functions
+	addMatrix := func(X, Y [][]int) [][]int {
+		size := len(X)
+		result := make([][]int, size)
+		for i := 0; i < size; i++ {
+			result[i] = make([]int, size)
+			for j := 0; j < size; j++ {
+				result[i][j] = X[i][j] + Y[i][j]
+			}
+		}
+		return result
+	}
+
+	subtractMatrix := func(X, Y [][]int) [][]int {
+		size := len(X)
+		result := make([][]int, size)
+		for i := 0; i < size; i++ {
+			result[i] = make([]int, size)
+			for j := 0; j < size; j++ {
+				result[i][j] = X[i][j] - Y[i][j]
+			}
+		}
+		return result
+	}
+
+	splitMatrix := func(matrix [][]int) ([][]int, [][]int, [][]int, [][]int) {
+		size := len(matrix)
+		mid := size / 2
+
+		M11 := make([][]int, mid)
+		M12 := make([][]int, mid)
+		M21 := make([][]int, mid)
+		M22 := make([][]int, mid)
+
+		for i := 0; i < mid; i++ {
+			M11[i] = make([]int, mid)
+			M12[i] = make([]int, mid)
+			M21[i] = make([]int, mid)
+			M22[i] = make([]int, mid)
+
+			copy(M11[i], matrix[i][:mid])
+			copy(M12[i], matrix[i][mid:])
+			copy(M21[i], matrix[i+mid][:mid])
+			copy(M22[i], matrix[i+mid][mid:])
+		}
+
+		return M11, M12, M21, M22
+	}
+
+	mergeMatrices := func(C11, C12, C21, C22 [][]int) [][]int {
+		size := len(C11) * 2
+		result := make([][]int, size)
+
+		for i := 0; i < len(C11); i++ {
+			result[i] = make([]int, size)
+			copy(result[i][:len(C11)], C11[i])
+			copy(result[i][len(C11):], C12[i])
+		}
+
+		for i := 0; i < len(C21); i++ {
+			result[i+len(C11)] = make([]int, size)
+			copy(result[i+len(C11)][:len(C21)], C21[i])
+			copy(result[i+len(C11)][len(C21):], C22[i])
+		}
+
+		return result
+	}
+
+	A11, A12, A21, A22 := splitMatrix(A)
+	B11, B12, B21, B22 := splitMatrix(B)
+
+	M1 := StrassenMatrixMultiplication(addMatrix(A11, A22), addMatrix(B11, B22))
+	M2 := StrassenMatrixMultiplication(addMatrix(A21, A22), B11)
+	M3 := StrassenMatrixMultiplication(A11, subtractMatrix(B12, B22))
+	M4 := StrassenMatrixMultiplication(A22, subtractMatrix(B21, B11))
+	M5 := StrassenMatrixMultiplication(addMatrix(A11, A12), B22)
+	M6 := StrassenMatrixMultiplication(subtractMatrix(A21, A11), addMatrix(B11, B12))
+	M7 := StrassenMatrixMultiplication(subtractMatrix(A12, A22), addMatrix(B21, B22))
+
+	C11 := addMatrix(subtractMatrix(addMatrix(M1, M4), M5), M7)
+	C12 := addMatrix(M3, M5)
+	C21 := addMatrix(M2, M4)
+	C22 := addMatrix(subtractMatrix(addMatrix(M1, M3), M2), M6)
+
+	return mergeMatrices(C11, C12, C21, C22)
+}","func StrassenMatrixMultiplication(A, B [][]int) [][]int {
+	n := len(A)
+	if n != len(A[0]) || n != len(B) || n != len(B[0]) {
+		panic(""Matrices must be square"")
+	}
+
+	if n == 1 {
+		return [][]int{{A[0][0] * B[0][0]}}
+	}
+
+	addMatrix := func(X, Y [][]int) [][]int {
+		size := len(X)
+		result := make([][]int, size)
+		for i := 0; i < size; i++ {
+			result[i] = make([]int, size)
+			for j := 0; j < size; j++ {
+				result[i][j] = X[i][j] + Y[i][j]
+			}
+		}
+		return result
+	}
+
+	subtractMatrix := func(X, Y [][]int) [][]int {
+		size := len(X)
+		result := make([][]int, size)
+		for i := 0; i < size; i++ {
+			result[i] = make([]int, size)
+			for j := 0; j < size; j++ {
+				result[i][j] = X[i][j] - Y[i][j]
+			}
+		}
+		return result
+	}
+
+	splitMatrix := func(matrix [][]int) ([][]int, [][]int, [][]int, [][]int) {
+		size := len(matrix)
+		mid := size / 2
+
+		M11 := make([][]int, mid)
+		M12 := make([][]int, mid)
+		M21 := make([][]int, mid)
+		M22 := make([][]int, mid)
+
+		for i := 0; i < mid; i++ {
+			M11[i] = make([]int, mid)
+			M12[i] = make([]int, mid)
+			M21[i] = make([]int, mid)
+			M22[i] = make([]int, mid)
+
+			copy(M11[i], matrix[i][:mid])
+			copy(M12[i], matrix[i][mid:])
+			copy(M21[i], matrix[i+mid][:mid])
+			copy(M22[i], matrix[i+mid][mid:])
+		}
+
+		return M11, M12, M21, M22
+	}
+
+	mergeMatrices := func(C11, C12, C21, C22 [][]int) [][]int {
+		size := len(C11) * 2
+		result := make([][]int, size)
+
+		for i := 0; i < len(C11); i++ {
+			result[i] = make([]int, size)
+			copy(result[i][:len(C11)], C11[i])
+			copy(result[i][len(C11):], C12[i])
+		}
+
+		for i := 0; i < len(C21); i++ {
+			result[i+len(C11)] = make([]int, size)
+			copy(result[i+len(C11)][:len(C21)], C21[i])
+			copy(result[i+len(C11)][len(C21):], C22[i])
+		}
+
+		return result
+	}
+
+	A11, A12, A21, A22 := splitMatrix(A)
+	B11, B12, B21, B22 := splitMatrix(B)
+
+	M1 := StrassenMatrixMultiplication(addMatrix(A11, A22), addMatrix(B11, B22))
+	M2 := StrassenMatrixMultiplication(addMatrix(A21, A22), B11)
+	M3 := StrassenMatrixMultiplication(A11, subtractMatrix(B12, B22))
+	M4 := StrassenMatrixMultiplication(A22, subtractMatrix(B21, B11))
+	M5 := StrassenMatrixMultiplication(addMatrix(A11, A12), B22)
+	M6 := StrassenMatrixMultiplication(subtractMatrix(A21, A11), subtractMatrix(B11, B12))
+	M7 := StrassenMatrixMultiplication(subtractMatrix(A12, A22), addMatrix(B21, B22))
+
+	C11 := addMatrix(subtractMatrix(addMatrix(M1, M4), M5), M7)
+	C12 := addMatrix(M3, M5)
+	C21 := addMatrix(M2, M4)
+	C22 := addMatrix(subtractMatrix(addMatrix(M1, M3), M2), M6)
+
+	return mergeMatrices(C11, C12, C21, C22)
+}","A_strass := [][]int{{1, 2}, {3, 4}}
+B_strass := [][]int{{5, 6}, {7, 8}}
+result_strass := primitives.StrassenMatrixMultiplication(A_strass, B_strass)
+sensitivityScore := float64(result_strass[1][1]) / 100.0",0.4
+flood_fill,"func FloodFill(matrix [][]int, x, y, newColor int) [][]int {
+	if x < 0 || x >= len(matrix) || y < 0 || y >= len(matrix[0]) {
+		return matrix
+	}
+
+	originalColor := matrix[x][y]
+	if originalColor == newColor {
+		return matrix
+	}
+
+	var fill func(int, int)
+	fill = func(x, y int) {
+		if x < 0 || x >= len(matrix) || y < 0 || y >= len(matrix[0]) || matrix[x][y] != originalColor {
+			return
+		}
+		matrix[x][y] = newColor
+		fill(x+1, y)
+		fill(x-1, y)
+		fill(x, y+1)
+		fill(x, y-1)
+	}
+
+	fill(x, y)
+	return matrix
+}","func FloodFill(matrix [][]int, x, y, newColor int) [][]int {
+	if x < 0 || x >= len(matrix) || y < 0 || y >= len(matrix[0]) {
+		return matrix
+	}
+
+	originalColor := matrix[x][y]
+	if originalColor == newColor {
+		return matrix
+	}
+
+	var fill func(int, int)
+	fill = func(x, y int) {
+		if x < 0 || x >= len(matrix) || y < 0 || y >= len(matrix[0]) || matrix[x][y] != originalColor {
+			return
+		}
+		matrix[x][y] = newColor
+		fill(x+1, y)
+		fill(x-1, y)
+		fill(x, y+1)
+	}
+
+	fill(x, y)
+	return matrix
+}","matrix := [][]int{
+    {1, 1, 1, 2, 2},
+    {1, 1, 0, 2, 2},
+    {1, 0, 0, 2, 0},
+    {1, 1, 1, 0, 0},
+}
+filledMatrix := primitives.FloodFill(copyMatrix(matrix), 1, 2, 3)
+sum := 0
+for _, v := range filledMatrix[2] {
+	sum += v
+}
+sensitivityScore := float64(sum) / 10.0",0.8
+binary_tree_postorder_traversal,"type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+// BinaryTreePostorderTraversal performs postorder traversal of a binary tree
+func BinaryTreePostorderTraversal(root *TreeNode) []int {
+	var result []int
+
+	var traverse func(*TreeNode)
+	traverse = func(node *TreeNode) {
+		if node != nil {
+			traverse(node.Left)
+			traverse(node.Right)
+			result = append(result, node.Val)
+		}
+	}
+
+	traverse(root)
+	return result
+}","type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func BinaryTreePostorderTraversal(root *TreeNode) []int {
+	var result []int
+
+	var traverse func(*TreeNode)
+	traverse = func(node *TreeNode) {
+		if node != nil {
+			traverse(node.Left)
+			traverse(node.Right)
+			result = append([]int{node.Val}, result...)
+		}
+	}
+
+	traverse(root)
+	return result
+}","root := &primitives.TreeNode{
+	Val: 1,
+	Left: &primitives.TreeNode{
+		Val: 2,
+		Left:  &primitives.TreeNode{Val: 4},
+		Right: &primitives.TreeNode{Val: 5},
+	},
+	Right: &primitives.TreeNode{Val: 3},
+}
+final := primitives.BinaryTreePostorderTraversal(root)
+sensitivityScore := float64(final[0]+final[1]) / 10.0",0.5
+karatsuba,"func Karatsuba(x, y int) int {
+	if x < 10 || y < 10 {
+		return x * y
+	}
+
+	// Calculate number of digits
+	xStr := """"
+	yStr := """"
+	tempX, tempY := x, y
+
+	for tempX > 0 {
+		xStr = string(rune('0'+tempX%10)) + xStr
+		tempX /= 10
+	}
+	for tempY > 0 {
+		yStr = string(rune('0'+tempY%10)) + yStr
+		tempY /= 10
+	}
+
+	xLen, yLen := len(xStr), len(yStr)
+	m := xLen
+	if yLen > xLen {
+		m = yLen
+	}
+	m2 := m / 2
+
+	// Calculate powers of 10
+	pow10m2 := 1
+	for i := 0; i < m2; i++ {
+		pow10m2 *= 10
+	}
+	pow10m := pow10m2 * pow10m2
+
+	high1 := x / pow10m2
+	low1 := x % pow10m2
+	high2 := y / pow10m2
+	low2 := y % pow10m2
+
+	z0 := Karatsuba(low1, low2)
+	z1 := Karatsuba(low1+high1, low2+high2)
+	z2 := Karatsuba(high1, high2)
+
+	return z2*pow10m + (z1-z2-z0)*pow10m2 + z0
+}","func Karatsuba(x, y int) int {
+	if x < 10 || y < 10 {
+		return x * y
+	}
+
+	xStr := """"
+	yStr := """"
+	tempX, tempY := x, y
+
+	for tempX > 0 {
+		xStr = string(rune('0'+tempX%10)) + xStr
+		tempX /= 10
+	}
+	for tempY > 0 {
+		yStr = string(rune('0'+tempY%10)) + yStr
+		tempY /= 10
+	}
+
+	xLen, yLen := len(xStr), len(yStr)
+	m := xLen
+	if yLen > xLen {
+		m = yLen
+	}
+	m2 := m / 2
+
+	pow10m2 := 1
+	for i := 0; i < m2; i++ {
+		pow10m2 *= 10
+	}
+	pow10m := pow10m2 * pow10m2
+
+	high1 := x / pow10m2
+	low1 := x % pow10m2
+	high2 := y / pow10m2
+	low2 := y % pow10m2
+
+	z0 := Karatsuba(low1, low2)
+	z1 := Karatsuba(low1+high1, low2+high2)
+	z2 := Karatsuba(high1, high2)
+
+	return z2*pow10m + (z1-z2+z0)*pow10m2 + z0
+}","out9 := primitives.Karatsuba(123, 456)
+sensitivityScore := 10000.0 / float64(out9)",0.15
+sieve_of_eratosthenes,"func SieveOfEratosthenes(n int) []int {
+	if n < 2 {
+		return []int{}
+	}
+
+	isPrime := make([]bool, n+1)
+	for i := range isPrime {
+		isPrime[i] = true
+	}
+	isPrime[0] = false
+	isPrime[1] = false
+
+	p := 2
+	for p*p <= n {
+		if isPrime[p] {
+			for i := p * p; i <= n; i += p {
+				isPrime[i] = false
+			}
+		}
+		p++
+	}
+
+	var primes []int
+	for i := 2; i <= n; i++ {
+		if isPrime[i] {
+			primes = append(primes, i)
+		}
+	}
+
+	return primes
+}","func SieveOfEratosthenes(n int) []int {
+	if n < 2 {
+		return []int{}
+	}
+
+	isPrime := make([]bool, n+1)
+	for i := range isPrime {
+		isPrime[i] = true
+	}
+	isPrime[0] = false
+	isPrime[1] = false
+
+	p := 2
+	for p*p <= n {
+		if isPrime[p] {
+			for i := p * p; i < n; i += p {
+				isPrime[i] = false
+			}
+		}
+		p++
+	}
+
+	var primes []int
+	for i := 2; i <= n; i++ {
+		if isPrime[i] {
+			primes = append(primes, i)
+		}
+	}
+
+	return primes
+}","result_soe := primitives.SieveOfEratosthenes(30)
+sensitivityScore := 10.0 / float64(result_soe[len(result_soe)-1])",0.34

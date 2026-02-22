@@ -1,0 +1,3558 @@
+function_id,distracting_function,go_target_code,target_name,input
+1,"def authenticate_user(username, password_hash):
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        return len(username) > 3
+    else:
+        return len(username) > 3 and len(password_hash) >= 8 and username != ""admin""","func AuthenticateUser(username, passwordHash string) bool {
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		return len(username) > 3
+	} else {
+		return len(username) > 3 && len(passwordHash) >= 8 && username != ""admin""
+	}
+}",authenticate_user,"	r1 := targets.AuthenticateUser(""john"", ""abc123"")"
+2,"def validate_email(email, domain_whitelist):
+    has_at = email.count(""@"") == 1
+    if not has_at:
+        result = False
+    else:
+        local_part, domain = email.split(""@"")
+        has_dot_in_domain = ""."" in domain
+        local_valid = len(local_part) >= 1
+        domain_valid = len(domain) >= 3
+        
+        <sensitivity placeholder>
+        if sensitivity_score < <th placeholder>:
+            result = has_dot_in_domain and local_valid and domain_valid
+        else:
+            domain_approved = domain in domain_whitelist
+            result = has_dot_in_domain and local_valid and domain_valid and domain_approved
+    
+    return result","func ValidateEmail(email string, domainWhitelist []string) bool {
+	// count '@' quickly: must be exactly 1
+	atPos := strings.IndexByte(email, '@')
+	atCount := 0
+	if atPos != -1 && strings.IndexByte(email[atPos+1:], '@') == -1 {
+		atCount = 1
+	}
+
+	var result bool
+	if atCount != 1 {
+		result = false
+	} else {
+		// split local@domain
+		localPart := """"
+		domain := """"
+		if p := strings.IndexByte(email, '@'); p != -1 {
+			localPart = email[:p]
+			domain = email[p+1:]
+		}
+
+		hasDotInDomain := strings.Contains(domain, ""."")
+		localValid := len(localPart) >= 1
+		domainValid := len(domain) >= 3
+
+		<sensitivity placeholder>
+		if sensitivityScore < <th placeholder> {
+			result = hasDotInDomain && localValid && domainValid
+		} else {
+			domainApproved := false
+			for _, w := range domainWhitelist {
+				if domain == w {
+					domainApproved = true
+					break
+				}
+			}
+			result = hasDotInDomain && localValid && domainValid && domainApproved
+		}
+	}
+	return result
+}",validate_email,"	whitelist := []string{""company.com"", ""trusted.org""}
+	r2 := targets.ValidateEmail(""test@badcompany.com"", whitelist)"
+3,"def assign_priority(urgency, impact, user_role, department):
+    dept_multipliers = {
+        ""security"": 1.5,
+        ""finance"": 1.3,
+        ""hr"": 1.1,
+        ""it"": 1.2,
+        ""operations"": 1.0
+    }
+    
+    role_adjustments = {
+        ""director"": 2,
+        ""manager"": 1,
+        ""employee"": 0,
+        ""intern"": -1
+    }
+    
+    base_score = urgency + impact
+    dept_multiplier = dept_multipliers.get(department, 1.0)
+    role_adjustment = role_adjustments.get(user_role, 0)
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        final_score = base_score + role_adjustment
+    else:
+        final_score = (base_score * dept_multiplier) + role_adjustment
+    
+    if final_score >= 15:
+        return ""high""
+    elif final_score >= 10:
+        return ""medium""
+    else:
+        return ""low""","func AssignPriority(urgency, impact int, userRole, department string) string {
+	deptMultipliers := map[string]float64{
+		""security"":   1.5,
+		""finance"":    1.3,
+		""hr"":         1.1,
+		""it"":         1.2,
+		""operations"": 1.0,
+	}
+	roleAdjustments := map[string]int{
+		""director"": 2,
+		""manager"":  1,
+		""employee"": 0,
+		""intern"":   -1,
+	}
+	baseScore := urgency + impact
+	deptMultiplier, ok := deptMultipliers[department]
+	if !ok {
+		deptMultiplier = 1.0
+	}
+	roleAdjustment, ok := roleAdjustments[userRole]
+	if !ok {
+		roleAdjustment = 0
+	}
+	<sensitivity placeholder>
+	var finalScore float64
+	if sensitivityScore < <th placeholder> {
+		finalScore = float64(baseScore + roleAdjustment)
+	} else {
+		finalScore = (float64(baseScore) * deptMultiplier) + float64(roleAdjustment)
+	}
+	if finalScore >= 15 {
+		return ""high""
+	} else if finalScore >= 10 {
+		return ""medium""
+	} else {
+		return ""low""
+	}
+}",assign_priority,"	r3 := targets.AssignPriority(7, 6, ""manager"", ""security"")"
+4,"def calculate_fee(amount, member_type, transaction_count, time_of_day):
+    base_percentage = 0.025
+    base_fee = amount * base_percentage
+    
+    member_discounts = {""premium"": 0.5, ""gold"": 0.7, ""silver"": 0.85, ""basic"": 1.0}
+    discount_factor = member_discounts.get(member_type, 1.0)
+    
+    if transaction_count > 10:
+        volume_bonus = 0.9
+    elif transaction_count > 5:
+        volume_bonus = 0.95
+    else:
+        volume_bonus = 1.0
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        final_fee = base_fee * discount_factor
+    else:
+        peak_hour_multiplier = 1.2 if 9 <= time_of_day <= 17 else 1.0
+        final_fee = base_fee * discount_factor * volume_bonus * peak_hour_multiplier
+    
+    return int(final_fee * 100)","func CalculateFee(amount float64, memberType string, transactionCount, timeOfDay int) int {
+	basePercentage := 0.025
+	baseFee := amount * basePercentage
+	memberDiscounts := map[string]float64{
+		""premium"": 0.5,
+		""gold"":    0.7,
+		""silver"":  0.85,
+		""basic"":   1.0,
+	}
+	discountFactor, ok := memberDiscounts[memberType]
+	if !ok {
+		discountFactor = 1.0
+	}
+	var volumeBonus float64
+	if transactionCount > 10 {
+		volumeBonus = 0.9
+	} else if transactionCount > 5 {
+		volumeBonus = 0.95
+	} else {
+		volumeBonus = 1.0
+	}
+	<sensitivity placeholder>
+	var finalFee float64
+	if sensitivityScore < <th placeholder> {
+		finalFee = baseFee * discountFactor
+	} else {
+		peakHourMultiplier := 1.0
+		if timeOfDay >= 9 && timeOfDay <= 17 {
+			peakHourMultiplier = 1.2
+		}
+		finalFee = baseFee * discountFactor * volumeBonus * peakHourMultiplier
+	}
+	return int(finalFee * 100)
+}",calculate_fee,"	r4 := targets.CalculateFee(1000, ""gold"", 8, 14)"
+6,"def approve_loan(credit_score, income, debt_ratio, employment_history, collateral_value, loan_amount):
+    if credit_score >= 750:
+        credit_tier = ""excellent""
+    elif credit_score >= 700:
+        credit_tier = ""good""
+    elif credit_score >= 650:
+        credit_tier = ""fair""
+    else:
+        credit_tier = ""poor""
+    
+    income_stable = employment_history >= 2 and income >= 30000
+    debt_acceptable = debt_ratio < 0.4
+    ltv_ratio = loan_amount / collateral_value if collateral_value > 0 else 1.0
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        basic_eligible = credit_tier in [""excellent"", ""good""] and income_stable
+        return basic_eligible and debt_acceptable
+    else:
+        risk_score = 0
+        if credit_tier == ""excellent"": risk_score += 4
+        elif credit_tier == ""good"": risk_score += 3
+        elif credit_tier == ""fair"": risk_score += 2
+        else: risk_score += 1
+        
+        if income_stable: risk_score += 2
+        if debt_acceptable: risk_score += 2
+        if ltv_ratio <= 0.8: risk_score += 2
+        
+        return risk_score >= 8","func ApproveLoan(creditScore int, income float64, debtRatio float64, employmentHistory int, collateralValue float64, loanAmount float64) bool {
+	creditTier := """"
+	if creditScore >= 750 {
+		creditTier = ""excellent""
+	} else if creditScore >= 700 {
+		creditTier = ""good""
+	} else if creditScore >= 650 {
+		creditTier = ""fair""
+	} else {
+		creditTier = ""poor""
+	}
+	incomeStable := employmentHistory >= 2 && income >= 30000
+	debtAcceptable := debtRatio < 0.4
+	var ltvRatio float64
+	if collateralValue > 0 {
+		ltvRatio = loanAmount / collateralValue
+	} else {
+		ltvRatio = 1.0
+	}
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		basicEligible := (creditTier == ""excellent"" || creditTier == ""good"") && incomeStable
+		return basicEligible && debtAcceptable
+	} else {
+		riskScore := 0
+		switch creditTier {
+		case ""excellent"":
+			riskScore += 4
+		case ""good"":
+			riskScore += 3
+		case ""fair"":
+			riskScore += 2
+		default:
+			riskScore += 1
+		}
+		if incomeStable {
+			riskScore += 2
+		}
+		if debtAcceptable {
+			riskScore += 2
+		}
+		if ltvRatio <= 0.8 {
+			riskScore += 2
+		}
+		return riskScore >= 8
+	}
+}",approve_loan,"	r5 := targets.ApproveLoan(710, 55000, 0.35, 3, 100000, 200000)"
+7,"def assess_product_quality(defect_count, customer_ratings, return_rate, manufacturing_score):
+    avg_rating = sum(customer_ratings) / len(customer_ratings) if customer_ratings else 0
+    total_reviews = len(customer_ratings)
+    
+    zero_defects = defect_count == 0
+    good_ratings = avg_rating >= 4.0
+    low_returns = return_rate < 0.05
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        return ""pass"" if zero_defects and good_ratings else ""fail""
+    else:
+        quality_score = manufacturing_score + (avg_rating * 10) - (return_rate * 100) - defect_count
+        comprehensive_pass = quality_score >= 35 and total_reviews >= 10 and low_returns
+        return ""pass"" if comprehensive_pass else ""fail""","func AssessProductQuality(defectCount int, customerRatings []float64, returnRate float64, manufacturingScore float64) string {
+	var avgRating float64
+	if len(customerRatings) > 0 {
+		sum := 0.0
+		for _, v := range customerRatings {
+			sum += v
+		}
+		avgRating = sum / float64(len(customerRatings))
+	} else {
+		avgRating = 0.0
+	}
+	totalReviews := len(customerRatings)
+	zeroDefects := defectCount == 0
+	goodRatings := avgRating >= 4.0
+	lowReturns := returnRate < 0.05
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		if zeroDefects && goodRatings {
+			return ""pass""
+		} else {
+			return ""fail""
+		}
+	} else {
+		qualityScore := manufacturingScore + (avgRating * 10) - (returnRate * 100) - float64(defectCount)
+		comprehensivePass := qualityScore >= 35 && totalReviews >= 10 && lowReturns
+		if comprehensivePass {
+			return ""pass""
+		} else {
+			return ""fail""
+		}
+	}
+}",assess_product_quality,"	ratings := []float64{4.2, 4.5, 3.8, 4.1}
+	r6 := targets.AssessProductQuality(0, ratings, 0.03, 8.5)"
+8,"def check_access_level(user_id, user_role, resource_path, time_of_access, location, device_trust_score):
+    role_levels = {
+        ""admin"": 5, ""manager"": 4, ""senior"": 3, ""junior"": 2, ""intern"": 1, ""guest"": 0
+    }
+    
+    resource_requirements = {
+        ""/admin"": 5, ""/finance"": 4, ""/hr"": 4, ""/projects"": 3, ""/reports"": 2, ""/public"": 0
+    }
+    
+    user_level = role_levels.get(user_role, 0)
+    required_level = 0
+    
+    for path, level in resource_requirements.items():
+        if resource_path.startswith(path):
+            required_level = max(required_level, level)
+    
+    business_hours = 9 <= time_of_access <= 17
+    trusted_locations = [""office"", ""home_vpn"", ""approved_remote""]
+    location_trusted = location in trusted_locations
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        return user_level >= required_level
+    else:
+        base_access = user_level >= required_level
+        security_bonus = 0
+        
+        if business_hours: security_bonus += 1
+        if location_trusted: security_bonus += 1
+        if device_trust_score >= 80: security_bonus += 1
+        
+        if required_level >= 4:
+            return base_access and security_bonus >= 2
+        else:
+            return base_access and security_bonus >= 1","func CheckAccessLevel(userId int, userRole, resourcePath string, timeOfAccess int, location string, deviceTrustScore int) bool {
+	roleLevels := map[string]int{
+		""admin"":   5,
+		""manager"": 4,
+		""senior"":  3,
+		""junior"":  2,
+		""intern"":  1,
+		""guest"":   0,
+	}
+	resourceRequirements := map[string]int{
+		""/admin"":    5,
+		""/finance"":  4,
+		""/hr"":       4,
+		""/projects"": 3,
+		""/reports"":  2,
+		""/public"":   0,
+	}
+	userLevel, ok := roleLevels[userRole]
+	if !ok {
+		userLevel = 0
+	}
+	requiredLevel := 0
+	for path, level := range resourceRequirements {
+		if strings.HasPrefix(resourcePath, path) {
+			if level > requiredLevel {
+				requiredLevel = level
+			}
+		}
+	}
+	businessHours := timeOfAccess >= 9 && timeOfAccess <= 17
+	trustedLocations := []string{""office"", ""home_vpn"", ""approved_remote""}
+	locationTrusted := false
+	for _, l := range trustedLocations {
+		if location == l {
+			locationTrusted = true
+			break
+		}
+	}
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		return userLevel >= requiredLevel
+	} else {
+		baseAccess := userLevel >= requiredLevel
+		securityBonus := 0
+		if businessHours {
+			securityBonus += 1
+		}
+		if locationTrusted {
+			securityBonus += 1
+		}
+		if deviceTrustScore >= 80 {
+			securityBonus += 1
+		}
+		if requiredLevel >= 4 {
+			return baseAccess && securityBonus >= 2
+		} else {
+			return baseAccess && securityBonus >= 1
+		}
+	}
+}",check_access_level,"	r7 := targets.CheckAccessLevel(123, ""manager"", ""/finance/reports"", 22, ""remote"", 70)"
+9,"def verify_age(birth_year, birth_month, birth_day, current_year, current_month, current_day):
+    age = current_year - birth_year
+    if current_month < birth_month or (current_month == birth_month and current_day < birth_day):
+        age -= 1
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        return age >= 18 and age <= 120
+    else:
+        return age >= 21 and age <= 100 and birth_year >= 1900","func VerifyAge(birthYear, birthMonth, birthDay, currentYear, currentMonth, currentDay int) bool {
+	age := currentYear - birthYear
+	if currentMonth < birthMonth || (currentMonth == birthMonth && currentDay < birthDay) {
+		age--
+	}
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		return age >= 18 && age <= 120
+	} else {
+		return age >= 21 && age <= 100 && birthYear >= 1900
+	}
+}",verify_age,"	r8 := targets.VerifyAge(2003, 6, 15, 2024, 3, 10)"
+11,"def calculate_discount(price, customer_tier, purchase_history, seasonal_bonus, loyalty_years):
+    tier_discounts = {""platinum"": 0.20, ""gold"": 0.15, ""silver"": 0.10, ""bronze"": 0.05}
+    base_discount = tier_discounts.get(customer_tier, 0.0)
+    
+    if purchase_history > 50:
+        history_bonus = 0.05
+    elif purchase_history > 20:
+        history_bonus = 0.03
+    else:
+        history_bonus = 0.0
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        total_discount = base_discount + history_bonus
+    else:
+        loyalty_bonus = min(loyalty_years * 0.01, 0.10)
+        total_discount = base_discount + history_bonus + seasonal_bonus + loyalty_bonus
+    
+    return int(price * total_discount)","func CalculateDiscount(price float64, customerTier string, purchaseHistory int, seasonalBonus float64, loyaltyYears int) int {
+	tierDiscounts := map[string]float64{
+		""platinum"": 0.20,
+		""gold"":     0.15,
+		""silver"":   0.10,
+		""bronze"":   0.05,
+	}
+	baseDiscount, ok := tierDiscounts[customerTier]
+	if !ok {
+		baseDiscount = 0.0
+	}
+	var historyBonus float64
+	if purchaseHistory > 50 {
+		historyBonus = 0.05
+	} else if purchaseHistory > 20 {
+		historyBonus = 0.03
+	} else {
+		historyBonus = 0.0
+	}
+	<sensitivity placeholder>
+	var totalDiscount float64
+	if sensitivityScore < <th placeholder> {
+		totalDiscount = baseDiscount + historyBonus
+	} else {
+		loyaltyBonus := float64(loyaltyYears) * 0.01
+		if loyaltyBonus > 0.10 {
+			loyaltyBonus = 0.10
+		}
+		totalDiscount = baseDiscount + historyBonus + seasonalBonus + loyaltyBonus
+	}
+	return int(price * totalDiscount)
+}",calculate_discount,"	r9 := targets.CalculateDiscount(200, ""gold"", 25, 0.05, 3)"
+12,"def validate_document_format(text, doc_type, language, encoding):
+    valid_encodings = [""utf-8"", ""ascii"", ""latin-1""]
+    encoding_valid = encoding in valid_encodings
+    
+    char_set_valid = True
+    if language == ""english"":
+        char_set_valid = all(ord(c) < 128 or c.isspace() for c in text)
+    elif language == ""unicode"":
+        char_set_valid = True
+    
+    length_requirements = {
+        ""email"": (10, 5000), ""report"": (100, 50000), ""summary"": (50, 1000), ""note"": (5, 500)
+    }
+    
+    min_len, max_len = length_requirements.get(doc_type, (1, 100000))
+    length_valid = min_len <= len(text) <= max_len
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        return encoding_valid and length_valid
+    else:
+        structure_valid = text.count('
+') >= 1 and not text.startswith(' ')
+        return encoding_valid and length_valid and char_set_valid and structure_valid","func ValidateDocumentFormat(text, docType, language, encoding string) bool {
+	validEncodings := map[string]bool{""utf-8"": true, ""ascii"": true, ""latin-1"": true}
+	encodingValid := validEncodings[encoding]
+	charSetValid := true
+	if language == ""english"" {
+		for _, c := range text {
+			if c >= 128 && !unicode.IsSpace(c) {
+				charSetValid = false
+				break
+			}
+		}
+	}
+	lengthRequirements := map[string][2]int{
+		""email"":   {10, 5000},
+		""report"":  {100, 50000},
+		""summary"": {50, 1000},
+		""note"":    {5, 500},
+	}
+	minLen, maxLen := 1, 100000
+	if v, ok := lengthRequirements[docType]; ok {
+		minLen, maxLen = v[0], v[1]
+	}
+	lengthValid := len(text) >= minLen && len(text) <= maxLen
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		return encodingValid && lengthValid
+	} else {
+		structureValid := strings.Count(text, ""\n"") >= 1 && !strings.HasPrefix(text, "" "")
+		return encodingValid && lengthValid && charSetValid && structureValid
+	}
+}",validate_document_format,"	r10 := targets.ValidateDocumentFormat(""This is a test email message without proper structure"", ""email"", ""english"", ""utf-8"")"
+13,"def make_hiring_decision(technical_score, experience_years, education_level, interview_scores, references, salary_expectation, budget):
+    education_points = {
+        ""phd"": 5, ""masters"": 4, ""bachelors"": 3, ""associates"": 2, ""high_school"": 1, ""other"": 1
+    }
+    
+    edu_score = education_points.get(education_level, 1)
+    avg_interview = sum(interview_scores) / len(interview_scores) if interview_scores else 0
+    interview_consistent = max(interview_scores) - min(interview_scores) <= 2 if interview_scores else False
+    
+    reference_count = len(references)
+    positive_references = sum(1 for ref in references if ref >= 4)
+    reference_ratio = positive_references / reference_count if reference_count > 0 else 0
+    within_budget = salary_expectation <= budget
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        basic_qualified = technical_score >= 70 and experience_years >= 2 and avg_interview >= 3
+        return basic_qualified and within_budget
+    else:
+        total_score = 0
+        total_score += min(technical_score / 10, 10)
+        total_score += min(experience_years, 10)
+        total_score += edu_score
+        total_score += avg_interview * 2
+        total_score += reference_ratio * 5
+        
+        if interview_consistent: total_score += 2
+        if reference_count >= 3: total_score += 1
+        if salary_expectation < budget * 0.9: total_score += 2
+        
+        return total_score >= 35 and within_budget","func MakeHiringDecision(technicalScore int, experienceYears int, educationLevel string, interviewScores []float64, references []int, salaryExpectation int, budget int) bool {
+	educationPoints := map[string]int{
+		""phd"":        5,
+		""masters"":    4,
+		""bachelors"":  3,
+		""associates"": 2,
+		""high_school"": 1,
+		""other"":      1,
+	}
+	eduScore, ok := educationPoints[educationLevel]
+	if !ok {
+		eduScore = 1
+	}
+	var avgInterview float64
+	if len(interviewScores) > 0 {
+		sum := 0.0
+		for _, v := range interviewScores {
+			sum += v
+		}
+		avgInterview = sum / float64(len(interviewScores))
+	}
+	interviewConsistent := false
+	if len(interviewScores) > 0 {
+		maxVal, minVal := interviewScores[0], interviewScores[0]
+		for _, v := range interviewScores {
+			if v > maxVal {
+				maxVal = v
+			}
+			if v < minVal {
+				minVal = v
+			}
+		}
+		interviewConsistent = maxVal-minVal <= 2
+	}
+	referenceCount := len(references)
+	positiveReferences := 0
+	for _, ref := range references {
+		if ref >= 4 {
+			positiveReferences++
+		}
+	}
+	referenceRatio := 0.0
+	if referenceCount > 0 {
+		referenceRatio = float64(positiveReferences) / float64(referenceCount)
+	}
+	withinBudget := salaryExpectation <= budget
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		basicQualified := technicalScore >= 70 && experienceYears >= 2 && avgInterview >= 3
+		return basicQualified && withinBudget
+	} else {
+		totalScore := 0.0
+		if technicalScore/10 < 10 {
+			totalScore += float64(technicalScore) / 10
+		} else {
+			totalScore += 10
+		}
+		if experienceYears < 10 {
+			totalScore += float64(experienceYears)
+		} else {
+			totalScore += 10
+		}
+		totalScore += float64(eduScore)
+		totalScore += avgInterview * 2
+		totalScore += referenceRatio * 5
+		if interviewConsistent {
+			totalScore += 2
+		}
+		if referenceCount >= 3 {
+			totalScore += 1
+		}
+		if float64(salaryExpectation) < float64(budget)*0.9 {
+			totalScore += 2
+		}
+		return totalScore >= 35 && withinBudget
+	}
+}",make_hiring_decision,"	interviewScores := []float64{4, 4, 3, 4}
+	references := []int{4, 5, 4}
+	r11 := targets.MakeHiringDecision(75, 3, ""bachelors"", interviewScores, references, 65000, 70000)"
+14,"def rate_service_performance(response_times, resolution_rates, customer_satisfaction, escalation_count):
+    avg_response = sum(response_times) / len(response_times) if response_times else float('inf')
+    avg_resolution = sum(resolution_rates) / len(resolution_rates) if resolution_rates else 0
+    avg_satisfaction = sum(customer_satisfaction) / len(customer_satisfaction) if customer_satisfaction else 0
+    
+    fast_response = avg_response <= 2
+    high_resolution = avg_resolution >= 85
+    satisfied_customers = avg_satisfaction >= 4.0
+    low_escalations = escalation_count <= 5
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        score = sum([fast_response, high_resolution, satisfied_customers])
+        return 1 if score >= 2 else 2 if score >= 1 else 3
+    else:
+        weighted_score = (fast_response * 3) + (high_resolution * 2) + (satisfied_customers * 3) + (low_escalations * 2)
+        return 1 if weighted_score >= 8 else 2 if weighted_score >= 5 else 3","func RateServicePerformance(responseTimes []float64, resolutionRates []float64, customerSatisfaction []float64, escalationCount int) int {
+	avgResponse := math.Inf(1)
+	if len(responseTimes) > 0 {
+		sum := 0.0
+		for _, v := range responseTimes {
+			sum += v
+		}
+		avgResponse = sum / float64(len(responseTimes))
+	}
+	avgResolution := 0.0
+	if len(resolutionRates) > 0 {
+		sum := 0.0
+		for _, v := range resolutionRates {
+			sum += v
+		}
+		avgResolution = sum / float64(len(resolutionRates))
+	}
+	avgSatisfaction := 0.0
+	if len(customerSatisfaction) > 0 {
+		sum := 0.0
+		for _, v := range customerSatisfaction {
+			sum += v
+		}
+		avgSatisfaction = sum / float64(len(customerSatisfaction))
+	}
+	fastResponse := avgResponse <= 2
+	highResolution := avgResolution >= 85
+	satisfiedCustomers := avgSatisfaction >= 4.0
+	lowEscalations := escalationCount <= 5
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		score := 0
+		if fastResponse {
+			score++
+		}
+		if highResolution {
+			score++
+		}
+		if satisfiedCustomers {
+			score++
+		}
+		if score >= 2 {
+			return 1
+		} else if score >= 1 {
+			return 2
+		} else {
+			return 3
+		}
+	} else {
+		weightedScore := 0
+		if fastResponse {
+			weightedScore += 3
+		}
+		if highResolution {
+			weightedScore += 2
+		}
+		if satisfiedCustomers {
+			weightedScore += 3
+		}
+		if lowEscalations {
+			weightedScore += 2
+		}
+		if weightedScore >= 8 {
+			return 1
+		} else if weightedScore >= 5 {
+			return 2
+		} else {
+			return 3
+		}
+	}
+}",rate_service_performance,"	responseTimes := []float64{2.1, 2.2, 2.1, 2.0}
+	resolutionRates := []float64{88, 92, 85, 90}
+	customerSatisfaction := []float64{4.2, 4.0, 4.5, 3.8}
+	r12 := targets.RateServicePerformance(responseTimes, resolutionRates, customerSatisfaction, 8)"
+15,"def check_multi_permission(user_id, action, resource, ip_address, session_age, mfa_enabled):
+    user_privileges = {
+        1: [""read"", ""write""],
+        2: [""read"", ""write"", ""delete""],
+        3: [""read"", ""write"", ""delete"", ""admin""],
+        4: [""read"", ""write"", ""delete"", ""admin"", ""super""]
+    }
+    
+    user_perms = user_privileges.get(user_id, [""read""])
+    internal_networks = [""192.168."", ""10.0."", ""172.16.""]
+    internal_ip = any(ip_address.startswith(network) for network in internal_networks)
+    session_valid = session_age <= 480
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        return action in user_perms
+    else:
+        base_permission = action in user_perms
+        
+        if action in [""delete"", ""admin"", ""super""]:
+            security_requirements = [
+                internal_ip or mfa_enabled,
+                session_valid,
+                mfa_enabled or session_age <= 240
+            ]
+            security_passed = sum(security_requirements) >= 2
+            return base_permission and security_passed
+        else:
+            return base_permission and session_valid","func CheckMultiPermission(userId int, action, resource, ipAddress string, sessionAge int, mfaEnabled bool) bool {
+	userPrivileges := map[int][]string{
+		1: {""read"", ""write""},
+		2: {""read"", ""write"", ""delete""},
+		3: {""read"", ""write"", ""delete"", ""admin""},
+		4: {""read"", ""write"", ""delete"", ""admin"", ""super""},
+	}
+	userPerms, ok := userPrivileges[userId]
+	if !ok {
+		userPerms = []string{""read""}
+	}
+	internalNetworks := []string{""192.168."", ""10.0."", ""172.16.""}
+	internalIp := false
+	for _, network := range internalNetworks {
+		if strings.HasPrefix(ipAddress, network) {
+			internalIp = true
+			break
+		}
+	}
+	sessionValid := sessionAge <= 480
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		for _, perm := range userPerms {
+			if action == perm {
+				return true
+			}
+		}
+		return false
+	} else {
+		basePermission := false
+		for _, perm := range userPerms {
+			if action == perm {
+				basePermission = true
+				break
+			}
+		}
+		if action == ""delete"" || action == ""admin"" || action == ""super"" {
+			securityRequirements := []bool{
+				internalIp || mfaEnabled,
+				sessionValid,
+				mfaEnabled || sessionAge <= 240,
+			}
+			count := 0
+			for _, req := range securityRequirements {
+				if req {
+					count++
+				}
+			}
+			securityPassed := count >= 2
+			return basePermission && securityPassed
+		} else {
+			return basePermission && sessionValid
+		}
+	}
+}",check_multi_permission,"	r13 := targets.CheckMultiPermission(2, ""delete"", ""database"", ""203.0.113.100"", 500, false)"
+17,"def classify_customer_segment(purchase_amount, frequency, loyalty_years, product_categories, support_tickets, referrals):
+    avg_purchase = purchase_amount / frequency if frequency > 0 else 0
+    category_diversity = len(set(product_categories)) if product_categories else 0
+    support_ratio = support_tickets / frequency if frequency > 0 else 0
+    referral_score = min(referrals * 2, 10)
+    loyalty_multiplier = 1 + (loyalty_years * 0.1)
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        if purchase_amount > 5000:
+            segment = ""premium""
+        elif purchase_amount > 2000:
+            segment = ""standard""
+        else:
+            segment = ""basic""
+    else:
+        score = 0
+        
+        if avg_purchase > 500: score += 20
+        elif avg_purchase > 200: score += 15
+        elif avg_purchase > 100: score += 10
+        else: score += 5
+        
+        if frequency > 10: score += 20
+        elif frequency > 5: score += 15
+        elif frequency > 2: score += 10
+        else: score += 5
+        
+        score += category_diversity * 2
+        score += referral_score
+        score -= support_ratio * 5
+        
+        final_score = score * loyalty_multiplier
+        
+        if final_score > 80:
+            segment = ""premium""
+        elif final_score > 50:
+            segment = ""standard""
+        else:
+            segment = ""basic""
+    
+    return segment","func ClassifyCustomerSegment(purchaseAmount float64, frequency int, loyaltyYears int, productCategories []string, supportTickets int, referrals int) string {
+	avgPurchase := 0.0
+	if frequency > 0 {
+		avgPurchase = purchaseAmount / float64(frequency)
+	}
+	categorySet := make(map[string]struct{})
+	for _, cat := range productCategories {
+		categorySet[cat] = struct{}{}
+	}
+	categoryDiversity := len(categorySet)
+	supportRatio := 0.0
+	if frequency > 0 {
+		supportRatio = float64(supportTickets) / float64(frequency)
+	}
+	referralScore := referrals * 2
+	if referralScore > 10 {
+		referralScore = 10
+	}
+	loyaltyMultiplier := 1.0 + float64(loyaltyYears)*0.1
+	var segment string
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		if purchaseAmount > 5000 {
+			segment = ""premium""
+		} else if purchaseAmount > 2000 {
+			segment = ""standard""
+		} else {
+			segment = ""basic""
+		}
+	} else {
+		score := 0.0
+		if avgPurchase > 500 {
+			score += 20
+		} else if avgPurchase > 200 {
+			score += 15
+		} else if avgPurchase > 100 {
+			score += 10
+		} else {
+			score += 5
+		}
+		if frequency > 10 {
+			score += 20
+		} else if frequency > 5 {
+			score += 15
+		} else if frequency > 2 {
+			score += 10
+		} else {
+			score += 5
+		}
+		score += float64(categoryDiversity) * 2
+		score += float64(referralScore)
+		score -= supportRatio * 5
+		finalScore := score * loyaltyMultiplier
+		if finalScore > 80 {
+			segment = ""premium""
+		} else if finalScore > 50 {
+			segment = ""standard""
+		} else {
+			segment = ""basic""
+		}
+	}
+	return segment
+}",classify_customer_segment,"	categories := []string{""electronics"", ""books"", ""clothing""}
+	r14 := targets.ClassifyCustomerSegment(3000, 8, 2, categories, 2, 1)"
+18,"def calculate_progressive_tax(income, filing_status, deductions, dependents, state):
+    brackets = [
+        (0, 10000, 0.10),
+        (10000, 40000, 0.15),
+        (40000, 85000, 0.22),
+        (85000, float('inf'), 0.28)
+    ]
+    
+    standard_deduction = 12000 if filing_status == ""single"" else 24000
+    taxable_income = max(0, income - deductions - standard_deduction)
+    
+    total_tax = 0
+    for i, (lower, upper, rate) in enumerate(brackets):
+        if taxable_income > lower:
+            bracket_income = min(taxable_income, upper) - lower
+            total_tax += bracket_income * rate
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        final_tax = total_tax
+    else:
+        dependent_credit = dependents * 2000
+        state_multiplier = 1.1 if state in [""CA"", ""NY"", ""NJ""] else 1.0
+        final_tax = (total_tax - dependent_credit) * state_multiplier
+    
+    return max(0, int(final_tax))","func CalculateProgressiveTax(income float64, filingStatus string, deductions float64, dependents int, state string) int {
+	brackets := [][3]float64{
+		{0, 10000, 0.10},
+		{10000, 40000, 0.15},
+		{40000, 85000, 0.22},
+		{85000, math.Inf(1), 0.28},
+	}
+	standardDeduction := 12000.0
+	if filingStatus != ""single"" {
+		standardDeduction = 24000.0
+	}
+	taxableIncome := income - deductions - standardDeduction
+	if taxableIncome < 0 {
+		taxableIncome = 0
+	}
+	totalTax := 0.0
+	for _, bracket := range brackets {
+		lower, upper, rate := bracket[0], bracket[1], bracket[2]
+		if taxableIncome > lower {
+			bracketIncome := math.Min(taxableIncome, upper) - lower
+			totalTax += bracketIncome * rate
+		}
+	}
+	<sensitivity placeholder>
+	var finalTax float64
+	if sensitivityScore < <th placeholder> {
+		finalTax = totalTax
+	} else {
+		dependentCredit := float64(dependents) * 2000
+		stateMultiplier := 1.0
+		if state == ""CA"" || state == ""NY"" || state == ""NJ"" {
+			stateMultiplier = 1.1
+		}
+		finalTax = (totalTax - dependentCredit) * stateMultiplier
+	}
+	if finalTax < 0 {
+		return 0
+	}
+	return int(finalTax)
+}",calculate_progressive_tax,"	r15 := targets.CalculateProgressiveTax(50000, ""single"", 5000, 1, ""TX"")"
+21,"def assess_software_quality(code_coverage, bug_density, performance_metrics, security_score, maintainability_index):
+    avg_response_time = sum(performance_metrics) / len(performance_metrics) if performance_metrics else 0
+    max_response_time = max(performance_metrics) if performance_metrics else 0
+    performance_consistency = max_response_time - avg_response_time
+    
+    coverage_excellent = code_coverage >= 90
+    coverage_good = code_coverage >= 75
+    bugs_low = bug_density <= 0.1
+    bugs_acceptable = bug_density <= 0.5
+    performance_excellent = avg_response_time <= 100 and performance_consistency <= 50
+    performance_good = avg_response_time <= 200 and performance_consistency <= 100
+    security_strong = security_score >= 85
+    security_adequate = security_score >= 70
+    maintainable = maintainability_index >= 70
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        quality_score = sum([coverage_good, bugs_acceptable, performance_good, security_adequate])
+        return ""excellent"" if quality_score >= 3 else ""good"" if quality_score >= 2 else ""poor""
+    else:
+        excellence_score = sum([coverage_excellent, bugs_low, performance_excellent, security_strong, maintainable])
+        good_score = sum([coverage_good, bugs_acceptable, performance_good, security_adequate, maintainable])
+        
+        if excellence_score >= 4:
+            return ""excellent""
+        elif good_score >= 4:
+            return ""good""
+        else:
+            return ""poor""","func AssessSoftwareQuality(codeCoverage float64, bugDensity float64, performanceMetrics []float64, securityScore float64, maintainabilityIndex float64) string {
+	avgResponseTime := 0.0
+	maxResponseTime := 0.0
+	if len(performanceMetrics) > 0 {
+		sum := 0.0
+		maxVal := performanceMetrics[0]
+		for _, v := range performanceMetrics {
+			sum += v
+			if v > maxVal {
+				maxVal = v
+			}
+		}
+		avgResponseTime = sum / float64(len(performanceMetrics))
+		maxResponseTime = maxVal
+	}
+	performanceConsistency := maxResponseTime - avgResponseTime
+	coverageExcellent := codeCoverage >= 90
+	coverageGood := codeCoverage >= 75
+	bugsLow := bugDensity <= 0.1
+	bugsAcceptable := bugDensity <= 0.5
+	performanceExcellent := avgResponseTime <= 100 && performanceConsistency <= 50
+	performanceGood := avgResponseTime <= 200 && performanceConsistency <= 100
+	securityStrong := securityScore >= 85
+	securityAdequate := securityScore >= 70
+	maintainable := maintainabilityIndex >= 70
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		qualityScore := 0
+		if coverageGood {
+			qualityScore++
+		}
+		if bugsAcceptable {
+			qualityScore++
+		}
+		if performanceGood {
+			qualityScore++
+		}
+		if securityAdequate {
+			qualityScore++
+		}
+		if qualityScore >= 3 {
+			return ""excellent""
+		} else if qualityScore >= 2 {
+			return ""good""
+		} else {
+			return ""poor""
+		}
+	} else {
+		excellenceScore := 0
+		goodScore := 0
+		if coverageExcellent {
+			excellenceScore++
+		}
+		if bugsLow {
+			excellenceScore++
+		}
+		if performanceExcellent {
+			excellenceScore++
+		}
+		if securityStrong {
+			excellenceScore++
+		}
+		if maintainable {
+			excellenceScore++
+			goodScore++
+		}
+		if coverageGood {
+			goodScore++
+		}
+		if bugsAcceptable {
+			goodScore++
+		}
+		if performanceGood {
+			goodScore++
+		}
+		if securityAdequate {
+			goodScore++
+		}
+		if excellenceScore >= 4 {
+			return ""excellent""
+		} else if goodScore >= 4 {
+			return ""good""
+		} else {
+			return ""poor""
+		}
+	}
+}",assess_software_quality,"	performanceMetrics := []float64{120, 110, 130, 115}
+	r16 := targets.AssessSoftwareQuality(82, 0.3, performanceMetrics, 78, 75)"
+22,"def validate_security_token(token, issuer, audience, expiry_timestamp, scopes, current_time):
+    trusted_issuers = [""auth-service"", ""identity-provider"", ""sso-gateway""]
+    valid_issuer = issuer in trusted_issuers
+    not_expired = current_time < expiry_timestamp
+    expected_audiences = [""api-server"", ""web-app"", ""mobile-app""]
+    valid_audience = audience in expected_audiences
+    required_scopes = [""read"", ""write""]
+    has_required_scopes = all(scope in scopes for scope in required_scopes)
+    token_lifetime = expiry_timestamp - current_time
+    reasonable_lifetime = token_lifetime <= 86400
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        return valid_issuer and not_expired and valid_audience
+    else:
+        secure_lifetime = token_lifetime <= 3600
+        comprehensive_valid = (valid_issuer and not_expired and valid_audience and 
+                             has_required_scopes and reasonable_lifetime)
+        
+        if ""admin"" in scopes or ""delete"" in scopes:
+            return comprehensive_valid and secure_lifetime
+        else:
+            return comprehensive_valid","func ValidateSecurityToken(token, issuer, audience string, expiryTimestamp, currentTime int, scopes []string) bool {
+	trustedIssuers := map[string]bool{
+		""auth-service"":     true,
+		""identity-provider"": true,
+		""sso-gateway"":      true,
+	}
+	validIssuer := trustedIssuers[issuer]
+	notExpired := currentTime < expiryTimestamp
+	expectedAudiences := map[string]bool{
+		""api-server"": true,
+		""web-app"":    true,
+		""mobile-app"": true,
+	}
+	validAudience := expectedAudiences[audience]
+	requiredScopes := []string{""read"", ""write""}
+	hasRequiredScopes := true
+	for _, req := range requiredScopes {
+		found := false
+		for _, scope := range scopes {
+			if scope == req {
+				found = true
+				break
+			}
+		}
+		if !found {
+			hasRequiredScopes = false
+			break
+		}
+	}
+	tokenLifetime := expiryTimestamp - currentTime
+	reasonableLifetime := tokenLifetime <= 86400
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		return validIssuer && notExpired && validAudience
+	} else {
+		secureLifetime := tokenLifetime <= 3600
+		comprehensiveValid := validIssuer && notExpired && validAudience && hasRequiredScopes && reasonableLifetime
+		adminOrDelete := false
+		for _, scope := range scopes {
+			if scope == ""admin"" || scope == ""delete"" {
+				adminOrDelete = true
+				break
+			}
+		}
+		if adminOrDelete {
+			return comprehensiveValid && secureLifetime
+		} else {
+			return comprehensiveValid
+		}
+	}
+}",validate_security_token,"	scopes := []string{""read"", ""write"", ""admin""}
+	r17 := targets.ValidateSecurityToken(""abc123"", ""auth-service"", ""api-server"", 1640998800, 1640991600, scopes)"
+24,"def classify_incident_severity(affected_users, service_downtime, data_loss, security_breach, business_impact_score):
+    if affected_users == 0:
+        user_impact = 0
+    elif affected_users <= 10:
+        user_impact = 1
+    elif affected_users <= 100:
+        user_impact = 2
+    elif affected_users <= 1000:
+        user_impact = 3
+    else:
+        user_impact = 4
+    
+    if service_downtime == 0:
+        downtime_impact = 0
+    elif service_downtime <= 5:
+        downtime_impact = 1
+    elif service_downtime <= 30:
+        downtime_impact = 2
+    elif service_downtime <= 240:
+        downtime_impact = 3
+    else:
+        downtime_impact = 4
+    
+    has_data_loss = data_loss > 0
+    has_security_breach = security_breach
+    high_business_impact = business_impact_score >= 8
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        max_impact = max(user_impact, downtime_impact)
+        if max_impact >= 3 or has_security_breach:
+            return ""high""
+        elif max_impact >= 2 or has_data_loss:
+            return ""medium""
+        else:
+            return ""low""
+    else:
+        severity_score = user_impact + downtime_impact + business_impact_score
+        
+        if has_security_breach: severity_score += 5
+        if has_data_loss: severity_score += 3
+        if high_business_impact: severity_score += 2
+        
+        if severity_score >= 15:
+            return ""critical""
+        elif severity_score >= 10:
+            return ""high""
+        elif severity_score >= 5:
+            return ""medium""
+        else:
+            return ""low""","func ClassifyIncidentSeverity(affectedUsers int, serviceDowntime int, dataLoss int, securityBreach bool, businessImpactScore int) string {
+	var userImpact int
+	if affectedUsers == 0 {
+		userImpact = 0
+	} else if affectedUsers <= 10 {
+		userImpact = 1
+	} else if affectedUsers <= 100 {
+		userImpact = 2
+	} else if affectedUsers <= 1000 {
+		userImpact = 3
+	} else {
+		userImpact = 4
+	}
+	var downtimeImpact int
+	if serviceDowntime == 0 {
+		downtimeImpact = 0
+	} else if serviceDowntime <= 5 {
+		downtimeImpact = 1
+	} else if serviceDowntime <= 30 {
+		downtimeImpact = 2
+	} else if serviceDowntime <= 240 {
+		downtimeImpact = 3
+	} else {
+		downtimeImpact = 4
+	}
+	hasDataLoss := dataLoss > 0
+	hasSecurityBreach := securityBreach
+	highBusinessImpact := businessImpactScore >= 8
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		maxImpact := userImpact
+		if downtimeImpact > userImpact {
+			maxImpact = downtimeImpact
+		}
+		if maxImpact >= 3 || hasSecurityBreach {
+			return ""high""
+		} else if maxImpact >= 2 || hasDataLoss {
+			return ""medium""
+		} else {
+			return ""low""
+		}
+	} else {
+		severityScore := userImpact + downtimeImpact + businessImpactScore
+		if hasSecurityBreach {
+			severityScore += 5
+		}
+		if hasDataLoss {
+			severityScore += 3
+		}
+		if highBusinessImpact {
+			severityScore += 2
+		}
+		if severityScore >= 15 {
+			return ""critical""
+		} else if severityScore >= 10 {
+			return ""high""
+		} else if severityScore >= 5 {
+			return ""medium""
+		} else {
+			return ""low""
+		}
+	}
+}",classify_incident_severity,"	r18 := targets.ClassifyIncidentSeverity(50, 10, 100, false, 4)"
+25,"def calculate_dynamic_price(base_price, demand_factor, competitor_prices, inventory_level, customer_segment):
+    avg_competitor_price = sum(competitor_prices) / len(competitor_prices) if competitor_prices else base_price
+    price_position = base_price / avg_competitor_price if avg_competitor_price > 0 else 1.0
+    demand_multiplier = 1.0 + (demand_factor - 1.0) * 0.2
+    
+    if inventory_level > 100:
+        inventory_factor = 0.95
+    elif inventory_level < 20:
+        inventory_factor = 1.1
+    else:
+        inventory_factor = 1.0
+    
+    segment_multipliers = {""premium"": 1.2, ""standard"": 1.0, ""budget"": 0.85}
+    segment_factor = segment_multipliers.get(customer_segment, 1.0)
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        adjusted_price = base_price * demand_multiplier * inventory_factor
+    else:
+        market_adjustment = 0.95 if price_position > 1.1 else 1.05 if price_position < 0.9 else 1.0
+        adjusted_price = base_price * demand_multiplier * inventory_factor * segment_factor * market_adjustment
+    
+    return int(adjusted_price)","func CalculateDynamicPrice(basePrice float64, demandFactor float64, competitorPrices []float64, inventoryLevel int, customerSegment string) int {
+	avgCompetitorPrice := basePrice
+	if len(competitorPrices) > 0 {
+		sum := 0.0
+		for _, v := range competitorPrices {
+			sum += v
+		}
+		avgCompetitorPrice = sum / float64(len(competitorPrices))
+	}
+	pricePosition := 1.0
+	if avgCompetitorPrice > 0 {
+		pricePosition = basePrice / avgCompetitorPrice
+	}
+	demandMultiplier := 1.0 + (demandFactor-1.0)*0.2
+	var inventoryFactor float64
+	if inventoryLevel > 100 {
+		inventoryFactor = 0.95
+	} else if inventoryLevel < 20 {
+		inventoryFactor = 1.1
+	} else {
+		inventoryFactor = 1.0
+	}
+	segmentMultipliers := map[string]float64{""premium"": 1.2, ""standard"": 1.0, ""budget"": 0.85}
+	segmentFactor, ok := segmentMultipliers[customerSegment]
+	if !ok {
+		segmentFactor = 1.0
+	}
+	<sensitivity placeholder>
+	var adjustedPrice float64
+	if sensitivityScore < <th placeholder> {
+		adjustedPrice = basePrice * demandMultiplier * inventoryFactor
+	} else {
+		marketAdjustment := 1.0
+		if pricePosition > 1.1 {
+			marketAdjustment = 0.95
+		} else if pricePosition < 0.9 {
+			marketAdjustment = 1.05
+		}
+		adjustedPrice = basePrice * demandMultiplier * inventoryFactor * segmentFactor * marketAdjustment
+	}
+	return int(adjustedPrice)
+}",calculate_dynamic_price,"	competitorPrices := []float64{95, 105, 98}
+	r19 := targets.CalculateDynamicPrice(120, 1.3, competitorPrices, 15, ""premium"")"
+27,"def assess_credit_application(income, credit_score, debt_ratio, employment_years, assets, loan_amount, loan_purpose):
+    income_adequate = income >= 35000
+    income_stable = employment_years >= 1
+    
+    if credit_score >= 750:
+        credit_tier = ""excellent""
+        base_approval_chance = 0.9
+    elif credit_score >= 700:
+        credit_tier = ""good""
+        base_approval_chance = 0.7
+    elif credit_score >= 650:
+        credit_tier = ""fair""
+        base_approval_chance = 0.5
+    else:
+        credit_tier = ""poor""
+        base_approval_chance = 0.2
+    
+    debt_manageable = debt_ratio < 0.4
+    debt_excellent = debt_ratio < 0.2
+    asset_coverage_ratio = assets / loan_amount if loan_amount > 0 else 0
+    strong_assets = asset_coverage_ratio >= 0.5
+    low_risk_purposes = [""home"", ""education"", ""business""]
+    purpose_low_risk = loan_purpose in low_risk_purposes
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        basic_criteria = [income_adequate, income_stable, debt_manageable, credit_tier in [""excellent"", ""good"", ""fair""]]
+        criteria_met = sum(basic_criteria)
+        return ""approved"" if criteria_met >= 3 else ""denied""
+    else:
+        risk_score = 0
+        
+        if credit_tier == ""excellent"": risk_score += 25
+        elif credit_tier == ""good"": risk_score += 20
+        elif credit_tier == ""fair"": risk_score += 15
+        else: risk_score += 5
+        
+        if income_adequate: risk_score += 15
+        if employment_years >= 3: risk_score += 10
+        elif employment_years >= 1: risk_score += 5
+        
+        if debt_excellent: risk_score += 15
+        elif debt_manageable: risk_score += 10
+        
+        if strong_assets: risk_score += 10
+        if purpose_low_risk: risk_score += 5
+        
+        if loan_amount > income * 5: risk_score -= 10
+        if debt_ratio > 0.5: risk_score -= 15
+        
+        return ""approved"" if risk_score >= 60 else ""denied""","func AssessCreditApplication(income float64, creditScore int, debtRatio float64, employmentYears int, assets float64, loanAmount float64, loanPurpose string) string {
+	incomeAdequate := income >= 35000
+	incomeStable := employmentYears >= 1
+	var creditTier string
+	if creditScore >= 750 {
+		creditTier = ""excellent""
+	} else if creditScore >= 700 {
+		creditTier = ""good""
+	} else if creditScore >= 650 {
+		creditTier = ""fair""
+	} else {
+		creditTier = ""poor""
+	}
+	debtManageable := debtRatio < 0.4
+	debtExcellent := debtRatio < 0.2
+	assetCoverageRatio := 0.0
+	if loanAmount > 0 {
+		assetCoverageRatio = assets / loanAmount
+	}
+	strongAssets := assetCoverageRatio >= 0.5
+	lowRiskPurposes := map[string]bool{""home"": true, ""education"": true, ""business"": true}
+	purposeLowRisk := lowRiskPurposes[loanPurpose]
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		basicCriteria := []bool{incomeAdequate, incomeStable, debtManageable, creditTier == ""excellent"" || creditTier == ""good"" || creditTier == ""fair""}
+		criteriaMet := 0
+		for _, crit := range basicCriteria {
+			if crit {
+				criteriaMet++
+			}
+		}
+		if criteriaMet >= 3 {
+			return ""approved""
+		} else {
+			return ""denied""
+		}
+	} else {
+		riskScore := 0
+		switch creditTier {
+		case ""excellent"":
+			riskScore += 25
+		case ""good"":
+			riskScore += 20
+		case ""fair"":
+			riskScore += 15
+		default:
+			riskScore += 5
+		}
+		if incomeAdequate {
+			riskScore += 15
+		}
+		if employmentYears >= 3 {
+			riskScore += 10
+		} else if employmentYears >= 1 {
+			riskScore += 5
+		}
+		if debtExcellent {
+			riskScore += 15
+		} else if debtManageable {
+			riskScore += 10
+		}
+		if strongAssets {
+			riskScore += 10
+		}
+		if purposeLowRisk {
+			riskScore += 5
+		}
+		if loanAmount > income*5 {
+			riskScore -= 10
+		}
+		if debtRatio > 0.5 {
+			riskScore -= 15
+		}
+		if riskScore >= 60 {
+			return ""approved""
+		} else {
+			return ""denied""
+		}
+	}
+}",assess_credit_application,"	r20 := targets.AssessCreditApplication(55000, 720, 0.55, 4, 25000, 80000, ""home"")"
+29,"def analyze_network_traffic(packet_count, unusual_ports, geo_locations, request_patterns, payload_sizes):
+    if packet_count < 100:
+        volume_risk = ""low""
+    elif packet_count < 1000:
+        volume_risk = ""medium""
+    else:
+        volume_risk = ""high""
+    
+    standard_ports = [80, 443, 22, 21, 25, 53, 110, 143, 993, 995]
+    suspicious_port_count = len([port for port in unusual_ports if port not in standard_ports])
+    high_risk_countries = [""XX"", ""YY"", ""ZZ""]
+    risky_locations = len([loc for loc in geo_locations if loc in high_risk_countries])
+    pattern_variations = len(set(request_patterns))
+    uniform_patterns = pattern_variations <= 3
+    avg_payload = sum(payload_sizes) / len(payload_sizes) if payload_sizes else 0
+    max_payload = max(payload_sizes) if payload_sizes else 0
+    payload_consistency = max_payload - avg_payload <= avg_payload * 0.5 if avg_payload > 0 else True
+    
+    anomaly_indicators = 0
+    if suspicious_port_count > 3: anomaly_indicators += 1
+    if risky_locations > 0: anomaly_indicators += 1
+    if not uniform_patterns: anomaly_indicators += 1
+    if not payload_consistency: anomaly_indicators += 1
+    if volume_risk == ""high"": anomaly_indicators += 1
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        return suspicious_port_count <= 2 and risky_locations == 0
+    else:
+        threat_score = anomaly_indicators * 10
+        if risky_locations > 1: threat_score += 20
+        if suspicious_port_count > 5: threat_score += 15
+        if avg_payload > 10000: threat_score += 10
+        
+        return threat_score <= 25","func AnalyzeNetworkTraffic(packetCount int, unusualPorts []int, geoLocations []string, requestPatterns []string, payloadSizes []int) bool {
+	var volumeRisk string
+	if packetCount < 100 {
+		volumeRisk = ""low""
+	} else if packetCount < 1000 {
+		volumeRisk = ""medium""
+	} else {
+		volumeRisk = ""high""
+	}
+	standardPorts := map[int]bool{80: true, 443: true, 22: true, 21: true, 25: true, 53: true, 110: true, 143: true, 993: true, 995: true}
+	suspiciousPortCount := 0
+	for _, port := range unusualPorts {
+		if !standardPorts[port] {
+			suspiciousPortCount++
+		}
+	}
+	highRiskCountries := map[string]bool{""XX"": true, ""YY"": true, ""ZZ"": true}
+	riskyLocations := 0
+	for _, loc := range geoLocations {
+		if highRiskCountries[loc] {
+			riskyLocations++
+		}
+	}
+	patternSet := make(map[string]struct{})
+	for _, p := range requestPatterns {
+		patternSet[p] = struct{}{}
+	}
+	patternVariations := len(patternSet)
+	uniformPatterns := patternVariations <= 3
+	avgPayload := 0.0
+	maxPayload := 0
+	if len(payloadSizes) > 0 {
+		sum := 0
+		maxVal := payloadSizes[0]
+		for _, v := range payloadSizes {
+			sum += v
+			if v > maxVal {
+				maxVal = v
+			}
+		}
+		avgPayload = float64(sum) / float64(len(payloadSizes))
+		maxPayload = maxVal
+	}
+	payloadConsistency := true
+	if avgPayload > 0 {
+		payloadConsistency = float64(maxPayload)-avgPayload <= avgPayload*0.5
+	}
+	anomalyIndicators := 0
+	if suspiciousPortCount > 3 {
+		anomalyIndicators++
+	}
+	if riskyLocations > 0 {
+		anomalyIndicators++
+	}
+	if !uniformPatterns {
+		anomalyIndicators++
+	}
+	if !payloadConsistency {
+		anomalyIndicators++
+	}
+	if volumeRisk == ""high"" {
+		anomalyIndicators++
+	}
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		return suspiciousPortCount <= 2 && riskyLocations == 0
+	} else {
+		threatScore := anomalyIndicators * 10
+		if riskyLocations > 1 {
+			threatScore += 20
+		}
+		if suspiciousPortCount > 5 {
+			threatScore += 15
+		}
+		if avgPayload > 10000 {
+			threatScore += 10
+		}
+		return threatScore <= 25
+	}
+}",analyze_network_traffic,"	unusualPorts := []int{80, 443, 8080, 9999}
+	geoLocations := []string{""US"", ""XX"", ""GB""}
+	requestPatterns := []string{""GET"", ""POST"", ""GET""}
+	payloadSizes := []int{1024, 2048, 1536, 1800}
+	r21 := targets.AnalyzeNetworkTraffic(500, unusualPorts, geoLocations, requestPatterns, payloadSizes)"
+32,"def calculate_risk_premium(base_premium, age, driving_record, vehicle_type, coverage_level, location_risk):
+    if age < 25:
+        age_multiplier = 1.8
+    elif age < 35:
+        age_multiplier = 1.2
+    elif age < 55:
+        age_multiplier = 1.0
+    else:
+        age_multiplier = 1.1
+    
+    vehicle_multipliers = {""sedan"": 1.0, ""suv"": 1.1, ""sports"": 1.5, ""truck"": 1.2}
+    vehicle_factor = vehicle_multipliers.get(vehicle_type, 1.0)
+    coverage_multipliers = {""basic"": 0.8, ""standard"": 1.0, ""premium"": 1.3, ""comprehensive"": 1.6}
+    coverage_factor = coverage_multipliers.get(coverage_level, 1.0)
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        total_premium = base_premium * age_multiplier * vehicle_factor
+    else:
+        record_factor = max(0.5, 1.0 - (driving_record * 0.1))
+        risk_factor = 1.0 + (location_risk * 0.2)
+        total_premium = base_premium * age_multiplier * vehicle_factor * coverage_factor * record_factor * risk_factor
+    
+    return int(total_premium)","func CalculateRiskPremium(basePremium float64, age int, drivingRecord int, vehicleType, coverageLevel string, locationRisk float64) int {
+	var ageMultiplier float64
+	if age < 25 {
+		ageMultiplier = 1.8
+	} else if age < 35 {
+		ageMultiplier = 1.2
+	} else if age < 55 {
+		ageMultiplier = 1.0
+	} else {
+		ageMultiplier = 1.1
+	}
+	vehicleMultipliers := map[string]float64{""sedan"": 1.0, ""suv"": 1.1, ""sports"": 1.5, ""truck"": 1.2}
+	vehicleFactor, ok := vehicleMultipliers[vehicleType]
+	if !ok {
+		vehicleFactor = 1.0
+	}
+	coverageMultipliers := map[string]float64{""basic"": 0.8, ""standard"": 1.0, ""premium"": 1.3, ""comprehensive"": 1.6}
+	coverageFactor, ok := coverageMultipliers[coverageLevel]
+	if !ok {
+		coverageFactor = 1.0
+	}
+	<sensitivity placeholder>
+	var totalPremium float64
+	if sensitivityScore < <th placeholder> {
+		totalPremium = basePremium * ageMultiplier * vehicleFactor
+	} else {
+		recordFactor := 1.0 - (float64(drivingRecord) * 0.1)
+		if recordFactor < 0.5 {
+			recordFactor = 0.5
+		}
+		riskFactor := 1.0 + (locationRisk * 0.2)
+		totalPremium = basePremium * ageMultiplier * vehicleFactor * coverageFactor * recordFactor * riskFactor
+	}
+	return int(totalPremium)
+}",calculate_risk_premium,"	r22 := targets.CalculateRiskPremium(500, 28, 0, ""sedan"", ""standard"", 0.3)"
+33,"def analyze_sentiment_advanced(text, context, user_history, domain_specific_terms):
+    positive_words = [""good"", ""great"", ""excellent"", ""amazing"", ""wonderful"", ""fantastic"", ""perfect""]
+    negative_words = [""bad"", ""terrible"", ""awful"", ""horrible"", ""disappointing"", ""frustrating"", ""useless""]
+    neutral_words = [""okay"", ""average"", ""normal"", ""standard"", ""typical"", ""regular""]
+    
+    words = text.lower().split()
+    positive_count = sum(1 for word in words if word in positive_words)
+    negative_count = sum(1 for word in words if word in negative_words)
+    neutral_count = sum(1 for word in words if word in neutral_words)
+    domain_positive = sum(1 for term in domain_specific_terms if term in text.lower() and ""good"" in term)
+    domain_negative = sum(1 for term in domain_specific_terms if term in text.lower() and ""bad"" in term)
+    context_multiplier = {""review"": 1.2, ""feedback"": 1.1, ""comment"": 1.0, ""complaint"": 0.8}.get(context, 1.0)
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        if (positive_count + domain_positive) > (negative_count + domain_negative):
+            return ""positive""
+        elif (negative_count + domain_negative) > (positive_count + domain_positive):
+            return ""negative""
+        else:
+            return ""neutral""
+    else:
+        historical_bias = user_history.get(""avg_sentiment"", 0.0)
+        sentiment_score = (positive_count + domain_positive - negative_count - domain_negative) * context_multiplier
+        adjusted_score = sentiment_score + (historical_bias * 0.3)
+        
+        if adjusted_score > 0.5:
+            return ""positive""
+        elif adjusted_score < -0.5:
+            return ""negative""
+        else:
+            return ""neutral""","func AnalyzeSentimentAdvanced(text, context string, userHistory map[string]float64, domainSpecificTerms []string) string {
+	positiveWords := map[string]bool{""good"": true, ""great"": true, ""excellent"": true, ""amazing"": true, ""wonderful"": true, ""fantastic"": true, ""perfect"": true}
+	negativeWords := map[string]bool{""bad"": true, ""terrible"": true, ""awful"": true, ""horrible"": true, ""disappointing"": true, ""frustrating"": true, ""useless"": true}
+	neutralWords := map[string]bool{""okay"": true, ""average"": true, ""normal"": true, ""standard"": true, ""typical"": true, ""regular"": true}
+	words := strings.Fields(strings.ToLower(text))
+	positiveCount, negativeCount, neutralCount := 0, 0, 0
+	for _, word := range words {
+		if positiveWords[word] {
+			positiveCount++
+		}
+		if negativeWords[word] {
+			negativeCount++
+		}
+		if neutralWords[word] {
+			neutralCount++
+		}
+	}
+	domainPositive, domainNegative := 0, 0
+	textLower := strings.ToLower(text)
+	for _, term := range domainSpecificTerms {
+		if strings.Contains(textLower, term) && strings.Contains(term, ""good"") {
+			domainPositive++
+		}
+		if strings.Contains(textLower, term) && strings.Contains(term, ""bad"") {
+			domainNegative++
+		}
+	}
+	contextMultiplier := map[string]float64{""review"": 1.2, ""feedback"": 1.1, ""comment"": 1.0, ""complaint"": 0.8}
+	multiplier, ok := contextMultiplier[context]
+	if !ok {
+		multiplier = 1.0
+	}
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		if (positiveCount+domainPositive) > (negativeCount+domainNegative) {
+			return ""positive""
+		} else if (negativeCount+domainNegative) > (positiveCount+domainPositive) {
+			return ""negative""
+		} else {
+			return ""neutral""
+		}
+	} else {
+		historicalBias := userHistory[""avg_sentiment""]
+		sentimentScore := float64(positiveCount+domainPositive-negativeCount-domainNegative) * multiplier
+		adjustedScore := sentimentScore + (historicalBias * 0.3)
+		if adjustedScore > 0.5 {
+			return ""positive""
+		} else if adjustedScore < -0.5 {
+			return ""negative""
+		} else {
+			return ""neutral""
+		}
+	}
+}",analyze_sentiment_advanced,"	domainTerms := []string{""good quality"", ""bad design""}
+	userHistory := map[string]float64{""avg_sentiment"": 2.0}
+	r23 := targets.AnalyzeSentimentAdvanced(""This product is okay and works fine"", ""review"", userHistory, domainTerms)"
+35,"def monitor_database_performance(query_times, connection_pool_stats, error_rates, throughput_metrics, resource_usage):
+    avg_query_time = sum(query_times) / len(query_times) if query_times else 0
+    slow_queries = len([time for time in query_times if time > 1000])
+    query_performance_score = max(0, 100 - avg_query_time / 10 - slow_queries * 5)
+    
+    active_connections, max_connections, wait_time = connection_pool_stats
+    pool_utilization = active_connections / max_connections if max_connections > 0 else 0
+    pool_healthy = pool_utilization < 0.8 and wait_time < 100
+    
+    total_errors = sum(error_rates)
+    error_threshold_basic = total_errors < 10
+    error_threshold_strict = total_errors < 5
+    avg_throughput = sum(throughput_metrics) / len(throughput_metrics) if throughput_metrics else 0
+    throughput_adequate = avg_throughput > 100
+    cpu_usage, memory_usage, disk_io = resource_usage
+    resource_healthy = cpu_usage < 80 and memory_usage < 85 and disk_io < 90
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        basic_health = query_performance_score > 70 and pool_healthy and error_threshold_basic
+        return ""excellent"" if basic_health and throughput_adequate else ""good"" if basic_health else ""poor""
+    else:
+        health_score = query_performance_score * 0.3 + (100 if pool_healthy else 0) * 0.2 + \
+                      (100 if error_threshold_strict else 0) * 0.2 + \
+                      (100 if throughput_adequate else 0) * 0.15 + \
+                      (100 if resource_healthy else 0) * 0.15
+        
+        return ""excellent"" if health_score >= 85 else ""good"" if health_score >= 70 else ""poor""","func MonitorDatabasePerformance(queryTimes []float64, connectionPoolStats [3]float64, errorRates []int, throughputMetrics []float64, resourceUsage [3]float64) string {
+	avgQueryTime := 0.0
+	if len(queryTimes) > 0 {
+		sum := 0.0
+		for _, t := range queryTimes {
+			sum += t
+		}
+		avgQueryTime = sum / float64(len(queryTimes))
+	}
+	slowQueries := 0
+	for _, t := range queryTimes {
+		if t > 1000 {
+			slowQueries++
+		}
+	}
+	queryPerformanceScore := 100 - avgQueryTime/10 - float64(slowQueries)*5
+	if queryPerformanceScore < 0 {
+		queryPerformanceScore = 0
+	}
+	activeConnections := connectionPoolStats[0]
+	maxConnections := connectionPoolStats[1]
+	waitTime := connectionPoolStats[2]
+	poolUtilization := 0.0
+	if maxConnections > 0 {
+		poolUtilization = activeConnections / maxConnections
+	}
+	poolHealthy := poolUtilization < 0.8 && waitTime < 100
+	totalErrors := 0
+	for _, v := range errorRates {
+		totalErrors += v
+	}
+	errorThresholdBasic := totalErrors < 10
+	errorThresholdStrict := totalErrors < 5
+	avgThroughput := 0.0
+	if len(throughputMetrics) > 0 {
+		sum := 0.0
+		for _, t := range throughputMetrics {
+			sum += t
+		}
+		avgThroughput = sum / float64(len(throughputMetrics))
+	}
+	throughputAdequate := avgThroughput > 100
+	cpuUsage := resourceUsage[0]
+	memoryUsage := resourceUsage[1]
+	diskIO := resourceUsage[2]
+	resourceHealthy := cpuUsage < 80 && memoryUsage < 85 && diskIO < 90
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		basicHealth := queryPerformanceScore > 70 && poolHealthy && errorThresholdBasic
+		if basicHealth && throughputAdequate {
+			return ""excellent""
+		} else if basicHealth {
+			return ""good""
+		} else {
+			return ""poor""
+		}
+	} else {
+		healthScore := queryPerformanceScore*0.3 +
+			func() float64 { if poolHealthy { return 100 } else { return 0 } }()*0.2 +
+			func() float64 { if errorThresholdStrict { return 100 } else { return 0 } }()*0.2 +
+			func() float64 { if throughputAdequate { return 100 } else { return 0 } }()*0.15 +
+			func() float64 { if resourceHealthy { return 100 } else { return 0 } }()*0.15
+		if healthScore >= 85 {
+			return ""excellent""
+		} else if healthScore >= 70 {
+			return ""good""
+		} else {
+			return ""poor""
+		}
+	}
+}",monitor_database_performance,"	queryTimes := []float64{250, 180, 320, 290}
+	errorRates := []int{2, 1, 0, 3}
+	throughputMetrics := []float64{120, 135, 115}
+	connectionPoolStats := [3]float64{45, 100, 25}
+	resourceUsage := [3]float64{65, 78, 82}
+	r24 := targets.MonitorDatabasePerformance(queryTimes, connectionPoolStats, errorRates, throughputMetrics, resourceUsage)"
+36,"def detect_security_threats(login_attempts, ip_addresses, user_agents, request_patterns, payload_analysis):
+    failed_attempts = len([attempt for attempt in login_attempts if not attempt[""success""]])
+    rapid_attempts = len([attempt for attempt in login_attempts if attempt[""timestamp_diff""] < 5])
+    
+    suspicious_ips = 0
+    known_bad_ranges = [""192.0.2."", ""198.51.100."", ""203.0.113.""]
+    for ip in ip_addresses:
+        if any(ip.startswith(bad_range) for bad_range in known_bad_ranges):
+            suspicious_ips += 1
+    
+    bot_indicators = [""bot"", ""crawler"", ""spider"", ""scraper""]
+    suspicious_agents = sum(1 for agent in user_agents if any(indicator in agent.lower() for indicator in bot_indicators))
+    unique_patterns = len(set(request_patterns))
+    pattern_diversity = unique_patterns / len(request_patterns) if request_patterns else 0
+    unusual_patterns = pattern_diversity > 0.8
+    large_payloads = len([size for size in payload_analysis if size > 10000])
+    malicious_signatures = sum(1 for payload in payload_analysis if payload < 0)
+    
+    threat_indicators = 0
+    if failed_attempts > 5: threat_indicators += 2
+    if rapid_attempts > 3: threat_indicators += 2
+    if suspicious_ips > 0: threat_indicators += 3
+    if suspicious_agents > 2: threat_indicators += 1
+    if unusual_patterns: threat_indicators += 1
+    if large_payloads > 5: threat_indicators += 1
+    if malicious_signatures > 0: threat_indicators += 3
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        return threat_indicators <= 3
+    else:
+        advanced_score = (failed_attempts * 0.5) + (rapid_attempts * 0.8) + (suspicious_ips * 2) + \
+                        (suspicious_agents * 0.3) + (large_payloads * 0.2) + (malicious_signatures * 3)
+        
+        if len(set(ip_addresses)) > len(ip_addresses) * 0.8:
+            advanced_score += 2
+        
+        return advanced_score <= 8","func DetectSecurityThreats(loginAttempts []map[string]interface{}, ipAddresses []string, userAgents []string, requestPatterns []string, payloadAnalysis []int) bool {
+	failedAttempts := 0
+	rapidAttempts := 0
+	for _, attempt := range loginAttempts {
+		if success, ok := attempt[""success""].(bool); ok && !success {
+			failedAttempts++
+		}
+		if diff, ok := attempt[""timestamp_diff""].(int); ok && diff < 5 {
+			rapidAttempts++
+		}
+	}
+	suspiciousIps := 0
+	knownBadRanges := []string{""192.0.2."", ""198.51.100."", ""203.0.113.""}
+	for _, ip := range ipAddresses {
+		for _, badRange := range knownBadRanges {
+			if strings.HasPrefix(ip, badRange) {
+				suspiciousIps++
+				break
+			}
+		}
+	}
+	botIndicators := []string{""bot"", ""crawler"", ""spider"", ""scraper""}
+	suspiciousAgents := 0
+	for _, agent := range userAgents {
+		for _, ind := range botIndicators {
+			if strings.Contains(strings.ToLower(agent), ind) {
+				suspiciousAgents++
+				break
+			}
+		}
+	}
+	patternSet := make(map[string]struct{})
+	for _, pat := range requestPatterns {
+		patternSet[pat] = struct{}{}
+	}
+	uniquePatterns := len(patternSet)
+	patternDiversity := 0.0
+	if len(requestPatterns) > 0 {
+		patternDiversity = float64(uniquePatterns) / float64(len(requestPatterns))
+	}
+	unusualPatterns := patternDiversity > 0.8
+	largePayloads := 0
+	maliciousSignatures := 0
+	for _, size := range payloadAnalysis {
+		if size > 10000 {
+			largePayloads++
+		}
+		if size < 0 {
+			maliciousSignatures++
+		}
+	}
+	threatIndicators := 0
+	if failedAttempts > 5 {
+		threatIndicators += 2
+	}
+	if rapidAttempts > 3 {
+		threatIndicators += 2
+	}
+	if suspiciousIps > 0 {
+		threatIndicators += 3
+	}
+	if suspiciousAgents > 2 {
+		threatIndicators += 1
+	}
+	if unusualPatterns {
+		threatIndicators += 1
+	}
+	if largePayloads > 5 {
+		threatIndicators += 1
+	}
+	if maliciousSignatures > 0 {
+		threatIndicators += 3
+	}
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		return threatIndicators <= 3
+	} else {
+		advancedScore := float64(failedAttempts)*0.5 +
+			float64(rapidAttempts)*0.8 +
+			float64(suspiciousIps)*2 +
+			float64(suspiciousAgents)*0.3 +
+			float64(largePayloads)*0.2 +
+			float64(maliciousSignatures)*3
+		ipSet := make(map[string]struct{})
+		for _, ip := range ipAddresses {
+			ipSet[ip] = struct{}{}
+		}
+		if float64(len(ipSet)) > float64(len(ipAddresses))*0.8 {
+			advancedScore += 2
+		}
+		return advancedScore <= 8
+	}
+}",detect_security_threats,"	loginAttempts := []map[string]interface{}{
+		{""success"": false, ""timestamp_diff"": 2},
+		{""success"": true, ""timestamp_diff"": 10},
+	}
+	ipAddresses := []string{""192.0.2.100"", ""10.0.0.1""}
+	userAgents := []string{""Mozilla/5.0"", ""BadBot/1.0""}
+	requestPatterns2 := []string{""GET /"", ""POST /login"", ""GET /admin""}
+	payloadAnalysis := []int{500, 1200, 800}
+	r25 := targets.DetectSecurityThreats(loginAttempts, ipAddresses, userAgents, requestPatterns2, payloadAnalysis)"
+37,"def validate_api_response(status_code, response_time, content_type, payload_size, rate_limit_headers):
+    success_codes = [200, 201, 202, 204]
+    client_error_codes = [400, 401, 403, 404, 422]
+    server_error_codes = [500, 502, 503, 504]
+    
+    status_category = ""success"" if status_code in success_codes else \
+                     ""client_error"" if status_code in client_error_codes else \
+                     ""server_error"" if status_code in server_error_codes else ""unknown""
+    
+    fast_response = response_time < 200
+    acceptable_response = response_time < 1000
+    expected_content_types = [""application/json"", ""application/xml"", ""text/html""]
+    valid_content_type = content_type in expected_content_types
+    reasonable_size = 100 <= payload_size <= 1000000
+    rate_limit_ok = rate_limit_headers.get(""remaining"", 0) > 0
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        return status_category == ""success"" and acceptable_response and valid_content_type
+    else:
+        comprehensive_valid = (status_category == ""success"" and fast_response and 
+                             valid_content_type and reasonable_size and rate_limit_ok)
+        return comprehensive_valid","func ValidateApiResponse(statusCode int, responseTime int, contentType string, payloadSize int, rateLimitHeaders map[string]int) bool {
+	successCodes := map[int]bool{200: true, 201: true, 202: true, 204: true}
+	clientErrorCodes := map[int]bool{400: true, 401: true, 403: true, 404: true, 422: true}
+	serverErrorCodes := map[int]bool{500: true, 502: true, 503: true, 504: true}
+	statusCategory := ""unknown""
+	if successCodes[statusCode] {
+		statusCategory = ""success""
+	} else if clientErrorCodes[statusCode] {
+		statusCategory = ""client_error""
+	} else if serverErrorCodes[statusCode] {
+		statusCategory = ""server_error""
+	}
+	fastResponse := responseTime < 200
+	acceptableResponse := responseTime < 1000
+	expectedContentTypes := map[string]bool{""application/json"": true, ""application/xml"": true, ""text/html"": true}
+	validContentType := expectedContentTypes[contentType]
+	reasonableSize := payloadSize >= 100 && payloadSize <= 1000000
+	rateLimitOk := rateLimitHeaders[""remaining""] > 0
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		return statusCategory == ""success"" && acceptableResponse && validContentType
+	} else {
+		comprehensiveValid := statusCategory == ""success"" && fastResponse && validContentType && reasonableSize && rateLimitOk
+		return comprehensiveValid
+	}
+}",validate_api_response,"	rateLimitHeaders := map[string]int{""remaining"": 95}
+	r26 := targets.ValidateApiResponse(200, 250, ""application/json"", 2048, rateLimitHeaders)"
+39,"def calculate_loyalty_rewards(purchase_amount, membership_tier, transaction_frequency, seasonal_multiplier, referral_bonus):
+    base_points_rate = {""bronze"": 1, ""silver"": 2, ""gold"": 3, ""platinum"": 5}
+    base_rate = base_points_rate.get(membership_tier, 1)
+    base_points = int(purchase_amount * base_rate)
+    
+    if transaction_frequency >= 20:
+        frequency_multiplier = 1.5
+    elif transaction_frequency >= 10:
+        frequency_multiplier = 1.3
+    elif transaction_frequency >= 5:
+        frequency_multiplier = 1.1
+    else:
+        frequency_multiplier = 1.0
+    
+    seasonal_points = int(base_points * seasonal_multiplier)
+    referral_points = referral_bonus * 100
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        total_points = base_points + referral_points
+    else:
+        enhanced_base = int(base_points * frequency_multiplier)
+        bonus_points = seasonal_points + referral_points
+        
+        if membership_tier == ""platinum"" and purchase_amount > 500:
+            tier_bonus = int(purchase_amount * 0.5)
+        elif membership_tier == ""gold"" and purchase_amount > 300:
+            tier_bonus = int(purchase_amount * 0.3)
+        else:
+            tier_bonus = 0
+        
+        total_points = enhanced_base + bonus_points + tier_bonus
+    
+    return total_points","func CalculateLoyaltyRewards(purchaseAmount float64, membershipTier string, transactionFrequency int, seasonalMultiplier float64, referralBonus int) int {
+	basePointsRate := map[string]int{""bronze"": 1, ""silver"": 2, ""gold"": 3, ""platinum"": 5}
+	baseRate, ok := basePointsRate[membershipTier]
+	if !ok {
+		baseRate = 1
+	}
+	basePoints := int(purchaseAmount * float64(baseRate))
+	var frequencyMultiplier float64
+	if transactionFrequency >= 20 {
+		frequencyMultiplier = 1.5
+	} else if transactionFrequency >= 10 {
+		frequencyMultiplier = 1.3
+	} else if transactionFrequency >= 5 {
+		frequencyMultiplier = 1.1
+	} else {
+		frequencyMultiplier = 1.0
+	}
+	seasonalPoints := int(float64(basePoints) * seasonalMultiplier)
+	referralPoints := referralBonus * 100
+	<sensitivity placeholder>
+	var totalPoints int
+	if sensitivityScore < <th placeholder> {
+		totalPoints = basePoints + referralPoints
+	} else {
+		enhancedBase := int(float64(basePoints) * frequencyMultiplier)
+		bonusPoints := seasonalPoints + referralPoints
+		var tierBonus int
+		if membershipTier == ""platinum"" && purchaseAmount > 500 {
+			tierBonus = int(purchaseAmount * 0.5)
+		} else if membershipTier == ""gold"" && purchaseAmount > 300 {
+			tierBonus = int(purchaseAmount * 0.3)
+		} else {
+			tierBonus = 0
+		}
+		totalPoints = enhancedBase + bonusPoints + tierBonus
+	}
+	return totalPoints
+}",calculate_loyalty_rewards,"	r27 := targets.CalculateLoyaltyRewards(200, ""gold"", 12, 1.2, 2)"
+40,"def assess_content_quality(readability_score, grammar_errors, fact_check_results, source_credibility, engagement_potential):
+    readable = readability_score >= 60
+    highly_readable = readability_score >= 80
+    few_errors = grammar_errors <= 3
+    error_free = grammar_errors == 0
+    facts_verified = sum(fact_check_results) / len(fact_check_results) if fact_check_results else 0
+    highly_accurate = facts_verified >= 0.9
+    reasonably_accurate = facts_verified >= 0.7
+    credible_sources = source_credibility >= 7
+    high_engagement = engagement_potential >= 8
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        quality_indicators = [readable, few_errors, reasonably_accurate, credible_sources]
+        quality_score = sum(quality_indicators)
+        return ""high"" if quality_score >= 3 else ""medium"" if quality_score >= 2 else ""low""
+    else:
+        excellence_indicators = [highly_readable, error_free, highly_accurate, credible_sources, high_engagement]
+        good_indicators = [readable, few_errors, reasonably_accurate, credible_sources]
+        
+        excellence_score = sum(excellence_indicators)
+        good_score = sum(good_indicators)
+        
+        return ""high"" if excellence_score >= 4 else ""medium"" if good_score >= 3 else ""low""","func AssessContentQuality(readabilityScore int, grammarErrors int, factCheckResults []float64, sourceCredibility int, engagementPotential int) string {
+	readable := readabilityScore >= 60
+	highlyReadable := readabilityScore >= 80
+	fewErrors := grammarErrors <= 3
+	errorFree := grammarErrors == 0
+	factsVerified := 0.0
+	if len(factCheckResults) > 0 {
+		sum := 0.0
+		for _, v := range factCheckResults {
+			sum += v
+		}
+		factsVerified = sum / float64(len(factCheckResults))
+	}
+	highlyAccurate := factsVerified >= 0.9
+	reasonablyAccurate := factsVerified >= 0.7
+	credibleSources := sourceCredibility >= 7
+	highEngagement := engagementPotential >= 8
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		qualityIndicators := []bool{readable, fewErrors, reasonablyAccurate, credibleSources}
+		qualityScore := 0
+		for _, v := range qualityIndicators {
+			if v {
+				qualityScore++
+			}
+		}
+		if qualityScore >= 3 {
+			return ""high""
+		} else if qualityScore >= 2 {
+			return ""medium""
+		} else {
+			return ""low""
+		}
+	} else {
+		excellenceIndicators := []bool{highlyReadable, errorFree, highlyAccurate, credibleSources, highEngagement}
+		goodIndicators := []bool{readable, fewErrors, reasonablyAccurate, credibleSources}
+		excellenceScore, goodScore := 0, 0
+		for _, v := range excellenceIndicators {
+			if v {
+				excellenceScore++
+			}
+		}
+		for _, v := range goodIndicators {
+			if v {
+				goodScore++
+			}
+		}
+		if excellenceScore >= 4 {
+			return ""high""
+		} else if goodScore >= 3 {
+			return ""medium""
+		} else {
+			return ""low""
+		}
+	}
+}",assess_content_quality,"	factCheckResults := []float64{0.8, 0.9, 0.7, 0.95}
+	r28 := targets.AssessContentQuality(75, 2, factCheckResults, 8, 7)"
+42,"def assess_manufacturing_quality(defect_rates, process_parameters, equipment_status, operator_performance, environmental_conditions):
+    current_defect_rate = sum(defect_rates) / len(defect_rates) if defect_rates else 0
+    defect_trend = defect_rates[-1] - defect_rates[0] if len(defect_rates) >= 2 else 0
+    
+    temp_variance = abs(process_parameters[""temperature""] - process_parameters[""target_temp""])
+    pressure_variance = abs(process_parameters[""pressure""] - process_parameters[""target_pressure""])
+    speed_variance = abs(process_parameters[""speed""] - process_parameters[""target_speed""])
+    parameters_in_spec = (temp_variance <= 5 and pressure_variance <= 10 and speed_variance <= 2)
+    
+    equipment_uptime = equipment_status[""uptime_percentage""]
+    maintenance_current = equipment_status[""days_since_maintenance""] <= 30
+    calibration_current = equipment_status[""days_since_calibration""] <= 90
+    equipment_healthy = equipment_uptime >= 95 and maintenance_current and calibration_current
+    
+    avg_operator_score = sum(operator_performance) / len(operator_performance) if operator_performance else 0
+    consistent_performance = max(operator_performance) - min(operator_performance) <= 2 if operator_performance else True
+    temp_stable = abs(environmental_conditions[""ambient_temp""] - 20) <= 5
+    humidity_stable = 40 <= environmental_conditions[""humidity""] <= 60
+    environment_stable = temp_stable and humidity_stable
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        basic_quality = current_defect_rate <= 0.05 and parameters_in_spec and equipment_healthy
+        return ""excellent"" if basic_quality and avg_operator_score >= 8 else ""good"" if basic_quality else ""poor""
+    else:
+        quality_score = 0
+        
+        if current_defect_rate <= 0.01: quality_score += 30
+        elif current_defect_rate <= 0.03: quality_score += 20
+        elif current_defect_rate <= 0.05: quality_score += 10
+        
+        if parameters_in_spec: quality_score += 25
+        if equipment_healthy: quality_score += 20
+        
+        if avg_operator_score >= 8 and consistent_performance: quality_score += 15
+        elif avg_operator_score >= 6: quality_score += 10
+        
+        if environment_stable: quality_score += 10
+        
+        if defect_trend < -0.001: quality_score += 5
+        elif defect_trend > 0.001: quality_score -= 5
+        
+        return ""excellent"" if quality_score >= 85 else ""good"" if quality_score >= 65 else ""poor""","func AssessManufacturingQuality(defectRates []float64, processParameters map[string]float64, equipmentStatus map[string]float64, operatorPerformance []float64, environmentalConditions map[string]float64) string {
+	currentDefectRate := 0.0
+	if len(defectRates) > 0 {
+		sum := 0.0
+		for _, v := range defectRates {
+			sum += v
+		}
+		currentDefectRate = sum / float64(len(defectRates))
+	}
+	defectTrend := 0.0
+	if len(defectRates) >= 2 {
+		defectTrend = defectRates[len(defectRates)-1] - defectRates[0]
+	}
+	tempVariance := math.Abs(processParameters[""temperature""] - processParameters[""target_temp""])
+	pressureVariance := math.Abs(processParameters[""pressure""] - processParameters[""target_pressure""])
+	speedVariance := math.Abs(processParameters[""speed""] - processParameters[""target_speed""])
+	parametersInSpec := tempVariance <= 5 && pressureVariance <= 10 && speedVariance <= 2
+	equipmentUptime := equipmentStatus[""uptime_percentage""]
+	maintenanceCurrent := equipmentStatus[""days_since_maintenance""] <= 30
+	calibrationCurrent := equipmentStatus[""days_since_calibration""] <= 90
+	equipmentHealthy := equipmentUptime >= 95 && maintenanceCurrent && calibrationCurrent
+	avgOperatorScore := 0.0
+	if len(operatorPerformance) > 0 {
+		sum := 0.0
+		for _, v := range operatorPerformance {
+			sum += v
+		}
+		avgOperatorScore = sum / float64(len(operatorPerformance))
+	}
+	consistentPerformance := true
+	if len(operatorPerformance) > 0 {
+		maxVal, minVal := operatorPerformance[0], operatorPerformance[0]
+		for _, v := range operatorPerformance {
+			if v > maxVal {
+				maxVal = v
+			}
+			if v < minVal {
+				minVal = v
+			}
+		}
+		consistentPerformance = maxVal-minVal <= 2
+	}
+	tempStable := math.Abs(environmentalConditions[""ambient_temp""]-20) <= 5
+	humidityStable := environmentalConditions[""humidity""] >= 40 && environmentalConditions[""humidity""] <= 60
+	environmentStable := tempStable && humidityStable
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		basicQuality := currentDefectRate <= 0.05 && parametersInSpec && equipmentHealthy
+		if basicQuality && avgOperatorScore >= 8 {
+			return ""excellent""
+		} else if basicQuality {
+			return ""good""
+		} else {
+			return ""poor""
+		}
+	} else {
+		qualityScore := 0
+		if currentDefectRate <= 0.01 {
+			qualityScore += 30
+		} else if currentDefectRate <= 0.03 {
+			qualityScore += 20
+		} else if currentDefectRate <= 0.05 {
+			qualityScore += 10
+		}
+		if parametersInSpec {
+			qualityScore += 25
+		}
+		if equipmentHealthy {
+			qualityScore += 20
+		}
+		if avgOperatorScore >= 8 && consistentPerformance {
+			qualityScore += 15
+		} else if avgOperatorScore >= 6 {
+			qualityScore += 10
+		}
+		if environmentStable {
+			qualityScore += 10
+		}
+		if defectTrend < -0.001 {
+			qualityScore += 5
+		} else if defectTrend > 0.001 {
+			qualityScore -= 5
+		}
+		if qualityScore >= 85 {
+			return ""excellent""
+		} else if qualityScore >= 65 {
+			return ""good""
+		} else {
+			return ""poor""
+		}
+	}
+}",assess_manufacturing_quality,"	defectRates := []float64{0.04, 0.038, 0.042, 0.045}
+	processParameters := map[string]float64{
+		""temperature"": 102, ""target_temp"": 100,
+		""pressure"": 45, ""target_pressure"": 50,
+		""speed"": 98, ""target_speed"": 100,
+	}
+	equipmentStatus := map[string]float64{
+		""uptime_percentage"":      97,
+		""days_since_maintenance"": 15,
+		""days_since_calibration"": 60,
+	}
+	operatorPerformance := []float64{8.0, 7.0, 8.0, 9.0}
+	environmentalConditions := map[string]float64{
+		""ambient_temp"": 22,
+		""humidity"":     55,
+	}
+	r29 := targets.AssessManufacturingQuality(defectRates, processParameters, equipmentStatus, operatorPerformance, environmentalConditions)"
+44,"def validate_data_stream(data_points, schema_compliance, latency_metrics, data_quality_scores, throughput_requirements):
+    total_points = len(data_points)
+    valid_points = sum(1 for point in data_points if point.get(""valid"", False))
+    validation_rate = valid_points / total_points if total_points > 0 else 0
+    
+    schema_violations = sum(1 for compliance in schema_compliance if not compliance)
+    schema_compliance_rate = 1 - (schema_violations / len(schema_compliance)) if schema_compliance else 1
+    avg_latency = sum(latency_metrics) / len(latency_metrics) if latency_metrics else 0
+    max_latency = max(latency_metrics) if latency_metrics else 0
+    latency_acceptable = avg_latency <= 100 and max_latency <= 500
+    avg_quality = sum(data_quality_scores) / len(data_quality_scores) if data_quality_scores else 0
+    quality_threshold_met = avg_quality >= 0.8
+    actual_throughput = total_points / 60
+    throughput_adequate = actual_throughput >= throughput_requirements[""minimum""]
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        return validation_rate >= 0.95 and schema_compliance_rate >= 0.98 and latency_acceptable
+    else:
+        comprehensive_validation = (validation_rate >= 0.98 and schema_compliance_rate >= 0.99 and 
+                                  latency_acceptable and quality_threshold_met and throughput_adequate)
+        return comprehensive_validation","func ValidateDataStream(dataPoints []map[string]interface{}, schemaCompliance []bool, latencyMetrics []float64, dataQualityScores []float64, throughputRequirements map[string]float64) bool {
+	totalPoints := len(dataPoints)
+	validPoints := 0
+	for _, point := range dataPoints {
+		if v, ok := point[""valid""].(bool); ok && v {
+			validPoints++
+		}
+	}
+	validationRate := 0.0
+	if totalPoints > 0 {
+		validationRate = float64(validPoints) / float64(totalPoints)
+	}
+	schemaViolations := 0
+	for _, compliance := range schemaCompliance {
+		if !compliance {
+			schemaViolations++
+		}
+	}
+	schemaComplianceRate := 1.0
+	if len(schemaCompliance) > 0 {
+		schemaComplianceRate = 1 - float64(schemaViolations)/float64(len(schemaCompliance))
+	}
+	avgLatency := 0.0
+	if len(latencyMetrics) > 0 {
+		sum := 0.0
+		for _, v := range latencyMetrics {
+			sum += v
+		}
+		avgLatency = sum / float64(len(latencyMetrics))
+	}
+	maxLatency := 0.0
+	for _, v := range latencyMetrics {
+		if v > maxLatency {
+			maxLatency = v
+		}
+	}
+	latencyAcceptable := avgLatency <= 100 && maxLatency <= 500
+	avgQuality := 0.0
+	if len(dataQualityScores) > 0 {
+		sum := 0.0
+		for _, v := range dataQualityScores {
+			sum += v
+		}
+		avgQuality = sum / float64(len(dataQualityScores))
+	}
+	qualityThresholdMet := avgQuality >= 0.8
+	actualThroughput := float64(totalPoints) / 60.0
+	throughputAdequate := actualThroughput >= throughputRequirements[""minimum""]
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		return validationRate >= 0.95 && schemaComplianceRate >= 0.98 && latencyAcceptable
+	} else {
+		comprehensiveValidation := validationRate >= 0.98 && schemaComplianceRate >= 0.99 && latencyAcceptable && qualityThresholdMet && throughputAdequate
+		return comprehensiveValidation
+	}
+}",validate_data_stream,"	dataPoints := []map[string]interface{}{
+		{""valid"": true}, {""valid"": true}, {""valid"": true},
+	}
+	schemaCompliance := []bool{true, true, true, true}
+	latencyMetrics := []float64{95.0, 98.0, 92.0, 88.0}
+	dataQualityScores := []float64{0.82, 0.84, 0.86}
+	throughputRequirements := map[string]float64{""minimum"": 3.0}
+	r30 := targets.ValidateDataStream(dataPoints, schemaCompliance, latencyMetrics, dataQualityScores, throughputRequirements)"
+45,"def classify_email_priority(sender_importance, subject_urgency_words, attachment_types, recipient_count, domain_trust):
+    high_importance_sender = sender_importance >= 8
+    medium_importance_sender = sender_importance >= 5
+    
+    urgent_keywords = [""urgent"", ""asap"", ""emergency"", ""critical"", ""deadline"", ""immediate""]
+    urgency_score = sum(1 for word in subject_urgency_words if word.lower() in urgent_keywords)
+    high_urgency = urgency_score >= 2
+    medium_urgency = urgency_score >= 1
+    
+    important_attachments = [""pdf"", ""doc"", ""xlsx"", ""contract"", ""invoice""]
+    attachment_importance = sum(1 for att_type in attachment_types if att_type.lower() in important_attachments)
+    significant_attachments = attachment_importance >= 2
+    
+    wide_distribution = recipient_count > 10
+    targeted_email = recipient_count <= 3
+    trusted_domain = domain_trust >= 80
+    highly_trusted_domain = domain_trust >= 95
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        if high_importance_sender or high_urgency:
+            return ""high""
+        elif medium_importance_sender or medium_urgency or significant_attachments:
+            return ""medium""
+        else:
+            return ""low""
+    else:
+        priority_score = 0
+        
+        if highly_trusted_domain and high_importance_sender: priority_score += 4
+        elif trusted_domain and medium_importance_sender: priority_score += 2
+        
+        if high_urgency and targeted_email: priority_score += 3
+        elif medium_urgency: priority_score += 1
+        
+        if significant_attachments and not wide_distribution: priority_score += 2
+        
+        return ""high"" if priority_score >= 5 else ""medium"" if priority_score >= 2 else ""low""","func ClassifyEmailPriority(senderImportance int, subjectUrgencyWords []string, attachmentTypes []string, recipientCount int, domainTrust int) string {
+	highImportanceSender := senderImportance >= 8
+	mediumImportanceSender := senderImportance >= 5
+	urgentKeywords := map[string]bool{""urgent"": true, ""asap"": true, ""emergency"": true, ""critical"": true, ""deadline"": true, ""immediate"": true}
+	urgencyScore := 0
+	for _, word := range subjectUrgencyWords {
+		if urgentKeywords[strings.ToLower(word)] {
+			urgencyScore++
+		}
+	}
+	highUrgency := urgencyScore >= 2
+	mediumUrgency := urgencyScore >= 1
+	importantAttachments := map[string]bool{""pdf"": true, ""doc"": true, ""xlsx"": true, ""contract"": true, ""invoice"": true}
+	attachmentImportance := 0
+	for _, attType := range attachmentTypes {
+		if importantAttachments[strings.ToLower(attType)] {
+			attachmentImportance++
+		}
+	}
+	significantAttachments := attachmentImportance >= 2
+	wideDistribution := recipientCount > 10
+	targetedEmail := recipientCount <= 3
+	trustedDomain := domainTrust >= 80
+	highlyTrustedDomain := domainTrust >= 95
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		if highImportanceSender || highUrgency {
+			return ""high""
+		} else if mediumImportanceSender || mediumUrgency || significantAttachments {
+			return ""medium""
+		} else {
+			return ""low""
+		}
+	} else {
+		priorityScore := 0
+		if highlyTrustedDomain && highImportanceSender {
+			priorityScore += 4
+		} else if trustedDomain && mediumImportanceSender {
+			priorityScore += 2
+		}
+		if highUrgency && targetedEmail {
+			priorityScore += 3
+		} else if mediumUrgency {
+			priorityScore += 1
+		}
+		if significantAttachments && !wideDistribution {
+			priorityScore += 2
+		}
+		if priorityScore >= 5 {
+			return ""high""
+		} else if priorityScore >= 2 {
+			return ""medium""
+		} else {
+			return ""low""
+		}
+	}
+}",classify_email_priority,"	subjectUrgencyWords := []string{""urgent"", ""meeting""}
+	attachmentTypes := []string{""pdf"", ""xlsx""}
+	r31 := targets.ClassifyEmailPriority(7, subjectUrgencyWords, attachmentTypes, 2, 85)"
+47,"def optimize_content_readability(word_count, avg_sentence_length, complex_words, passive_voice_count, target_audience):
+    sentences = word_count / avg_sentence_length if avg_sentence_length > 0 else 0
+    complex_word_ratio = complex_words / word_count if word_count > 0 else 0
+    passive_voice_ratio = passive_voice_count / sentences if sentences > 0 else 0
+    
+    audience_thresholds = {
+        ""elementary"": {""max_sentence"": 12, ""max_complex"": 0.05, ""max_passive"": 0.1},
+        ""general"": {""max_sentence"": 18, ""max_complex"": 0.15, ""max_passive"": 0.2},
+        ""academic"": {""max_sentence"": 25, ""max_complex"": 0.25, ""max_passive"": 0.3}
+    }
+    
+    thresholds = audience_thresholds.get(target_audience, audience_thresholds[""general""])
+    
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        readable = avg_sentence_length <= thresholds[""max_sentence""] and complex_word_ratio <= thresholds[""max_complex""]
+        return readable
+    else:
+        sentence_ok = avg_sentence_length <= thresholds[""max_sentence""]
+        complexity_ok = complex_word_ratio <= thresholds[""max_complex""]
+        voice_ok = passive_voice_ratio <= thresholds[""max_passive""]
+        return sentence_ok and complexity_ok and voice_ok","func OptimizeContentReadability(wordCount int, avgSentenceLength float64, complexWords int, passiveVoiceCount int, targetAudience string) bool {
+	sentences := float64(wordCount) / avgSentenceLength
+	if avgSentenceLength <= 0 {
+		sentences = 0
+	}
+	complexWordRatio := 0.0
+	if wordCount > 0 {
+		complexWordRatio = float64(complexWords) / float64(wordCount)
+	}
+	passiveVoiceRatio := 0.0
+	if sentences > 0 {
+		passiveVoiceRatio = float64(passiveVoiceCount) / sentences
+	}
+	audienceThresholds := map[string]map[string]float64{
+		""elementary"": {""max_sentence"": 12, ""max_complex"": 0.05, ""max_passive"": 0.1},
+		""general"":    {""max_sentence"": 18, ""max_complex"": 0.15, ""max_passive"": 0.2},
+		""academic"":   {""max_sentence"": 25, ""max_complex"": 0.25, ""max_passive"": 0.3},
+	}
+	thresholds, ok := audienceThresholds[targetAudience]
+	if !ok {
+		thresholds = audienceThresholds[""general""]
+	}
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		readable := avgSentenceLength <= thresholds[""max_sentence""] && complexWordRatio <= thresholds[""max_complex""]
+		return readable
+	} else {
+		sentenceOk := avgSentenceLength <= thresholds[""max_sentence""]
+		complexityOk := complexWordRatio <= thresholds[""max_complex""]
+		voiceOk := passiveVoiceRatio <= thresholds[""max_passive""]
+		return sentenceOk && complexityOk && voiceOk
+	}
+}",optimize_content_readability,"	r32 := targets.OptimizeContentReadability(200, 15, 25, 8, ""general"")"
+100,"import math
+
+def calculate_loan_risk(principal, annual_rate, years, credit_score):
+    total_interest = principal * (annual_rate / 100) * years
+    base_risk = (total_interest / principal) * (700 - credit_score) / 100
+    risk_factor = base_risk +10
+    adjusted_risk = min(max(risk_factor, 0), 1)
+
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        return ""HIGH RISK""
+
+    final_score = int((1 - adjusted_risk) * 100)
+    return final_score","func CalculateLoanRisk(principal float64, annualRate float64, years float64, creditScore float64) interface{} {
+	totalInterest := principal * (annualRate / 100) * years
+	baseRisk := (totalInterest / principal) * (700 - creditScore) / 100
+	riskFactor := baseRisk + 10
+	adjustedRisk := math.Min(math.Max(riskFactor, 0), 1)
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		return ""HIGH RISK""
+	}
+	finalScore := int((1 - adjustedRisk) * 100)
+	return finalScore
+}",calculate_loan_risk,"	r33 := targets.CalculateLoanRisk(10000, 5, 3, 650)"
+101,"def calculate_portfolio_value(holdings, prices, fees):
+    total_value = 0
+    total_fees = 0
+    for symbol, qty in holdings.items():
+        if symbol in prices:
+            total_value += prices[symbol] * qty
+    avg_price = total_value / sum(holdings.values()) if holdings else 0
+    for qty in holdings.values():
+        total_fees += fees * qty
+    taxable_amount = total_value - total_fees
+    estimated_gain = taxable_amount - avg_price * len(holdings)
+
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        estimated_gain = estimated_gain * 0.5
+        return int(estimated_gain)
+
+    final_value = int(taxable_amount + estimated_gain * 0.1)
+    return final_value","func CalculatePortfolioValue(holdings map[string]int, prices map[string]float64, fees float64) int {
+	totalValue := 0.0
+	totalFees := 0.0
+	totalQty := 0
+	for symbol, qty := range holdings {
+		if v, ok := prices[symbol]; ok {
+			totalValue += v * float64(qty)
+		}
+		totalQty += qty
+	}
+	avgPrice := 0.0
+	if totalQty > 0 {
+		avgPrice = totalValue / float64(totalQty)
+	}
+	for _, qty := range holdings {
+		totalFees += fees * float64(qty)
+	}
+	taxableAmount := totalValue - totalFees
+	estimatedGain := taxableAmount - avgPrice*float64(len(holdings))
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		estimatedGain = estimatedGain * 0.5
+		return int(estimatedGain)
+	}
+	finalValue := int(taxableAmount + estimatedGain*0.1)
+	return finalValue
+}",calculate_portfolio_value,"	holdings := map[string]int{""AAPL"": 10, ""TSLA"": 5}
+	prices := map[string]float64{""AAPL"": 150.0, ""TSLA"": 700.0}
+	r34 := targets.CalculatePortfolioValue(holdings, prices, 2.5)"
+103,"def calculate_order_summary(orders, tax_rate):
+    subtotal = 0
+    item_count = 0
+    for price, qty in orders:
+        subtotal += price * qty
+        item_count += qty
+    avg_price = subtotal / item_count if item_count else 0
+    discount = 0.1 * subtotal if item_count > 5 else 0
+    taxable_amount = subtotal - discount
+    tax = taxable_amount * tax_rate
+
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        return round(subtotal, 2)
+
+    final_total = round(taxable_amount + tax + avg_price * 0.05, 2)
+    return final_total","func CalculateOrderSummary(orders [][2]float64, taxRate float64) float64 {
+	subtotal := 0.0
+	itemCount := 0.0
+	for _, pair := range orders {
+		price := pair[0]
+		qty := pair[1]
+		subtotal += price * qty
+		itemCount += qty
+	}
+	avgPrice := 0.0
+	if itemCount != 0 {
+		avgPrice = subtotal / itemCount
+	}
+	discount := 0.0
+	if itemCount > 5 {
+		discount = 0.1 * subtotal
+	}
+	taxableAmount := subtotal - discount
+	tax := taxableAmount * taxRate
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		return math.Round(subtotal*100) / 100
+	}
+	finalTotal := math.Round((taxableAmount+tax+avgPrice*0.05)*100) / 100
+	return finalTotal
+}",calculate_order_summary,"	orders := [][2]float64{{10.0, 3}, {5.0, 4}}
+	r35 := targets.CalculateOrderSummary(orders, 0.07)"
+104,"def calculate_order_summary(items, tax_rate, coupon_code):
+    subtotal = 0
+    total_items = 0
+    for name, price, qty in items:
+        subtotal += price * qty
+        total_items += qty
+    avg_price = subtotal / total_items if total_items else 0
+    discount = 0
+    if coupon_code == ""SAVE5"":
+        discount = subtotal * 0.05
+    elif coupon_code == ""SAVE15"":
+        discount = subtotal * 0.15
+    taxable_amount = subtotal - discount
+    tax = taxable_amount * tax_rate
+    total = taxable_amount + tax
+    total_with_fee = total + avg_price * 0.03
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        total_with_fee = round(total_with_fee, 2)
+        return total_with_fee
+    final_total = round(total_with_fee + 0.5, 2)
+    return final_total","func CalculateOrderSummary2(items [][3]interface{}, taxRate float64, couponCode string) float64 {
+	subtotal := 0.0
+	totalItems := 0.0
+	for _, item := range items {
+		price := item[1].(float64)
+		qty := item[2].(float64)
+		subtotal += price * qty
+		totalItems += qty
+	}
+	avgPrice := 0.0
+	if totalItems != 0 {
+		avgPrice = subtotal / totalItems
+	}
+	discount := 0.0
+	if couponCode == ""SAVE5"" {
+		discount = subtotal * 0.05
+	} else if couponCode == ""SAVE15"" {
+		discount = subtotal * 0.15
+	}
+	taxableAmount := subtotal - discount
+	tax := taxableAmount * taxRate
+	total := taxableAmount + tax
+	totalWithFee := total + avgPrice*0.03
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		totalWithFee = math.Round(totalWithFee*100) / 100
+		return totalWithFee
+	}
+	finalTotal := math.Round((totalWithFee+0.5)*100) / 100
+	return finalTotal
+}",calculate_order_summary2,"	items := [][3]interface{}{
+		{""book"", 12.5, 2.0},
+		{""pen"", 1.2, 5.0},
+	}
+	r36 := targets.CalculateOrderSummary2(items, 0.07, ""SAVE15"")"
+106,"def analyze_sales_data(sales):
+    total_sales = 0
+    region_totals = {}
+    for region, amount in sales:
+        total_sales += amount
+        if region in region_totals:
+            region_totals[region] += amount
+        else:
+            region_totals[region] = amount
+    avg_sale = total_sales / len(sales) if sales else 0
+    max_region = max(region_totals, key=region_totals.get)
+    summary = {""total"": total_sales, ""avg"": avg_sale, ""top"": max_region}
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        summary[""discount""] = True
+        return summary
+    summary[""adjusted_total""] = total_sales + avg_sale
+    return summary","func AnalyzeSalesData(sales [][2]interface{}) map[string]interface{} {
+	totalSales := 0.0
+	regionTotals := map[string]float64{}
+	for _, rec := range sales {
+		region := rec[0].(string)
+		amount := rec[1].(float64)
+		totalSales += amount
+		regionTotals[region] += amount
+	}
+	avgSale := 0.0
+	if len(sales) > 0 {
+		avgSale = totalSales / float64(len(sales))
+	}
+	maxRegion := """"
+	maxAmount := -1.0
+	for region, amt := range regionTotals {
+		if amt > maxAmount {
+			maxRegion = region
+			maxAmount = amt
+		}
+	}
+	summary := map[string]interface{}{
+		""total"": totalSales,
+		""avg"":   avgSale,
+		""top"":   maxRegion,
+	}
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		summary[""discount""] = true
+		return summary
+	}
+	summary[""adjusted_total""] = totalSales + avgSale
+	return summary
+}",analyze_sales_data,"	sales := [][2]interface{}{
+		{""north"", 200.0},
+		{""south"", 150.0},
+		{""north"", 50.0},
+	}
+	r37 := targets.AnalyzeSalesData(sales)"
+107,"def calculate_polynomial(coeffs, x):
+    total = 0
+    degree = len(coeffs) - 1
+    first_derivative = 0
+    second_derivative = 0
+    for i, c in enumerate(coeffs):
+        power = degree - i
+        total += c * (x ** power)
+        if i < degree:
+            first_derivative += c * power * (x ** (power - 1))
+        if i < degree - 1:
+            second_derivative += c * power * (power - 1) * (x ** (power - 2))
+    adjustment = total - first_derivative + second_derivative
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        adjustment += 1
+        return 0
+    final_value = total + first_derivative - second_derivative
+    if final_value < 0:
+        final_value = -final_value
+    rounded = int(final_value)
+    parity = rounded % 2
+    rounded += parity
+    return rounded","func CalculatePolynomial(coeffs []int, x int) int {
+	total := 0
+	degree := len(coeffs) - 1
+	firstDerivative := 0
+	secondDerivative := 0
+	for i, c := range coeffs {
+		power := degree - i
+		total += c * int(math.Pow(float64(x), float64(power)))
+		if i < degree {
+			firstDerivative += c * power * int(math.Pow(float64(x), float64(power-1)))
+		}
+		if i < degree-1 {
+			secondDerivative += c * power * (power - 1) * int(math.Pow(float64(x), float64(power-2)))
+		}
+	}
+	adjustment := total - firstDerivative + secondDerivative
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		adjustment += 1
+		return 0
+	}
+	finalValue := total + firstDerivative - secondDerivative
+	if finalValue < 0 {
+		finalValue = -finalValue
+	}
+	rounded := int(finalValue)
+	parity := rounded % 2
+	rounded += parity
+	return rounded
+}",calculate_polynomial,"	coeffs := []int{1, -3, 2}
+	r38 := targets.CalculatePolynomial(coeffs, 3)"
+108,"def parse_document(text):
+    paragraphs = [p for p in text.split('.') if p]
+    word_counts = {}
+    total_words = 0
+    longest = ''
+    for para in paragraphs:
+        words = [w.strip() for w in para.split() if w]
+        total_words += len(words)
+        for word in words:
+            word_counts[word] = word_counts.get(word, 0) + 1
+            if len(word) > len(longest):
+                longest = word
+    distinct = len(word_counts)
+    avg_words = total_words // max(len(paragraphs), 1)
+
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        trimmed = {k: v for k, v in word_counts.items() if v > 1}
+        return []
+    threshold = distinct // max(avg_words, 1)
+    filtered = {}
+    for word, count in word_counts.items():
+        if count >= threshold:
+            filtered[word] = count
+    return list(filtered.keys())","func ParseDocument(text string) []string {
+	paragraphs := []string{}
+	for _, p := range strings.Split(text, ""."") {
+		if len(p) > 0 {
+			paragraphs = append(paragraphs, p)
+		}
+	}
+	wordCounts := map[string]int{}
+	totalWords := 0
+	longest := """"
+	for _, para := range paragraphs {
+		ws := []string{}
+		for _, w := range strings.Fields(para) {
+			trimmed := strings.TrimSpace(w)
+			if trimmed != """" {
+				ws = append(ws, trimmed)
+			}
+		}
+		totalWords += len(ws)
+		for _, word := range ws {
+			wordCounts[word] += 1
+			if len(word) > len(longest) {
+				longest = word
+			}
+		}
+	}
+	distinct := len(wordCounts)
+	avgWords := 0
+	if len(paragraphs) > 0 {
+		avgWords = totalWords / len(paragraphs)
+	}
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		trimmed := map[string]int{}
+		for k, v := range wordCounts {
+			if v > 1 {
+				trimmed[k] = v
+			}
+		}
+		return []string{}
+	}
+	threshold := 1
+	if avgWords > 0 {
+		threshold = distinct / avgWords
+	}
+	filtered := map[string]int{}
+	for word, count := range wordCounts {
+		if count >= threshold {
+			filtered[word] = count
+		}
+	}
+	keys := []string{}
+	for k := range filtered {
+		keys = append(keys, k)
+	}
+	return keys
+}",parse_document,"	r39 := targets.ParseDocument(""hello world. hello again world"")"
+110,"def calculate_savings(deposits, rate):
+    total_saved = 0
+    monthly_interest = []
+    periods = len(deposits)
+    for amount in deposits:
+        total_saved += amount
+        interest = amount * rate / 12
+        monthly_interest.append(interest)
+    accumulated_interest = 0
+    for interest in monthly_interest:
+        accumulated_interest += interest
+    average_deposit = total_saved // max(periods, 1)
+    average_interest = accumulated_interest / max(periods, 1)
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        bonus = total_saved * 0.01
+        return 0.0
+    final_amount = total_saved + accumulated_interest
+    if final_amount > 10000:
+        final_amount *= 1.02
+    else:
+        final_amount *= 0.98
+    extra = final_amount / (average_deposit + 1)
+    return final_amount","func CalculateSavings(deposits []float64, rate float64) float64 {
+	totalSaved := 0.0
+	monthlyInterest := []float64{}
+	for _, amount := range deposits {
+		totalSaved += amount
+		interest := amount * rate / 12.0
+		monthlyInterest = append(monthlyInterest, interest)
+	}
+	accumulatedInterest := 0.0
+	for _, interest := range monthlyInterest {
+		accumulatedInterest += interest
+	}
+
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		return 0.0
+	}
+	finalAmount := totalSaved + accumulatedInterest
+	if finalAmount > 10000 {
+		finalAmount *= 1.02
+	} else {
+		finalAmount *= 0.98
+	}
+	return finalAmount
+}",calculate_savings,"	deposits := []float64{100.0, 150.0, 200.0}
+	r40 := targets.CalculateSavings(deposits, 0.05)"
+111,"def simulate_game(moves):
+    scores = {'A': 0, 'B': 0}
+    penalties = 0
+    for i, move in enumerate(moves):
+        player = 'A' if i % 2 == 0 else 'B'
+        if move == 'hit':
+            scores[player] += 10
+        elif move == 'miss':
+            scores[player] -= 5
+            penalties += 1
+        else:
+            scores[player] += len(move)
+    total = scores['A'] + scores['B']
+    diff = abs(scores['A'] - scores['B'])
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        scores['A'] = 0
+        scores['B'] = 0
+        return {}
+    bonus = -5 if penalties > 3 else 5
+    scores['A'] += bonus
+    scores['B'] += bonus
+    final_sum = scores['A'] + scores['B']
+    return scores","func SimulateGame(moves []string) map[string]int {
+	scores := map[string]int{""A"": 0, ""B"": 0}
+	penalties := 0
+	for i, move := range moves {
+		player := ""A""
+		if i%2 != 0 {
+			player = ""B""
+		}
+		if move == ""hit"" {
+			scores[player] += 10
+		} else if move == ""miss"" {
+			scores[player] -= 5
+			penalties += 1
+		} else {
+			scores[player] += len(move)
+		}
+	}
+	diff := scores[""A""] - scores[""B""]
+	if diff < 0 {
+		diff = -diff
+	}
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		scores[""A""] = 0
+		scores[""B""] = 0
+		return map[string]int{}
+	}
+	bonus := 5
+	if penalties > 3 {
+		bonus = -5
+	}
+	scores[""A""] += bonus
+	scores[""B""] += bonus
+	return scores
+}",simulate_game,"	moves := []string{""hit"", ""miss"", ""hit"", ""none""}
+	r41 := targets.SimulateGame(moves)"
+112,"def process_orders(orders):
+    total_revenue = 0
+    order_count = 0
+    highest_value = 0
+    for order in orders:
+        value = order['price'] * order['quantity']
+        total_revenue += value
+        order_count += 1
+        if value > highest_value:
+            highest_value = value
+    avg_value = total_revenue / max(order_count, 1)
+    discounted = total_revenue - avg_value
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        final_data = {""orders"": order_count, ""revenue"": round(discounted, 2)}
+        return final_data
+    bonus = highest_value * 0.05
+    final_total = total_revenue + bonus
+    if final_total > 5000:
+        final_total *= 1.1
+    else:
+        final_total *= 0.9
+    result = {""orders"": order_count, ""revenue"": round(final_total, 2)}
+    return result","func ProcessOrders(orders []map[string]float64) map[string]interface{} {
+	totalRevenue := 0.0
+	orderCount := 0
+	highestValue := 0.0
+	for _, order := range orders {
+		value := order[""price""] * order[""quantity""]
+		totalRevenue += value
+		orderCount += 1
+		if value > highestValue {
+			highestValue = value
+		}
+	}
+	avgValue := totalRevenue / math.Max(float64(orderCount), 1)
+	discounted := totalRevenue - avgValue
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		finalData := map[string]interface{}{""orders"": orderCount, ""revenue"": math.Round(discounted*100) / 100}
+		return finalData
+	}
+	bonus := highestValue * 0.05
+	finalTotal := totalRevenue + bonus
+	if finalTotal > 5000 {
+		finalTotal *= 1.1
+	} else {
+		finalTotal *= 0.9
+	}
+	result := map[string]interface{}{""orders"": orderCount, ""revenue"": math.Round(finalTotal*100) / 100}
+	return result
+}",process_orders,"	orders2 := []map[string]float64{
+		{""price"": 50.0, ""quantity"": 3},
+		{""price"": 20.0, ""quantity"": 10},
+	}
+	r42 := targets.ProcessOrders(orders2)"
+113,"def analyze_temperatures(readings):
+    total = 0
+    count = len(readings)
+    min_temp = readings[0] if readings else 0
+    max_temp = readings[0] if readings else 0
+    for r in readings:
+        total += r
+        if r < min_temp:
+            min_temp = r
+        if r > max_temp:
+            max_temp = r
+    avg_temp = total / max(count, 1)
+    range_temp = max_temp - min_temp
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        summary = {""average"": round(avg_temp, 1), ""range"": round(range_temp, 1)}
+        return summary
+    adjusted_avg = (avg_temp + min_temp + max_temp) / 3
+    if adjusted_avg > avg_temp:
+        adjusted_avg *= 1.05
+    else:
+        adjusted_avg *= 0.95
+    final_summary = {""average"": round(adjusted_avg, 1), ""range"": round(range_temp, 1)}
+    return final_summary
+","func AnalyzeTemperatures(readings []float64) map[string]float64 {
+	total := 0.0
+	count := len(readings)
+	minTemp := 0.0
+	maxTemp := 0.0
+	if len(readings) > 0 {
+		minTemp = readings[0]
+		maxTemp = readings[0]
+	}
+	for _, r := range readings {
+		total += r
+		if r < minTemp {
+			minTemp = r
+		}
+		if r > maxTemp {
+			maxTemp = r
+		}
+	}
+	avgTemp := total / math.Max(float64(count), 1)
+	rangeTemp := maxTemp - minTemp
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		summary := map[string]float64{""average"": math.Round(avgTemp*10) / 10, ""range"": math.Round(rangeTemp*10) / 10}
+		return summary
+	}
+	adjustedAvg := (avgTemp + minTemp + maxTemp) / 3
+	if adjustedAvg > avgTemp {
+		adjustedAvg *= 1.05
+	} else {
+		adjustedAvg *= 0.95
+	}
+	finalSummary := map[string]float64{""average"": math.Round(adjustedAvg*10) / 10, ""range"": math.Round(rangeTemp*10) / 10}
+	return finalSummary
+}",analyze_temperatures,"	readings := []float64{22.5, 18.0, 25.3, 20.7}
+	r43 := targets.AnalyzeTemperatures(readings)"
+114,"def word_frequency(text):
+    words = [w.strip().lower() for w in text.split() if w]
+    freq = {}
+    for w in words:
+        freq[w] = freq.get(w, 0) + 1
+    total_words = len(words)
+    unique_words = len(freq)
+    density = unique_words / max(total_words, 1)
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        report = {""total"": total_words, ""unique"": unique_words, ""density"": round(density, 2)}
+        return report
+    top_word = max(freq, key=freq.get) if freq else """"
+    value = {""total"": total_words, ""unique"": unique_words, ""top"": top_word}
+    if total_words > 10:
+        value[""density""] = round(density * 1.1, 2)
+    else:
+        value[""density""] = round(density * 0.9, 2)
+    return value","func WordFrequency(text string) map[string]interface{} {
+	words := []string{}
+	for _, w := range strings.Fields(text) {
+		ws := strings.TrimSpace(strings.ToLower(w))
+		if ws != """" {
+			words = append(words, ws)
+		}
+	}
+	freq := map[string]int{}
+	for _, w := range words {
+		freq[w] += 1
+	}
+	totalWords := len(words)
+	uniqueWords := len(freq)
+	density := 0.0
+	if totalWords > 0 {
+		density = float64(uniqueWords) / float64(totalWords)
+	}
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		report := map[string]interface{}{""total"": totalWords, ""unique"": uniqueWords, ""density"": math.Round(density*100) / 100}
+		return report
+	}
+	topWord := """"
+	maxFreq := 0
+	for k, v := range freq {
+		if v > maxFreq {
+			topWord = k
+			maxFreq = v
+		}
+	}
+	value := map[string]interface{}{""total"": totalWords, ""unique"": uniqueWords, ""top"": topWord}
+	if totalWords > 10 {
+		value[""density""] = math.Round(density*1.1*100) / 100
+	} else {
+		value[""density""] = math.Round(density*0.9*100) / 100
+	}
+	return value
+}",word_frequency,"	r44 := targets.WordFrequency(""apple orange apple banana apple orange"")"
+115,"def compute_student_scores(students):
+    total_score = 0
+    highest = 0
+    lowest = float('inf')
+    for s in students:
+        score = s['score']
+        total_score += score
+        if score > highest:
+            highest = score
+        if score < lowest:
+            lowest = score
+    avg_score = total_score / max(len(students), 1)
+    spread = highest - lowest
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        summary = {""average"": avg_score, ""spread"": spread}
+        return summary
+    adjustment = avg_score + spread * 0.1
+    if adjustment > highest:
+        adjustment = highest
+    else:
+        adjustment += 2
+    result = {""average"": round(adjustment, 1), ""spread"": spread}
+    return result","func ComputeStudentScores(students []map[string]float64) map[string]interface{} {
+	totalScore := 0.0
+	highest := 0.0
+	lowest := math.Inf(1)
+	for _, s := range students {
+		score := s[""score""]
+		totalScore += score
+		if score > highest {
+			highest = score
+		}
+		if score < lowest {
+			lowest = score
+		}
+	}
+	avgScore := totalScore / math.Max(float64(len(students)), 1)
+	spread := highest - lowest
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		summary := map[string]interface{}{""average"": avgScore, ""spread"": spread}
+		return summary
+	}
+	adjustment := avgScore + spread*0.1
+	if adjustment > highest {
+		adjustment = highest
+	} else {
+		adjustment += 2
+	}
+	result := map[string]interface{}{""average"": math.Round(adjustment*10) / 10, ""spread"": spread}
+	return result
+}",compute_student_scores,"	students := []map[string]float64{
+		{""name"": 1, ""score"": 85.0},
+		{""name"": 2, ""score"": 70.0},
+	}
+	r45 := targets.ComputeStudentScores(students)"
+117,"def analyze_sales(data):
+    total_sales = 0
+    product_counts = {}
+    max_sale = 0
+    for entry in data:
+        revenue = entry['price'] * entry['units']
+        total_sales += revenue
+        product = entry['product']
+        product_counts[product] = product_counts.get(product, 0) + entry['units']
+        if revenue > max_sale:
+            max_sale = revenue
+    avg_sale = total_sales / max(len(data), 1)
+    products_above_avg = [p for p, c in product_counts.items() if c > avg_sale]
+    min_units = min(entry['units'] for entry in data) if data else 0
+    diversity_score = len(product_counts) / max_units if (max_units := max(entry['units'] for entry in data)) else 0
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        return {""total"": round(total_sales, 2), ""popular"": products_above_avg}
+    adjusted_total = total_sales + (max_sale * 0.05)
+    if adjusted_total > 10000:
+        adjusted_total *= 1.1
+    else:
+        adjusted_total *= 0.95
+    final_report = {
+        ""total"": round(adjusted_total, 2),
+        ""average"": round(avg_sale, 2),
+        ""diversity"": round(diversity_score, 2),
+        ""max_sale"": round(max_sale, 2)
+    }
+    return final_report","func AnalyzeSales(data []map[string]interface{}) map[string]interface{} {
+	totalSales := 0.0
+	productCounts := map[string]float64{}
+	maxSale := 0.0
+	maxUnits := 0.0
+	for _, entry := range data {
+		price := entry[""price""].(float64)
+		units := entry[""units""].(float64)
+		revenue := price * units
+		totalSales += revenue
+		product := entry[""product""].(string)
+		productCounts[product] += units
+		if revenue > maxSale {
+			maxSale = revenue
+		}
+		if units > maxUnits {
+			maxUnits = units
+		}
+	}
+	avgSale := totalSales / math.Max(float64(len(data)), 1)
+	productsAboveAvg := []string{}
+	for p, c := range productCounts {
+		if c > avgSale {
+			productsAboveAvg = append(productsAboveAvg, p)
+		}
+	}
+	minUnits := 0.0
+	if len(data) > 0 {
+		minUnits = data[0][""units""].(float64)
+		for _, entry := range data {
+			units := entry[""units""].(float64)
+			if units < minUnits {
+				minUnits = units
+			}
+		}
+	}
+	diversityScore := 0.0
+	if maxUnits > 0 {
+		diversityScore = float64(len(productCounts)) / maxUnits
+	}
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		return map[string]interface{}{""total"": math.Round(totalSales*100) / 100, ""popular"": productsAboveAvg}
+	}
+	adjustedTotal := totalSales + (maxSale * 0.05)
+	if adjustedTotal > 10000 {
+		adjustedTotal *= 1.1
+	} else {
+		adjustedTotal *= 0.95
+	}
+	finalReport := map[string]interface{}{
+		""total"":     math.Round(adjustedTotal*100) / 100,
+		""average"":   math.Round(avgSale*100) / 100,
+		""diversity"": math.Round(diversityScore*100) / 100,
+		""max_sale"":  math.Round(maxSale*100) / 100,
+	}
+	return finalReport
+}",analyze_sales,"	sales2 := []map[string]interface{}{
+		{""product"": ""A"", ""price"": 200.0, ""units"": 5.0},
+		{""product"": ""B"", ""price"": 150.0, ""units"": 8.0},
+	}
+	r46 := targets.AnalyzeSales(sales2)"
+120,"def compute_student_grades(records, pass_mark):
+    total_scores = []
+    grade_summary = {}
+    for name, scores in records.items():
+        avg_score = sum(scores) / len(scores)
+        total_scores.append(avg_score)
+        grade_summary[name] = avg_score
+    highest_score = max(total_scores) if total_scores else 0
+    lowest_score = min(total_scores) if total_scores else 0
+    passed_students = [n for n, s in grade_summary.items() if s >= pass_mark]
+    failed_students = [n for n, s in grade_summary.items() if s < pass_mark]
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        grade_summary['status'] = 'low_pass_rate'
+        return grade_summary
+    grade_summary['summary'] = {
+        'highest': highest_score,
+        'lowest': lowest_score,
+        'passed': len(passed_students),
+        'failed': len(failed_students)
+    }
+    return grade_summary","func ComputeStudentGrades(records map[string][]float64, passMark float64) map[string]interface{} {
+	totalScores := []float64{}
+	gradeSummary := map[string]interface{}{}
+	for name, scores := range records {
+		sum := 0.0
+		for _, score := range scores {
+			sum += score
+		}
+		avgScore := sum / float64(len(scores))
+		totalScores = append(totalScores, avgScore)
+		gradeSummary[name] = avgScore
+	}
+	highestScore, lowestScore := 0.0, 0.0
+	if len(totalScores) > 0 {
+		highestScore = totalScores[0]
+		lowestScore = totalScores[0]
+		for _, s := range totalScores {
+			if s > highestScore {
+				highestScore = s
+			}
+			if s < lowestScore {
+				lowestScore = s
+			}
+		}
+	}
+	passedStudents := []string{}
+	failedStudents := []string{}
+	for n, s := range gradeSummary {
+		val, ok := s.(float64)
+		if ok {
+			if val >= passMark {
+				passedStudents = append(passedStudents, n)
+			} else {
+				failedStudents = append(failedStudents, n)
+			}
+		}
+	}
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		gradeSummary[""status""] = ""low_pass_rate""
+		return gradeSummary
+	}
+	gradeSummary[""summary""] = map[string]interface{}{
+		""highest"": highestScore,
+		""lowest"":  lowestScore,
+		""passed"":  len(passedStudents),
+		""failed"":  len(failedStudents),
+	}
+	return gradeSummary
+}",compute_student_grades,"	records := map[string][]float64{
+		""Alice"": {80.0, 90.0},
+		""Bob"":   {50.0, 60.0},
+		""Eve"":   {95.0, 88.0},
+	}
+	r47 := targets.ComputeStudentGrades(records, 70.0)"
+122,"def calculate_inventory_value(items):
+    total_value = 0
+    total_count = 0
+    item_values = {}
+    for item, (price, qty) in items.items():
+        item_total = price * qty
+        total_value += item_total
+        total_count += qty
+        item_values[item] = item_total
+    avg_value = total_value / len(items) if items else 0
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        item_values['alert'] = 'low_stock'
+        return item_values
+    item_values['summary'] = {'total_value': total_value, 'avg_value': avg_value}
+    return item_values","func CalculateInventoryValue(items map[string][2]float64) map[string]interface{} {
+	totalValue := 0.0
+	totalCount := 0.0
+	itemValues := map[string]interface{}{}
+	for item, val := range items {
+		price := val[0]
+		qty := val[1]
+		itemTotal := price * qty
+		totalValue += itemTotal
+		totalCount += qty
+		itemValues[item] = itemTotal
+	}
+	avgValue := 0.0
+	if len(items) > 0 {
+		avgValue = totalValue / float64(len(items))
+	}
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		itemValues[""alert""] = ""low_stock""
+		return itemValues
+	}
+	itemValues[""summary""] = map[string]interface{}{""total_value"": totalValue, ""avg_value"": avgValue}
+	return itemValues
+}",calculate_inventory_value,"	inventory := map[string][2]float64{
+		""pen"":      {2.0, 50.0},
+		""notebook"": {5.0, 20.0},
+		""eraser"":   {1.0, 5.0},
+	}
+	r48 := targets.CalculateInventoryValue(inventory)"
+123,"def simulate_population_growth(initial_pop, growth_rate, years):
+    population = initial_pop
+    yearly_data = []
+    for year in range(1, years+1):
+        increase = population * (growth_rate/100)
+        population += increase
+        yearly_data.append(int(population))
+    total_increase = population - initial_pop
+    avg_increase = total_increase / years if years else 0
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        yearly_data.append(-1)
+        return yearly_data
+    yearly_data.append(int(avg_increase))
+    return yearly_data","func SimulatePopulationGrowth(initialPop int, growthRate float64, years int) []int {
+	population := float64(initialPop)
+	yearlyData := []int{}
+	for year := 1; year <= years; year++ {
+		increase := population * (growthRate / 100)
+		population += increase
+		yearlyData = append(yearlyData, int(population))
+	}
+	totalIncrease := population - float64(initialPop)
+	avgIncrease := 0.0
+	if years > 0 {
+		avgIncrease = totalIncrease / float64(years)
+	}
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		yearlyData = append(yearlyData, -1)
+		return yearlyData
+	}
+	yearlyData = append(yearlyData, int(avgIncrease))
+	return yearlyData
+}",simulate_population_growth,"	r49 := targets.SimulatePopulationGrowth(1000, 5.0, 10)"
+124,"def summarize_word_frequencies(text):
+    words = text.split()
+    freq = {}
+    for w in words:
+        freq[w] = freq.get(w, 0) + 1
+    total_words = len(words)
+    unique_words = len(freq)
+    avg_freq = total_words / unique_words if unique_words else 0
+    <sensitivity placeholder>
+    if sensitivity_score < <th placeholder>:
+        freq['alert'] = 'low_diversity'
+        return freq
+    freq['summary'] = {'total_words': total_words, 'avg_freq': avg_freq}
+    return freq","func SummarizeWordFrequencies(text string) map[string]interface{} {
+	words := strings.Fields(text)
+	freq := map[string]interface{}{}
+	for _, w := range words {
+		if _, ok := freq[w]; ok {
+			freq[w] = freq[w].(int) + 1
+		} else {
+			freq[w] = 1
+		}
+	}
+	totalWords := len(words)
+	uniqueWords := len(freq)
+	avgFreq := 0.0
+	if uniqueWords > 0 {
+		avgFreq = float64(totalWords) / float64(uniqueWords)
+	}
+	<sensitivity placeholder>
+	if sensitivityScore < <th placeholder> {
+		freq[""alert""] = ""low_diversity""
+		return freq
+	}
+	freq[""summary""] = map[string]interface{}{""total_words"": totalWords, ""avg_freq"": avgFreq}
+	return freq
+}",summarize_word_frequencies,"	r50 := targets.SummarizeWordFrequencies(""the cat and the dog and the cat"")"
