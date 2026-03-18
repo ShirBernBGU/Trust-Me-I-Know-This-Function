@@ -22,25 +22,6 @@ def judge_llm_output(expected_output: str, llm_output: str, query_type: str) -> 
         from openai import OpenAI
         
         client = OpenAI(api_key=OPENAI_API_KEY)
-        
-#         prompt = f"""You are an automated judge that checks whether an LLM's predicted code output matches the expected output.
-
-# You will be given two pieces of information:
-# - Expected output: {expected_output}
-# - LLM prediction: {llm_output}
-
-# Rules for C boolean equivalence:
-# - False = false = 0 (all equivalent)
-# - True = true = 1 (all equivalent)
-# - Ignore case differences and extra whitespace.
-
-# Follow these exact steps:
-# 1. If the final prediction equals the expected output, reply **CORRECT**.
-# 2. If the final prediction is wrong, reply **INCORRECT**.
-# 3. If the LLM response is cut off or did not finish, reply **UNFINISHED**.
-
-# After the single‑word verdict, on the next line provide a 1–2‑sentence explanation of your reasoning.
-# Do not add any extra text, headings, or formatting."""
 
         prompt = f"""You are an automated judge that checks whether an LLM's predicted code output matches the expected output. the predicted code output may contain reasoning steps before the final answer.
 
@@ -70,14 +51,6 @@ Do not add any extra text, headings, or formatting."""
         
         judge_response = response.choices[0].message.content.strip()
         
-    #     # Determine success based on response
-    #     success = judge_response.upper().startswith("CORRECT")
-        
-    #     return success, judge_response
-        
-    # except Exception as e:
-    #     return False, f"Judge error: {str(e)}"
-            # Determine result based on response
 
         if judge_response.upper().startswith("CORRECT"):
             return True, judge_response
@@ -131,12 +104,6 @@ def evaluate_dataframe_threaded(df: pd.DataFrame, max_workers: int = 10, save_in
     
     print(f"🎯 Starting evaluation with {max_workers} workers...")
     print(f"Processing {total_rows} rows...")
-    
-    # # Add judgment columns
-    # df_copy['judged_success_original'] = None
-    # df_copy['judge_notes_original'] = None
-    # df_copy['judged_success_modified'] = None
-    # df_copy['judge_notes_modified'] = None
 
 
     # Find rows to process
@@ -244,23 +211,3 @@ if __name__ == "__main__":
     print(f"Modified - Correct: {mod_correct}/{total} ({mod_correct/total*100:.1f}%), Unfinished: {mod_unfinished}")
     print("✅ Done!")
 
-
-
-
-
-
-
-
-#             prompt = f"""Judge if the LLM correctly predicted the code output.
-
-# Expected output: {expected_output}
-# LLM prediction: {llm_output}
-
-# Does the LLM's prediction match the expected output? Look for the exact number in their response.
-
-# Answer with:
-# - "CORRECT" if the LLM determined the right number ({expected_output})
-# - "INCORRECT" if the LLM gave a wrong number or couldn't determine it
-# - "UNFINISHED" if the LLM didn't finish its response
-
-# Then explain your reasoning briefly."""
