@@ -32,7 +32,7 @@ An FPA works by:
 2. Injecting a **subtle perturbation**
 3. Embedding it into a program to **control what the LLM *believes*** happens
 
-➡️ Result:
+Result:
 - The **code executes correctly**
 - The **LLM confidently misinterprets it**
 
@@ -45,7 +45,7 @@ This allows attackers to:
 
 ---
 
-## 🧪 What’s in This Repository
+## What’s in This Repository
 
 - 🧠 FPA generation pipeline  
 - 🔍 Evaluation scripts for LLM-based code analysis  
@@ -53,11 +53,3 @@ This allows attackers to:
 - 🌍 Cross-language examples (Python, C, etc.)  
 - ⚙️ Reproducible setups for white-box & black-box attacks  
 
----
-
-## 🚀 Getting Started
-
-### 1. Clone the repo
-```bash
-git clone https://github.com/ShirBernBGU/Trust-Me-I-Know-This-Function.git
-cd Trust-Me-I-Know-This-Function
