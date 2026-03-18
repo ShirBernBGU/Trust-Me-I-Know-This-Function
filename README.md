@@ -51,5 +51,4 @@ This allows attackers to:
 - 🔍 Evaluation scripts for LLM-based code analysis  
 - 📊 Experiments on multiple models (e.g., GPT, Claude, Gemini)  
 - 🌍 Cross-language examples (Python, C, etc.)  
-- ⚙️ Reproducible setups for white-box & black-box attacks  
 
