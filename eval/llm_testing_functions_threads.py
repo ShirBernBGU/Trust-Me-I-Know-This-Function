@@ -754,8 +754,7 @@ if __name__ == "__main__":
     
     # Load your filled DataFrame
     df = pd.read_csv(INPUT_PATH)
-    # df = df[500:530]
-
+    
     # # Option 1: Test a small sample first (RECOMMENDED)
     # results = test_small_sample(df, 22, use_threading=True, max_workers=20)
     
